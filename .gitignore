@@ -1,4 +1,4 @@
 # .gitignore
 
 dist
-./src/malloy.egg-info/*
+src/malloy.egg-info/*
