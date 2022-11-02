@@ -31,7 +31,7 @@ Github = "https://github.com/malloydata/malloy-py"
 malloy = "malloy.__main__:main"
 
 [tool.bumpver]
-current_version = "2022.1002-alpha"
+current_version = "2022.1003-alpha"
 version_pattern = "YYYY.BUILD[-TAG]"
 commit_message = "bump version {old_version} -> {new_version}"
 commit = true

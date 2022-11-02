@@ -1,4 +1,4 @@
 # __init__.py
 
 # Version of the python malloy package
-__version__ = "2022.1001-alpha"
+__version__ = "2022.1003-alpha"
