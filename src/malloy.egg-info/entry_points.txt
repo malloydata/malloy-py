@@ -1,0 +1,2 @@
+[console_scripts]
+malloy = malloy.__main__:main

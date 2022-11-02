@@ -1,0 +1,13 @@
+LICENSE
+MANIFEST.in
+README.md
+pyproject.toml
+src/malloy/__init__.py
+src/malloy/__main__.py
+src/malloy/runtime.py
+src/malloy.egg-info/PKG-INFO
+src/malloy.egg-info/SOURCES.txt
+src/malloy.egg-info/dependency_links.txt
+src/malloy.egg-info/entry_points.txt
+src/malloy.egg-info/requires.txt
+src/malloy.egg-info/top_level.txt
