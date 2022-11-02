@@ -9,12 +9,13 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 
-# __main__.py
+# __init__.py
 
-def main():
-    """Malloy Python Runtime Library"""
+from malloy.data.connection import ConnectionInterface
+from malloy.data.connection_manager import ConnectionManagerInterface, DefaultConnectionManager
 
-    print("Hello Python")
-
-if __name__ == "__main__":
-    main()
+__all__ = [
+    "ConnectionInterface",
+    "ConnectionManagerInterface",
+    "DefaultConnectionManager"
+]

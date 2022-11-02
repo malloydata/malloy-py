@@ -14,10 +14,12 @@ license = { file = "LICENSE" }
 classifiers = [
     "Development Status :: 1 - Planning",
     "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
-    "Programming Language :: Python :: 3"
+    "Programming Language :: Python :: 3",
 ]
 keywords = ["malloy"]
 dependencies = [
+    "duckdb",
+    "google-cloud-bigquery"
 ]
 requires-python = ">3.9"
 

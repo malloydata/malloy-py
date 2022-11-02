@@ -9,12 +9,10 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 
-# __main__.py
+# __init__.py
 
-def main():
-    """Malloy Python Runtime Library"""
+from malloy.data.bigquery.bq_connection import BigQueryConnection
 
-    print("Hello Python")
-
-if __name__ == "__main__":
-    main()
+__all__ = [
+    "BigQueryConnection"
+]
