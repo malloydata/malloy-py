@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "malloy"
-version = "0.0.1"
+version = "2022.1001-alpha"
 description = "Malloy is an experimental language for describing data relationships and transformations"
 readme = "README.md"
 # authors = [{name="", email=""}]
