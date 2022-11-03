@@ -10,4 +10,8 @@ steps:
   - name: "docker.io/library/python:3.9"
     entrypoint: "/builder/home/.local/bin/pip-sync"
 
+  - name: "docker.io/library/python:3.9"
+    entrypoint: "python"
+    args: ["-m", "pytest", "--junitxml=${SHORT_SHA}_test_log.xml"] 
+    
 timeout: "300s"
