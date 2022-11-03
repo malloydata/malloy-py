@@ -3,4 +3,3 @@
 dist
 malloy.egg-info
 .pytest_cache
-requirements.txt

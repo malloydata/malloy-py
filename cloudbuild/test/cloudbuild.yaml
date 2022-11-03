@@ -1,22 +1,10 @@
 steps:
   - name: "python"
     entrypoint: "python"
-    args: ["-m", "venv", ".venv"]
-
-  - name: "python"
-    entrypoint: "source"
-    args: [".venv/bin/activate"]
-
-  - name: "python"
-    entrypoint: "python"
     args: ["-m", "pip", "install", "--upgrade", "pip"]
 
   - name: "python"
     entrypoint: "python"
-    args: ["-m", "pip", "install", "pip-tools", "--user"]
-
-  - name: "python"
-    entrypoint: "/builder/home/.local/bin/pip-compile"
-    args: ["--extra=dev", "pyproject.toml"]
+    args: ["-m", "pip", "install", "-r", "requirements.dev.txt", "--user"]
 
 timeout: "300s"
