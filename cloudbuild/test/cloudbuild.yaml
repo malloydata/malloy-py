@@ -1,14 +1,13 @@
 steps:
   - name: "docker.io/library/python:3.9"
     entrypoint: "python"
-    args: ["-m", "venv", "/opt/venv"]
-
-  - name: "docker.io/library/python:3.9"
-    entrypoint: "/opt/venv/bin/python"
     args: ["-m", "pip", "install", "--upgrade", "pip"]
 
   - name: "docker.io/library/python:3.9"
-    entrypoint: "/opt/venv/bin/python"
+    entrypoint: "python"
     args: ["-m", "pip", "install", "pip-tools", "--user"]
+
+  - name: "docker.io/library/python:3.9"
+    entrypoint: "/builder/home/.local/bin/pip-sync"
 
 timeout: "300s"
