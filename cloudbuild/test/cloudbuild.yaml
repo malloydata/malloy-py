@@ -1,14 +1,14 @@
 steps:
-  - name: python
-    entrypoint: python
+  - name: "python"
+    entrypoint: "python"
     args: ["-m", "pip", "install", "--upgrade", "pip"]
 
-  - name: python
-    entrypoint: python
+  - name: "python"
+    entrypoint: "python"
     args: ["-m", "pip", "install", "pip-tools", "--user"]
 
-  - name: python
-    entrypoint: pip-compile
+  - name: "python"
+    entrypoint: "/builder/home/.local/bin/pip-compile"
     args: ["--extra=dev", "pyproject.toml"]
 
 timeout: "300s"
