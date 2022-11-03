@@ -95,11 +95,15 @@ class DuckDbConnection(ConnectionInterface):
         fields = []
         for metadata in schema:
             field = {'name': metadata[0]}
-            if (metadata[1] in self.TYPE_MAP.keys()):
-                field |= self.TYPE_MAP[metadata[1]]
+            field_type = metadata[1]
+            # DECIMAL type includes precision ex. DECIMAL(18,3)
+            if field_type.startswith('DECIMAL'): 
+                field_type = 'DECIMAL'
+            if (field_type in self.TYPE_MAP.keys()):
+                field |= self.TYPE_MAP[field_type]
             else:
-                self._log.warn("Field type not mapped: {}".format(
-                    metadata[1]))
+                self._log.warning("Field type not mapped: {}".format(
+                    field_type))
             fields.append(field)
 
         return fields
