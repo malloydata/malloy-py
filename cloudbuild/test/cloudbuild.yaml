@@ -1,6 +1,14 @@
 steps:
   - name: "python"
     entrypoint: "python"
+    args: ["-m", "venv", ".venv"]
+
+  - name: "python"
+    entrypoint: "source"
+    args: [".venv/bin/activate"]
+
+  - name: "python"
+    entrypoint: "python"
     args: ["-m", "pip", "install", "--upgrade", "pip"]
 
   - name: "python"
