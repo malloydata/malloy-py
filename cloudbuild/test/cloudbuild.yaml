@@ -1,0 +1,14 @@
+steps:
+  - name: python
+    entrypoint: python
+    args: ["-m", "pip", "install", "--upgrade", "pip"]
+
+  - name: python
+    entrypoint: python
+    args: ["-m", "pip", "install", "piptools", "--user"]
+
+  - name: python
+    entrypoint: pip-compile
+    args: ["--extra=dev", "pyproject.toml"]
+    
+timeout: "300s"
