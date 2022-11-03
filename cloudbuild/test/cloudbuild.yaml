@@ -1,13 +1,13 @@
 steps:
-  - name: "python"
+  - name: "docker.io/library/python:3.9"
     entrypoint: "python"
     args: ["-m", "pip", "install", "--upgrade", "pip"]
 
-  - name: "python"
+  - name: "docker.io/library/python:3.9"
     entrypoint: "python"
     args: ["-m", "pip", "install", "pip-tools", "--user"]
 
-  - name: "python"
+  - name: "docker.io/library/python:3.9"
     entrypoint: "/builder/home/.local/bin/pip-sync"
 
 timeout: "300s"
