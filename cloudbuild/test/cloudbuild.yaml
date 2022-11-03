@@ -8,8 +8,8 @@ steps:
     args: ["-m", "pip", "install", "pip-tools", "--user"]
 
   - name: "docker.io/library/python:3.9"
-    entrypoint: "/builder/home/.local/bin/pip-sync"
-    args: ["requirements.dev.txt"]
+    entrypoint: "python"
+    args: ["-m", "pip", "install", "-r", "requirements.dev.txt", "--user"]
 
   - name: "docker.io/library/python:3.9"
     entrypoint: "python"
