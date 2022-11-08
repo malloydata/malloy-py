@@ -113,10 +113,12 @@ class DuckDbConnection(ConnectionInterface):
             'type': 'string'
         },
         'BIGINT': {
-            'type': 'number'
+            'type': 'number',
+            'numberType': 'integer'
         },
         'DOUBLE': {
-            'type': 'number'
+            'type': 'number',
+            'numberType': 'float'
         },
         'DATE': {
             'type': 'date'
@@ -128,12 +130,14 @@ class DuckDbConnection(ConnectionInterface):
             'type': 'string'
         },
         'DECIMAL': {
-            'type': 'number'
+            'type': 'number',
+            'numberType': 'float'
         },
         'BOOLEAN': {
             'type': 'boolean'
         },
         'INTEGER': {
-            'type': 'number'
+            'type': 'number',
+            'numberType': 'integer'
         },
     }

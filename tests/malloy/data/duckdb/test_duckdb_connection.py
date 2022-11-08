@@ -35,19 +35,19 @@ def test_creates_connection_with_search_path():
     assert fetch_setting(conn, 'FILE_SEARCH_PATH') == dir_str()
 
 type_test_data = [
-    ('varchar_col_1', 'string'),
-    ('bigint_col_1', 'number'),
-    ('double_col_1', 'number'),
-    ('date_col_1', 'date'),     
-    ('timestamp_col_1', 'timestamp'),
-    ('time_col_1', 'string'),   
-    ('decimal_col_1', 'number'),
-    ('boolean_col_1', 'boolean'),
-    ('integer_col_1', 'number'),
+    ('varchar_col_1', 'string', None),
+    ('bigint_col_1', 'number', 'integer'),
+    ('double_col_1', 'number', 'float'),
+    ('date_col_1', 'date', None),     
+    ('timestamp_col_1', 'timestamp', None),
+    ('time_col_1', 'string', None),   
+    ('decimal_col_1', 'number', 'float'),
+    ('boolean_col_1', 'boolean', None),
+    ('integer_col_1', 'number', 'integer'),
 ]
 
-@pytest.mark.parametrize("field_name,expected_type", type_test_data)
-def test_maps_db_types(field_name, expected_type):
+@pytest.mark.parametrize("field_name,expected_type,expected_num_type", type_test_data)
+def test_maps_db_types(field_name, expected_type, expected_num_type):
     duckdb = DuckDbConnection()
     init_test_table(duckdb)
 
@@ -58,6 +58,8 @@ def test_maps_db_types(field_name, expected_type):
     assert field is not None, ("Database column not found: {}".format(field_name))
     assert field['name'] == field_name
     assert field['type'] == expected_type
+    if expected_num_type is not None:
+        assert field['numberType'] == expected_num_type
 
 # Utility Methods
 def dir():
