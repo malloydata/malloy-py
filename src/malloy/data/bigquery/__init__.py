@@ -13,6 +13,4 @@
 
 from malloy.data.bigquery.bq_connection import BigQueryConnection
 
-__all__ = [
-    "BigQueryConnection"
-]
+__all__ = ["BigQueryConnection"]

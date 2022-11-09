@@ -117,6 +117,8 @@ six==1.16.0
     #   google-auth
     #   grpcio
     #   python-dateutil
+toml==0.10.2
+    # via malloy (pyproject.toml)
 tomli==2.0.1
     # via
     #   build
@@ -126,6 +128,8 @@ urllib3==1.26.12
     # via requests
 wheel==0.37.1
     # via pip-tools
+yapf==0.32.0
+    # via malloy (pyproject.toml)
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip

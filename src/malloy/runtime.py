@@ -29,13 +29,16 @@ from malloy.service import ServiceManager
 from malloy.services.v1.compiler_pb2_grpc import CompilerStub
 from malloy.services.v1.compiler_pb2 import CompileRequest, CompileDocument, CompilerRequest
 
+
 class Runtime():
     ready_state = [grpc.ChannelConnectivity.READY]
     error_state = [grpc.ChannelConnectivity.TRANSIENT_FAILURE]
-
     """Malloy runtime class for loading, compiling, and running .malloy files"""
 
-    def __init__(self, connection_manager: ConnectionManagerInterface=DefaultConnectionManager(), service_manager=ServiceManager()):
+    def __init__(self,
+                 connection_manager:
+                 ConnectionManagerInterface = DefaultConnectionManager(),
+                 service_manager=ServiceManager()):
         self._log = logging.getLogger(__name__)
         self._connection_manager = connection_manager
         self._service_manager = service_manager
@@ -45,12 +48,13 @@ class Runtime():
     def __enter__(self):
         self._was_entered = True
         return self
-    
+
     def __exit__(self, type, value, traceback):
         self._service_manager._kill_service()
         self._was_entered = False
 
     """Add connection to use when referenced by malloy source files."""
+
     def add_connection(self, connection: ConnectionInterface) -> Runtime:
         self._connection_manager.add_connection(connection)
         return self
@@ -78,13 +82,15 @@ class Runtime():
 
     async def get_sql(self, named_query=None, query=None):
         if named_query is None and query is None:
-            self._log.error("Parameter named_query or query is required to get_sql()")
+            self._log.error(
+                "Parameter named_query or query is required to get_sql()")
             return
 
         service = await self._service_manager.get_service()
 
         if not self._service_manager.is_ready():
-            self._log.error("Service manager failed to report ready state, compile ending")
+            self._log.error(
+                "Service manager failed to report ready state, compile ending")
             return
 
         self._log.debug("Using compiler service: {}".format(service))
@@ -111,7 +117,8 @@ class Runtime():
         if sql is None:
             return None
 
-        return self._connection_manager.get_connection(connection).run_query(sql)
+        return self._connection_manager.get_connection(connection).run_query(
+            sql)
 
     def __aiter__(self):
         return self
@@ -128,7 +135,8 @@ class Runtime():
             self._compile_completed.set()
             raise StopAsyncIteration
 
-        while not self._compile_completed.is_set() and self._last_response is None:
+        while not self._compile_completed.is_set(
+        ) and self._last_response is None:
             await self._parse_response()
 
         if self._compile_completed.is_set():
@@ -146,7 +154,7 @@ class Runtime():
                 request = self._generate_table_schema_request()
                 self._last_response = None
                 return request
-                
+
         except Exception as ex:
             self._log.error(ex)
             self._compile_completed.set()
@@ -172,21 +180,20 @@ class Runtime():
     def _generate_initial_compile_request(self):
         self._log.debug("Generating initial compile request")
         if self._is_file:
-            compile_request = CompileRequest(
-                type=CompileRequest.Type.COMPILE,
-                document=self._create_document(self._file_name)
-            )
+            compile_request = CompileRequest(type=CompileRequest.Type.COMPILE,
+                                             document=self._create_document(
+                                                 self._file_name))
         else:
-            compile_request = CompileRequest(
-                type=CompileRequest.Type.COMPILE,
-                document=self._create_document(self._file_name, internal=True)
-            )
+            compile_request = CompileRequest(type=CompileRequest.Type.COMPILE,
+                                             document=self._create_document(
+                                                 self._file_name,
+                                                 internal=True))
         if self._query_type == "query":
             compile_request.query = self._query
         else:
             compile_request.named_query = self._query
-        return compile_request;
-    
+        return compile_request
+
     def _generate_import_request(self):
         request = CompileRequest(type=CompileRequest.Type.REFERENCES)
         imports = []
@@ -206,17 +213,22 @@ class Runtime():
             else:
                 tables_per_connection_to_fetch[m.group(1)] = [m.group(2)]
 
-        self._log.debug("  fetching table schemas:\n{}".format(tables_per_connection_to_fetch))
-        combined_schemas = {"schemas":{}}
+        self._log.debug("  fetching table schemas:\n{}".format(
+            tables_per_connection_to_fetch))
+        combined_schemas = {"schemas": {}}
         for connection, tables in tables_per_connection_to_fetch.items():
             self._log.debug("  using connection: {}".format(connection))
             connection = self._connection_manager.get_connection(connection)
             # tables = tables_per_connection_to_fetch.get(connection)
             self._log.debug("  tables: {}".format(tables))
             schemas = connection.get_schema_for_tables(tables)
-            combined_schemas["schemas"] = {**combined_schemas["schemas"], **schemas["schemas"]}
+            combined_schemas["schemas"] = {
+                **combined_schemas["schemas"],
+                **schemas["schemas"]
+            }
 
-        request = CompileRequest(type=CompileRequest.Type.TABLE_SCHEMAS, schema=json.dumps(combined_schemas))
+        request = CompileRequest(type=CompileRequest.Type.TABLE_SCHEMAS,
+                                 schema=json.dumps(combined_schemas))
         return request
 
     def _create_document(self, path, internal=False):
@@ -225,7 +237,9 @@ class Runtime():
             filePath = path.removeprefix("{}/".format(self._file_name))
         url = "mlr://{}".format(path)
         if not internal:
-            return CompileDocument(url=url, content=Path(self._file_dir, filePath).read_text())
+            return CompileDocument(url=url,
+                                   content=Path(self._file_dir,
+                                                filePath).read_text())
         return CompileDocument(url=url, content=self._source)
 
     async def _parse_response(self):
@@ -235,14 +249,16 @@ class Runtime():
             self._log.error("No response received, ending session")
             return
 
-        last_response_hash = hashlib.md5(self._last_response.SerializeToString(deterministic=True)).digest()
+        last_response_hash = hashlib.md5(
+            self._last_response.SerializeToString(
+                deterministic=True)).digest()
         self._log.debug("Last Response ID: {}".format(last_response_hash))
 
         if last_response_hash in self._seen_responses:
             self._log.error("Request loop detected, ending session")
             self._compile_completed.set()
             return
-        
+
         self._seen_responses.append(last_response_hash)
 
         if self._last_response.type == CompilerRequest.Type.COMPLETE:
@@ -250,12 +266,10 @@ class Runtime():
             self._sql = self._last_response.content
             self._compile_completed.set()
             return
-        
+
         if self._last_response.type == CompilerRequest.Type.UNKNOWN:
             self._log.error(self._last_response.content)
             self._compile_completed.set()
             return
 
         self._log.debug(self._last_response)
-
-

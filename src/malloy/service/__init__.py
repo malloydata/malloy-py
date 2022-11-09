@@ -11,10 +11,6 @@
 
 # __init__.py
 
-from malloy.service.service_manager import (
-    ServiceManager
-)
+from malloy.service.service_manager import (ServiceManager)
 
-__all__ = [
-    "ServiceManager"
-]
+__all__ = ["ServiceManager"]

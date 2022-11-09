@@ -11,10 +11,6 @@
 
 # __init__.py
 
-from malloy.services.v1.compiler_pb2 import (
-    CompileRequest
-)
+from malloy.services.v1.compiler_pb2 import (CompileRequest)
 
-__all__ = [
-    "CompileRequest"
-]
+__all__ = ["CompileRequest"]

@@ -15,8 +15,9 @@ import abc
 import logging
 from collections.abc import Sequence
 from malloy.data.connection import ConnectionInterface
-
 """Manages a collection of connections required for compiling a malloy model."""
+
+
 class ConnectionManagerInterface(metaclass=abc.ABCMeta):
 
     @classmethod
@@ -25,18 +26,19 @@ class ConnectionManagerInterface(metaclass=abc.ABCMeta):
                 and callable(subclass.get_connection)
                 and hasattr(subclass, 'add_connection')
                 and callable(subclass.add_connection))
-    
+
     @abc.abstractmethod
     def get_connection(self, name: str) -> ConnectionInterface:
-        raise NotImplementedError 
-    
+        raise NotImplementedError
+
     @abc.abstractmethod
     def add_connection(self, connection: ConnectionInterface) -> None:
-        raise NotImplementedError 
+        raise NotImplementedError
 
-   
 
 """Default connection manager implementation, a basic mapping of connections to connection name."""
+
+
 class DefaultConnectionManager(ConnectionManagerInterface):
 
     def __init__(self):
@@ -51,4 +53,3 @@ class DefaultConnectionManager(ConnectionManagerInterface):
     def add_connection(self, connection: ConnectionInterface) -> None:
         self._log.debug("Adding connection: {}".format(connection.get_name()))
         self._connections[connection.get_name()] = connection
-        

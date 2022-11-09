@@ -15,15 +15,19 @@ class CompilerStub(object):
             channel: A grpc.Channel.
         """
         self.Compile = channel.unary_unary(
-                '/malloy.services.v1.Compiler/Compile',
-                request_serializer=services_dot_v1_dot_compiler__pb2.CompileRequest.SerializeToString,
-                response_deserializer=services_dot_v1_dot_compiler__pb2.CompileResponse.FromString,
-                )
+            '/malloy.services.v1.Compiler/Compile',
+            request_serializer=services_dot_v1_dot_compiler__pb2.
+            CompileRequest.SerializeToString,
+            response_deserializer=services_dot_v1_dot_compiler__pb2.
+            CompileResponse.FromString,
+        )
         self.CompileStream = channel.stream_stream(
-                '/malloy.services.v1.Compiler/CompileStream',
-                request_serializer=services_dot_v1_dot_compiler__pb2.CompileRequest.SerializeToString,
-                response_deserializer=services_dot_v1_dot_compiler__pb2.CompilerRequest.FromString,
-                )
+            '/malloy.services.v1.Compiler/CompileStream',
+            request_serializer=services_dot_v1_dot_compiler__pb2.
+            CompileRequest.SerializeToString,
+            response_deserializer=services_dot_v1_dot_compiler__pb2.
+            CompilerRequest.FromString,
+        )
 
 
 class CompilerServicer(object):
@@ -44,56 +48,65 @@ class CompilerServicer(object):
 
 def add_CompilerServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'Compile': grpc.unary_unary_rpc_method_handler(
-                    servicer.Compile,
-                    request_deserializer=services_dot_v1_dot_compiler__pb2.CompileRequest.FromString,
-                    response_serializer=services_dot_v1_dot_compiler__pb2.CompileResponse.SerializeToString,
-            ),
-            'CompileStream': grpc.stream_stream_rpc_method_handler(
-                    servicer.CompileStream,
-                    request_deserializer=services_dot_v1_dot_compiler__pb2.CompileRequest.FromString,
-                    response_serializer=services_dot_v1_dot_compiler__pb2.CompilerRequest.SerializeToString,
-            ),
+        'Compile':
+        grpc.unary_unary_rpc_method_handler(
+            servicer.Compile,
+            request_deserializer=services_dot_v1_dot_compiler__pb2.
+            CompileRequest.FromString,
+            response_serializer=services_dot_v1_dot_compiler__pb2.
+            CompileResponse.SerializeToString,
+        ),
+        'CompileStream':
+        grpc.stream_stream_rpc_method_handler(
+            servicer.CompileStream,
+            request_deserializer=services_dot_v1_dot_compiler__pb2.
+            CompileRequest.FromString,
+            response_serializer=services_dot_v1_dot_compiler__pb2.
+            CompilerRequest.SerializeToString,
+        ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'malloy.services.v1.Compiler', rpc_method_handlers)
-    server.add_generic_rpc_handlers((generic_handler,))
+        'malloy.services.v1.Compiler', rpc_method_handlers)
+    server.add_generic_rpc_handlers((generic_handler, ))
 
 
- # This class is part of an EXPERIMENTAL API.
+# This class is part of an EXPERIMENTAL API.
 class Compiler(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
     def Compile(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/malloy.services.v1.Compiler/Compile',
+                target,
+                options=(),
+                channel_credentials=None,
+                call_credentials=None,
+                insecure=False,
+                compression=None,
+                wait_for_ready=None,
+                timeout=None,
+                metadata=None):
+        return grpc.experimental.unary_unary(
+            request, target, '/malloy.services.v1.Compiler/Compile',
             services_dot_v1_dot_compiler__pb2.CompileRequest.SerializeToString,
             services_dot_v1_dot_compiler__pb2.CompileResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options, channel_credentials, insecure, call_credentials,
+            compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
     def CompileStream(request_iterator,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.stream_stream(request_iterator, target, '/malloy.services.v1.Compiler/CompileStream',
+                      target,
+                      options=(),
+                      channel_credentials=None,
+                      call_credentials=None,
+                      insecure=False,
+                      compression=None,
+                      wait_for_ready=None,
+                      timeout=None,
+                      metadata=None):
+        return grpc.experimental.stream_stream(
+            request_iterator, target,
+            '/malloy.services.v1.Compiler/CompileStream',
             services_dot_v1_dot_compiler__pb2.CompileRequest.SerializeToString,
             services_dot_v1_dot_compiler__pb2.CompilerRequest.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options, channel_credentials, insecure, call_credentials,
+            compression, wait_for_ready, timeout, metadata)

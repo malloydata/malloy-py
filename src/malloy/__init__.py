@@ -14,10 +14,6 @@
 # Version of the python malloy package
 __version__ = "2022.1003-alpha"
 
-from malloy.runtime import (
-    Runtime
-)
+from malloy.runtime import (Runtime)
 
-__all__ = [
-    "Runtime"
-]
+__all__ = ["Runtime"]

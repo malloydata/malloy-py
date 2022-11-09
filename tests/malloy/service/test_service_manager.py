@@ -17,16 +17,21 @@ from pathlib import Path
 
 from malloy.service import ServiceManager
 
+
 def test_is_ready_is_false_when_not_ready():
     sm = ServiceManager()
     assert sm.is_ready() == False
+
 
 def test_is_ready_is_false_when_external_service_not_ready():
     sm = ServiceManager(external_service="localhost:54321")
     assert sm.is_ready() == False
 
+
 @pytest.mark.asyncio
-@pytest.mark.skipif(not Path(ServiceManager.service_path()).exists(), reason="Could not find: {}".format(ServiceManager.service_path()))
+@pytest.mark.skipif(not Path(ServiceManager.service_path()).exists(),
+                    reason="Could not find: {}".format(
+                        ServiceManager.service_path()))
 async def test_returns_local_service():
     sm = ServiceManager()
     service = await sm.get_service()
@@ -35,6 +40,7 @@ async def test_returns_local_service():
     sm._kill_service()
     await asyncio.sleep(0.05)
 
+
 @pytest.mark.asyncio
 async def test_returns_external_service_if_provided():
     external_service = "localhost:54321"
@@ -42,6 +48,7 @@ async def test_returns_external_service_if_provided():
     service = await sm.get_service()
     assert sm.is_ready()
     assert service == external_service
+
 
 def test_kill_service_does_not_throw_if_no_proc_started():
     sm = ServiceManager()

@@ -14,25 +14,33 @@
 from malloy.data.connection import ConnectionInterface
 from malloy.data.connection_manager import ConnectionManagerInterface, DefaultConnectionManager
 
+
 class FakeConnection(ConnectionInterface):
+
     def __init__(self, name="Test-Connection"):
         self._name = name
+
     def get_name(self):
         return self._name
+
     def get_schema_for_tables(self, tables):
         pass
+
     def run_query(self, sql):
         pass
+
 
 def test_default_connection_manager_is_connection_manager():
     manager = DefaultConnectionManager()
     assert isinstance(manager, ConnectionManagerInterface)
+
 
 def test_adding_connection():
     manager = DefaultConnectionManager()
     connection = FakeConnection()
     manager.add_connection(connection)
     assert manager.get_connection(connection.get_name()) == connection
+
 
 def test_get_connection_by_name():
     manager = DefaultConnectionManager()

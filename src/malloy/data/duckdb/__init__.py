@@ -13,6 +13,4 @@
 
 from malloy.data.duckdb.duckdb_connection import DuckDbConnection
 
-__all__ = [
-    "DuckDbConnection"
-]
+__all__ = ["DuckDbConnection"]

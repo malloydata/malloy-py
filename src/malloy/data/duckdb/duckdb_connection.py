@@ -20,6 +20,7 @@ import duckdb
 import logging
 import re
 
+
 class DuckDbConnection(ConnectionInterface):
     _table_regex = re.compile('^duckdb:(.+)$')
 
@@ -33,7 +34,6 @@ class DuckDbConnection(ConnectionInterface):
             self._home_directory = Path(home_dir).resolve()
         self._con = None
         self._log.debug("DuckDbConnection('{}') initialized".format(name))
-
 
     def get_name(self) -> str:
         return self._name
@@ -63,8 +63,9 @@ class DuckDbConnection(ConnectionInterface):
         for table in tables:
             self._log.debug("Fetching {}".format(table))
             con.execute('DESCRIBE SELECT * FROM \'{}\''.format(table))
-            schema['schemas']["{}:{}".format(self.get_name(),table)] = self._to_struct_def(
-                table, con.fetchall())
+            schema['schemas']["{}:{}".format(self.get_name(),
+                                             table)] = self._to_struct_def(
+                                                 table, con.fetchall())
         return schema
 
     def run_query(self, sql: str):
@@ -96,13 +97,13 @@ class DuckDbConnection(ConnectionInterface):
             field = {'name': metadata[0]}
             field_type = metadata[1]
             # DECIMAL type includes precision ex. DECIMAL(18,3)
-            if field_type.startswith('DECIMAL'): 
+            if field_type.startswith('DECIMAL'):
                 field_type = 'DECIMAL'
             if (field_type in self.TYPE_MAP.keys()):
                 field |= self.TYPE_MAP[field_type]
             else:
-                self._log.warning("Field type not mapped: {}".format(
-                    field_type))
+                self._log.warning(
+                    "Field type not mapped: {}".format(field_type))
             fields.append(field)
 
         return fields

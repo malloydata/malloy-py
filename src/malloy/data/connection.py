@@ -13,8 +13,9 @@
 
 import abc
 from collections.abc import Sequence
-
 """An object capable of returning data needed for compiling a malloy source."""
+
+
 class ConnectionInterface(metaclass=abc.ABCMeta):
 
     @classmethod
@@ -25,10 +26,10 @@ class ConnectionInterface(metaclass=abc.ABCMeta):
                 and callable(subclass.run_query)
                 and hasattr(subclass, 'get_name')
                 and callable(subclass.get_name))
-    
+
     @abc.abstractmethod
     def get_name(self, sql: str):
-        raise NotImplementedError 
+        raise NotImplementedError
 
     @abc.abstractmethod
     def get_schema_for_tables(self, tables: Sequence[str]):

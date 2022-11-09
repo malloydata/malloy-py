@@ -21,7 +21,10 @@ from malloy import Runtime
 from malloy.service import ServiceManager
 from malloy.data.duckdb import DuckDbConnection
 
-pytestmark = pytest.mark.skipif(not Path(ServiceManager.service_path()).exists(), reason="Could not find: {}".format(ServiceManager.service_path()), allow_module_level=True)
+pytestmark = pytest.mark.skipif(
+    not Path(ServiceManager.service_path()).exists(),
+    reason="Could not find: {}".format(ServiceManager.service_path()),
+    allow_module_level=True)
 
 logging.basicConfig(level=logging.ERROR)
 
@@ -35,6 +38,7 @@ query: airports -> {
                 aggregate: airport_count
             }"""
 
+
 @pytest_asyncio.fixture(scope="module")
 async def service_manager():
     service_manager = ServiceManager()
@@ -43,20 +47,25 @@ async def service_manager():
     service_manager._kill_service()
     await asyncio.sleep(0.1)
 
+
 @pytest.fixture(scope="module")
 def event_loop():
     loop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop
     loop.close()
 
+
 @pytest.mark.asyncio
-async def test_logs_error_and_returns_none_if_file_not_found(caplog, service_manager):
+async def test_logs_error_and_returns_none_if_file_not_found(
+        caplog, service_manager):
     rt = Runtime(service_manager=service_manager)
     rt.add_connection(DuckDbConnection(home_dir=home_dir))
     rt.load_file(fake_file)
     sql = await rt.get_sql(query=query_by_state)
     assert sql is None
-    assert "[Errno 2] No such file or directory: '{}'".format(fake_file) in caplog.text
+    assert "[Errno 2] No such file or directory: '{}'".format(
+        fake_file) in caplog.text
+
 
 @pytest.mark.asyncio
 async def test_returns_sql(service_manager):
@@ -73,6 +82,7 @@ WHERE airports."state" IS NOT NULL
 GROUP BY 1
 ORDER BY 2 desc NULLS LAST
 """.lstrip()
+
 
 @pytest.mark.asyncio
 async def test_runs_sql(service_manager):
