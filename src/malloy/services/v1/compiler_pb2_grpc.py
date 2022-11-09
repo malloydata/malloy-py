@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-from services.v1 import compiler_pb2 as services_dot_v1_dot_compiler__pb2
+from malloy.services.v1 import compiler_pb2 as services_dot_v1_dot_compiler__pb2
 
 
 class CompilerStub(object):

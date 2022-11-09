@@ -44,7 +44,9 @@ class DefaultConnectionManager(ConnectionManagerInterface):
         self._connections = {}
 
     def get_connection(self, name: str) -> ConnectionInterface:
-        return self._connections[name]
+        if name in self._connections:
+            return self._connections.get(name)
+        self._log.error("Connection not found: {}".format(name))
 
     def add_connection(self, connection: ConnectionInterface) -> None:
         self._log.debug("Adding connection: {}".format(connection.get_name()))

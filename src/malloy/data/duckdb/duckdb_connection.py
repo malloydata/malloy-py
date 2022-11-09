@@ -24,7 +24,7 @@ class DuckDbConnection(ConnectionInterface):
     _table_regex = re.compile('^duckdb:(.+)$')
 
     def __init__(self, home_dir=None, name="duckdb"):
-        self._log = logging.getLogger(__name__)
+        self._log = logging.getLogger("{}({})".format(__name__, name))
         self._name = name
         self._client_options = None
         if home_dir is None:
@@ -62,9 +62,8 @@ class DuckDbConnection(ConnectionInterface):
         con = self.get_connection()
         for table in tables:
             self._log.debug("Fetching {}".format(table))
-            table_def = self._table_regex.match(table).group(1)
-            con.execute('DESCRIBE SELECT * FROM \'{}\''.format(table_def))
-            schema['schemas'][table] = self._to_struct_def(
+            con.execute('DESCRIBE SELECT * FROM \'{}\''.format(table))
+            schema['schemas']["{}:{}".format(self.get_name(),table)] = self._to_struct_def(
                 table, con.fetchall())
         return schema
 

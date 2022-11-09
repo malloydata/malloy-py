@@ -1,0 +1,41 @@
+// Copyright 2022 Google LLC
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// version 2 as published by the Free Software Foundation.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+
+// test_file_01.malloy
+
+source: airports is table('duckdb:data/airports.parquet') {
+  measure: airport_count is count()
+
+  query: by_state is {
+    where: state != null
+    group_by: state
+    aggregate: airport_count
+  }
+
+  query: by_facility_type is {
+    group_by: fac_type
+    aggregate:
+      airport_count
+      avg_elevation is elevation.avg()
+  }
+
+  query: airports_by_region_dashboard is {
+    group_by: faa_region
+    aggregate: airport_count
+    nest:
+      by_state_shape_map is by_state
+      by_facility_type
+  }
+
+  query: select_star is {
+    project: *
+  }
+}

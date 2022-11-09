@@ -46,3 +46,10 @@ push = true
     'version = "{version}"'
 ]
 "src/malloy/__init__.py" = ["{version}"]
+
+[tool.pytest.ini_options]
+# addopts = "--log-cli-level 10" #DEBUG
+# addopts = "--log-cli-level 20" #INFO
+# addopts = "--log-cli-level 30" #WARNING
+# addopts = "--log-cli-level 40" #ERROR
+# addopts = "--log-cli-level 50" #CRITICAL

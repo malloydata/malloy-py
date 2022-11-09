@@ -1,5 +1,9 @@
 # .gitignore
-
+.DS_store
 dist
 malloy.egg-info
 .pytest_cache
+test.py
+
+# Avoid checking in binaries
+/src/malloy/service/malloy-service-*
