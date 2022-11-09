@@ -80,7 +80,7 @@ class ServiceManager:
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.STDOUT)
 
-        service_listening = re.compile('^Server listening on (\d+)$')
+        service_listening = re.compile(r'^Server listening on (\d+)$')
         line = await self._proc.stdout.readline()
         if line is not None:
             sline = line.decode().rstrip()
