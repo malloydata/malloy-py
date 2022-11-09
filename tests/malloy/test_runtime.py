@@ -21,6 +21,8 @@ from malloy import Runtime
 from malloy.service import ServiceManager
 from malloy.data.duckdb import DuckDbConnection
 
+pytestmark = pytest.mark.skipif(not Path(ServiceManager.service_path()).exists(), reason="Could not find: {}".format(ServiceManager.service_path()), allow_module_level=True)
+
 logging.basicConfig(level=logging.ERROR)
 
 home_dir = "{}/test_data".format(Path(__file__).parent)

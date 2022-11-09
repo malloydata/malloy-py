@@ -13,6 +13,7 @@
 
 import pytest
 import asyncio
+from pathlib import Path
 
 from malloy.service import ServiceManager
 
@@ -25,6 +26,7 @@ def test_is_ready_is_false_when_external_service_not_ready():
     assert sm.is_ready() == False
 
 @pytest.mark.asyncio
+@pytest.mark.skipif(not Path(ServiceManager.service_path()).exists(), reason="Could not find: {}".format(ServiceManager.service_path()))
 async def test_returns_local_service():
     sm = ServiceManager()
     service = await sm.get_service()

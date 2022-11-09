@@ -17,6 +17,6 @@ steps:
 
   - name: "docker.io/library/python:3.9"
     entrypoint: "python"
-    args: ["-m", "pytest", "--junitxml=${SHORT_SHA}_test_log.xml"] 
+    args: ["-m", "pytest", "--junitxml=${SHORT_SHA}_test_log.xml", "-rxXs"] 
 
 timeout: "300s"

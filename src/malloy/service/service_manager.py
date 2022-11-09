@@ -23,6 +23,29 @@ from pathlib import Path
 class ServiceManager:
     _internal_service="localhost:14310"
 
+    @staticmethod
+    def service_path():
+        service_name = 'malloy-service'
+        system = platform.system()
+        if system == "Windows":
+            service_name += "-win32"
+        elif system == "Linux":
+            service_name += "-linux"
+        elif system == "Darwin":
+            service_name += "-macos"
+
+        arch = platform.machine()
+        if arch == "x86_64" or system == "Darwin":
+            service_name += "-x64"
+        elif arch == "arm64":
+            service_name += "-arm64"
+
+        if system == "Windows":
+            service_name += ".exe"
+        
+        service_path = "{}".format(Path(Path(__file__).parent, service_name).resolve())
+        return service_path
+
     def __init__(self, external_service=None):
         self._log = logging.getLogger(__name__)
         self._is_ready = asyncio.Event()
@@ -46,25 +69,7 @@ class ServiceManager:
             self._is_ready.set()
             return
 
-        service_name = 'malloy-service'
-        system = platform.system()
-        if system == "Windows":
-            service_name += "-win32"
-        elif system == "Linux":
-            service_name += "-linux"
-        elif system == "Darwin":
-            service_name += "-macos"
-
-        arch = platform.machine()
-        if arch == "x86_64" or system == "Darwin":
-            service_name += "-x64"
-        elif arch == "arm64":
-            service_name += "-arm64"
-
-        if system == "Windows":
-            service_name += ".exe"
-
-        service_path = "{}".format(Path(Path(__file__).parent, service_name).resolve())
+        service_path = ServiceManager.service_path()
         self._log.debug("Starting compiler service: {}".format(service_path))
 
         self._proc = await asyncio.create_subprocess_exec(
