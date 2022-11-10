@@ -32,6 +32,12 @@ Github = "https://github.com/malloydata/malloy-py"
 [project.scripts]
 malloy = "malloy.__main__:main"
 
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
 [tool.bumpver]
 current_version = "2022.1003-alpha"
 version_pattern = "YYYY.BUILD[-TAG]"
