@@ -29,7 +29,7 @@ class ServiceManager:
         service_name = 'malloy-service'
         system = platform.system()
         if system == "Windows":
-            service_name += "-win32"
+            service_name += "-win"
         elif system == "Linux":
             service_name += "-linux"
         elif system == "Darwin":
