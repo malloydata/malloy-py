@@ -12,13 +12,14 @@
 # service_manager.py
 
 import asyncio
-import grpc
 import logging
-import malloy.services.v1.compiler_pb2_grpc
 import platform
 import re
-
 from pathlib import Path
+
+import grpc
+
+import malloy.services.v1.compiler_pb2_grpc
 
 
 class ServiceManager:
