@@ -24,7 +24,7 @@ dependencies = [
 requires-python = ">3.9"
 
 [project.optional-dependencies]
-dev = ["pytest", "pip-tools", "pytest-asyncio", "pandas", "toml", "yapf"]
+dev = ["pytest", "pip-tools", "pytest-asyncio", "pandas", "toml", "yapf", "twine"]
 
 [project.urls]
 Github = "https://github.com/malloydata/malloy-py"
