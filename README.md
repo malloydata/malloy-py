@@ -1,4 +1,4 @@
-# Malloy
+![Malloy Logo](https://raw.githubusercontent.com/looker-open-source/malloy/main/docs/img/logo.png)
 
 ## What is it?
 
