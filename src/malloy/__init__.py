@@ -12,7 +12,7 @@
 # __init__.py
 
 # Version of the python malloy package
-__version__ = "2022.1005-alpha"
+__version__ = "2022.1006-alpha"
 
 from malloy.runtime import (Runtime)
 
