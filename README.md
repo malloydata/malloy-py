@@ -1,4 +1,4 @@
-![Malloy Logo](https://raw.githubusercontent.com/malloydata/malloy-py/main/assets/malloy_square.png)
+![Malloy Logo](https://raw.githubusercontent.com/malloydata/malloy-py/main/assets/malloy_square_centered.png)
 
 ## What is it?
 
