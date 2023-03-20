@@ -8,10 +8,10 @@ Malloy is an experimental language for describing data relationships and transfo
 
 ## How do I get it?
 
-Binary installers for the latest released version are available at the Python Package Index (PyPI).
+Binary installers for the latest released version are available at the Python Package Index (PyPI). (Currently only available through the test respository)
 
 ```sh
-python -m pip install malloy
+python3 -m pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ malloy==2022.1006a0
 ```
 
 ## Resources
