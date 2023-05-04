@@ -4,6 +4,7 @@ dist
 malloy.egg-info
 .pytest_cache
 test.py
+scratch
 
 # Avoid checking in binaries
 /src/malloy/service/malloy-service-*

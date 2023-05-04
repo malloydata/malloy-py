@@ -21,7 +21,7 @@ dependencies = [
     "duckdb",
     "google-cloud-bigquery"
 ]
-requires-python = ">3.9"
+requires-python = ">3.7"
 
 [project.optional-dependencies]
 dev = ["pytest", "pip-tools", "pytest-asyncio", "pandas", "toml", "yapf", "twine", "bumpver"]
@@ -52,6 +52,17 @@ push = true
     'version = "{version}"'
 ]
 "src/malloy/__init__.py" = ["{version}"]
+
+[tool.yapfignore]
+ignore_patterns = [
+    "**/*.pb2_grpc.py",
+    "**/*.pb2.py",
+    "**/*.pb2.pyi",
+]
+
+[tool.yapf]
+based_on_style = "google"
+indent_width = 2
 
 [tool.pytest.ini_options]
 # addopts = "--log-cli-level 10" #DEBUG
