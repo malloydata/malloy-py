@@ -1,5 +1,6 @@
 # .gitignore
 .DS_store
+__pycache__
 dist
 malloy.egg-info
 .pytest_cache
