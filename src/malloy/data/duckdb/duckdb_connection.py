@@ -116,7 +116,8 @@ class DuckDbConnection(ConnectionInterface):
       if field_type in self.TYPE_MAP:
         field |= self.TYPE_MAP[field_type]
       else:
-        self._log.warning("Field type not mapped: %s", field_type)
+        field["type"] = "unsupported"
+        field["rawType"] = field_type.lower()
       fields.append(field)
 
     return fields

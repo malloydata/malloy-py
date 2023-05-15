@@ -109,7 +109,8 @@ class BigQueryConnection(ConnectionInterface):
       if metadata.field_type in self.TYPE_MAP:
         field |= self.TYPE_MAP[metadata.field_type]
       else:
-        self._log.error("Field type not mapped: %s", metadata.field_type)
+        field["type"] = "unsupported"
+        field["rawType"] = metadata.field_type.lower()
       fields.append(field)
 
     return fields
@@ -121,7 +122,8 @@ class BigQueryConnection(ConnectionInterface):
       if schema_field["type"] in self.TYPE_MAP:
         field |= self.TYPE_MAP[schema_field["type"]]
       else:
-        self._log.error("Field type not mapped: %s", schema_field["type"])
+        field["type"] = "unsupported"
+        field["rawType"] = schema_field["type"].lower()
       fields.append(field)
 
     return fields
