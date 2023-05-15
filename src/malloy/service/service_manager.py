@@ -84,14 +84,17 @@ class ServiceManager:
     self._proc = await asyncio.create_subprocess_exec(
         service_path,
         stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.STDOUT)
+        stderr=asyncio.subprocess.STDOUT,
+        env={"PORT": "0"})
 
     service_listening = re.compile(r"^Server listening on (\d+)$")
     line = await self._proc.stdout.readline()
     if line is not None:
       sline = line.decode().rstrip()
-      if service_listening.match(sline):
+      match = service_listening.match(sline)
+      if match:
         self._log.debug("Compiler service is running: %s", sline)
+        self._internal_service = "localhost:" + match.group(1)
         self._is_ready.set()
       else:
         self._log.debug("Compiler service NOT running: %s", sline)
@@ -99,4 +102,6 @@ class ServiceManager:
   def _kill_service(self):
     if self._proc is None:
       return
+    self._log.debug("Terminating compiler service")
     self._proc.kill()
+    self._proc = None
