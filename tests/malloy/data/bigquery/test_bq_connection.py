@@ -25,7 +25,6 @@ from collections import namedtuple
 from malloy.data.connection import ConnectionInterface
 from malloy.data.bigquery import BigQueryConnection
 
-from pathlib import Path
 import pytest
 
 
@@ -45,33 +44,102 @@ def test_returns_custom_name():
 
 
 type_test_data = [
-    ('date_col_1', 'DATE', 'date', None),
-    ('string_col_1', 'STRING', 'string', None),
-    ('integer_col_1', 'INTEGER', 'number', 'integer'),
-    ('int64_col_1', 'INT64', 'number', 'integer'),
-    ('float_col_1', 'FLOAT', 'number', 'float'),
-    ('float64_col_1', 'FLOAT64', 'number', 'float'),
-    ('numeric_col_1', 'NUMERIC', 'number', 'float'),
-    ('bignumeric_col_1', 'BIGNUMERIC', 'number', 'float'),
-    ('timestamp_col_1', 'TIMESTAMP', 'timestamp', None),
-    ('boolean_col_1', 'BOOLEAN', 'boolean', None),
-    ('bool_col_1', 'BOOL', 'boolean', None),
+  # DATE
+  ({"name": "date_col_1", "type": "DATE", "mode": "NULLABLE"},
+   {"name": "date_col_1", "type": "date"}),
+  # STRING
+  ({"name": "string_col_1", "type": "STRING", "mode": "NULLABLE"},
+   {"name": "string_col_1", "type": "string"}),
+  # INTEGER
+  ({"name": "integer_col_1", "type": "INTEGER", "mode": "NULLABLE"},
+   {"name": "integer_col_1", "type": "number", "numberType": "integer"}),
+  # INT64
+  ({"name": "int64_col_1", "type": "INT64", "mode": "NULLABLE"},
+   {"name": "int64_col_1", "type": "number", "numberType": "integer"}),
+  # FLOAT
+  ({"name": "float_col_1", "type": "FLOAT", "mode": "NULLABLE"},
+   {"name": "float_col_1", "type": "number", "numberType": "float"}),
+  # FLOAT64
+  ({"name": "float64_col_1", "type": "FLOAT64", "mode": "NULLABLE"},
+   {"name": "float64_col_1", "type": "number", "numberType": "float"}),
+  # NUMERIC
+  ({"name": "numeric_col_1", "type": "NUMERIC", "mode": "NULLABLE"},
+   {"name": "numeric_col_1", "type": "number", "numberType": "float"}),
+  # BIGNUMERIC
+  ({"name": "bignumeric_col_1", "type": "BIGNUMERIC", "mode": "NULLABLE"},
+   {"name": "bignumeric_col_1", "type": "number", "numberType": "float"}),
+  # TIMESTAMP
+  ({"name": "timestamp_col_1", "type": "TIMESTAMP", "mode": "NULLABLE"},
+   {"name": "timestamp_col_1", "type": "timestamp"}),
+  # BOOLEAN
+  ({"name": "boolean_col_1", "type": "BOOLEAN", "mode": "NULLABLE"},
+   {"name": "boolean_col_1", "type": "boolean"}),
+  # BOOL
+  ({"name": "bool_col_1", "type": "BOOL", "mode": "NULLABLE"},
+   {"name": "bool_col_1", "type": "boolean"}),
+  # JSON
+  ({"name": "json_col_1", "type": "JSON", "mode": "NULLABLE"},
+   {"name": "json_col_1", "type": "json"}),
+  # STRING ARRAY
+  ({"name": "string_array_1", "type": "STRING", "mode": "REPEATED"},
+    {"name": "string_array_1",
+    "type": "struct",
+    "dialect": "standardsql",
+    "fields": [{"name": "value", "type": "string"}],
+    "structRelationship": {"field": "string_array_1",
+                            "isArray": True,
+                            "type": "nested"},
+    "structSource": {"type": "nested"}
+    }
+  ),
+  # RECORD
+  ({"name": "record_1", "type": "RECORD", "mode": "NULLABLE", "fields": [
+    {"name": "record_integer_1", "type": "INTEGER", "mode": "NULLABLE"},
+    {"name": "record_string_1", "type": "STRING", "mode": "NULLABLE"}
+  ]},
+    {"name": "record_1",
+    "dialect": "standardsql",
+    "fields": [{"name": "record_integer_1",
+                "numberType": "integer",
+                "type": "number"},
+               {"name": "record_string_1", "type": "string"}],
+    "structRelationship": {"type": "inline"},
+    "structSource": {"type": "inline"},
+    "type": "struct"
+    }
+  )
 ]
 
+def _make_field_metadata(field):
+  field_metadata = namedtuple(
+    "metadata", {"name", "field_type", "mode", "fields"}
+  )
+  return field_metadata(
+        name=field["name"],
+        field_type=field["type"],
+        mode=field["mode"],
+        fields=
+          (_make_field_metadata(field) for field in field["fields"])
+          if "fields" in field else
+          None
+  )
 
 @pytest.mark.parametrize(
-    "field_name,field_type,expected_type,expected_num_type", type_test_data)
-def test_maps_db_types(field_name, field_type, expected_type,
-                       expected_num_type):
+    "field,expected", type_test_data)
+def test_maps_db_types(field, expected):
   conn = BigQueryConnection()
-  field_metadata = namedtuple('metadata', {"name", "field_type"})
-  fields = conn._map_schema(
-      [field_metadata(name=field_name, field_type=field_type)])
+  fields = conn._map_schema([_make_field_metadata(field)])
 
-  print(fields)
   assert fields[0] is not None, (
-      "Database column not found: {}".format(field_name))
-  assert fields[0]['name'] == field_name
-  assert fields[0]['type'] == expected_type
-  if expected_num_type is not None:
-    assert fields[0]['numberType'] == expected_num_type
+      f"Database column not found: {field['name']}")
+  assert fields[0] == expected
+
+@pytest.mark.parametrize(
+    "field,expected", type_test_data)
+def test_maps_sql_block_types(field, expected):
+  conn = BigQueryConnection()
+  fields = conn._map_sql_block_schema({"fields": [field]})
+
+  assert fields[0] is not None, (
+      f"Database column not found: {field['name']}")
+  assert fields[0] == expected
