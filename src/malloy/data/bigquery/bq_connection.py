@@ -102,11 +102,51 @@ class BigQueryConnection(ConnectionInterface):
         "fields": self._map_schema(schema)
     }
 
+  def _to_array_struct_def(self, name):
+    return {
+      "type": "struct",
+      "name": name,
+      "dialect": "standardsql",
+      "structSource": {"type": "nested"},
+      "structRelationship": {
+        "type": "nested",
+        "field": name,
+        "isArray": True,
+      },
+    }
+
+  def _to_inner_struct_def(self, name, mode):
+    return {
+      "type": "struct",
+      "dialect": "standardsql",
+      "structSource":
+        {"type": "nested"}
+        if mode == "REPEATED" else
+        {"type": "inline"},
+      "structRelationship":
+        {"type": "nested", "field": name, "isArray": False}
+        if mode == "REPEATED" else
+        {"type": "inline"},
+    }
+
   def _map_schema(self, schema):
     fields = []
     for metadata in schema:
       field = {"name": metadata.name}
-      if metadata.field_type in self.TYPE_MAP:
+      is_struct = metadata.field_type in ["STRUCT", "RECORD"]
+      if metadata.mode == "REPEATED" and not is_struct:
+        if metadata.field_type in self.TYPE_MAP:
+          field |= self._to_array_struct_def(metadata.name)
+          malloy_type = {"name": "value"}
+          malloy_type |= self.TYPE_MAP[metadata.field_type]
+          field["fields"] = [malloy_type]
+      elif is_struct:
+        field |= self._to_inner_struct_def(
+          metadata.name,
+          metadata.mode
+        )
+        field["fields"] = self._map_schema(metadata.fields)
+      elif metadata.field_type in self.TYPE_MAP:
         field |= self.TYPE_MAP[metadata.field_type]
       else:
         field["type"] = "unsupported"
@@ -119,7 +159,20 @@ class BigQueryConnection(ConnectionInterface):
     fields = []
     for schema_field in schema["fields"]:
       field = {"name": schema_field["name"]}
-      if schema_field["type"] in self.TYPE_MAP:
+      is_struct = schema_field["type"] in ["STRUCT", "RECORD"]
+      if schema_field["mode"] == "REPEATED" and not is_struct:
+        if schema_field["type"] in self.TYPE_MAP:
+          field |= self._to_array_struct_def(schema_field["name"])
+          malloy_type = {"name": "value"}
+          malloy_type |= self.TYPE_MAP[schema_field["type"]]
+          field["fields"] = [malloy_type]
+      elif schema_field["type"] in ["STRUCT", "RECORD"]:
+        field |= self._to_inner_struct_def(
+          schema_field["name"],
+          schema_field["mode"]
+        )
+        field["fields"] = self._map_sql_block_schema(schema_field)
+      elif schema_field["type"] in self.TYPE_MAP:
         field |= self.TYPE_MAP[schema_field["type"]]
       else:
         field["type"] = "unsupported"
@@ -167,8 +220,10 @@ class BigQueryConnection(ConnectionInterface):
       },
       "BOOL": {
           "type": "boolean"
+      },
+      "JSON": {
+          "type": "json"
       }
-
       # pylint: disable=line-too-long
       # TODO(https://cloud.google.com/bigquery/docs/reference/rest/v2/tables#tablefieldschema)
       # BYTES
