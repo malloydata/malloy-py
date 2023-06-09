@@ -10,7 +10,7 @@ certifi==2022.9.24
     # via requests
 charset-normalizer==2.1.1
     # via requests
-duckdb==0.5.1
+duckdb==0.8.0
     # via malloy (pyproject.toml)
 google-api-core[grpc]==2.10.2
     # via
