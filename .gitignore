@@ -9,3 +9,6 @@ scratch
 
 # Avoid checking in binaries
 /src/malloy/service/malloy-service-*
+
+# Jetbrains IDEs
+.idea/
