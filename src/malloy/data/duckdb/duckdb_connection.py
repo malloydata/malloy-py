@@ -40,7 +40,7 @@ class DuckDbConnection(ConnectionInterface):
   def __init__(self, home_dir=None, name="duckdb"):
     self._log = logging.getLogger(f"{__name__}({name})")
     self._name = name
-    self._client_options = None
+    self._client_options = dict()
     if home_dir is None:
       self._home_directory = None
     else:
@@ -51,7 +51,7 @@ class DuckDbConnection(ConnectionInterface):
   def get_name(self) -> str:
     return self._name
 
-  def with_options(self, options) -> DuckDbConnection:
+  def with_options(self, options: dict) -> DuckDbConnection:
     self._client_options = options
     return self
 
@@ -62,6 +62,7 @@ class DuckDbConnection(ConnectionInterface):
   def get_connection(self):
     if self._con is None:
       self._con = duckdb.connect(database=":memory:",
+                                 read_only=False,
                                  config=self._client_options)
       if self._home_directory:
         sql = f"SET FILE_SEARCH_PATH=\"{self._home_directory}\""
