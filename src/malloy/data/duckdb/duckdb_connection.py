@@ -40,7 +40,7 @@ class DuckDbConnection(ConnectionInterface):
   def __init__(self, home_dir=None, name="duckdb"):
     self._log = logging.getLogger(f"{__name__}({name})")
     self._name = name
-    self._client_options = dict()
+    self._client_options = {}
     if home_dir is None:
       self._home_directory = None
     else:

@@ -8,7 +8,7 @@
 [MASTER]
 
 # Files or directories to be skipped. They should be base names, not paths.
-ignore=third_party,src/malloy/services/v1,__main__.py
+ignore=third_party,src/malloy/services/v1
 
 # Files or directories matching the regex patterns are skipped. The regex
 # matches against base names, not paths.
@@ -214,7 +214,7 @@ inlinevar-rgx=^[a-z][a-z0-9_]*$
 class-rgx=^_?[A-Z][a-zA-Z0-9]*$
 
 # Regular expression matching correct module names
-module-rgx=^(_?[a-z][a-z0-9_]*|__init__)$
+module-rgx=^(_?[a-z][a-z0-9_]*|__init__|__main__)$
 
 # Regular expression matching correct method names
 method-rgx=(?x)^(?:(?P<exempt>_[a-z0-9_]+__|runTest|setUp|tearDown|setUpTestCase|tearDownTestCase|setupSelf|tearDownClass|setUpClass|(test|assert)_*[A-Z0-9][a-zA-Z0-9_]*|next)|(?P<camel_case>_{0,2}[A-Z][a-zA-Z0-9_]*)|(?P<snake_case>_{0,2}[a-z][a-z0-9_]*))$
