@@ -46,7 +46,7 @@ class ServiceManager:
     arch = platform.machine()
     if arch == "x86_64" or system == "Darwin" or system == "Windows":
       service_name += "-x64"
-    elif arch == "arm64":
+    elif arch in ("arm64", "aarch64"):
       service_name += "-arm64"
 
     if system == "Windows":
