@@ -20,12 +20,7 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 # __init__.py
-"""Base module of the Malloy python runtime."""
-# Version of the python malloy package
-__version__ = "2023.1010"
+"""Module provides IPython magics"""
+from malloy.ipython.ipython_magic import (malloy_model, malloy_query)
 
-from malloy.runtime import (Runtime)
-from malloy.ipython.ipython_magic import (load_ipython_extension,
-                                          unload_ipython_extension)
-
-__all__ = ["Runtime", "load_ipython_extension", "unload_ipython_extension"]
+__all__ = ["malloy_model", "malloy_query"]

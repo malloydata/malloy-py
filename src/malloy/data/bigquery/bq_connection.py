@@ -104,29 +104,35 @@ class BigQueryConnection(ConnectionInterface):
 
   def _to_array_struct_def(self, name):
     return {
-      "type": "struct",
-      "name": name,
-      "dialect": "standardsql",
-      "structSource": {"type": "nested"},
-      "structRelationship": {
-        "type": "nested",
-        "field": name,
-        "isArray": True,
-      },
+        "type": "struct",
+        "name": name,
+        "dialect": "standardsql",
+        "structSource": {
+            "type": "nested"
+        },
+        "structRelationship": {
+            "type": "nested",
+            "field": name,
+            "isArray": True,
+        },
     }
 
   def _to_inner_struct_def(self, name, mode):
     return {
-      "type": "struct",
-      "dialect": "standardsql",
-      "structSource":
-        {"type": "nested"}
-        if mode == "REPEATED" else
-        {"type": "inline"},
-      "structRelationship":
-        {"type": "nested", "field": name, "isArray": False}
-        if mode == "REPEATED" else
-        {"type": "inline"},
+        "type": "struct",
+        "dialect": "standardsql",
+        "structSource": {
+            "type": "nested"
+        } if mode == "REPEATED" else {
+            "type": "inline"
+        },
+        "structRelationship": {
+            "type": "nested",
+            "field": name,
+            "isArray": False
+        } if mode == "REPEATED" else {
+            "type": "inline"
+        },
     }
 
   def _map_schema(self, schema):
@@ -141,10 +147,7 @@ class BigQueryConnection(ConnectionInterface):
           malloy_type |= self.TYPE_MAP[metadata.field_type]
           field["fields"] = [malloy_type]
       elif is_struct:
-        field |= self._to_inner_struct_def(
-          metadata.name,
-          metadata.mode
-        )
+        field |= self._to_inner_struct_def(metadata.name, metadata.mode)
         field["fields"] = self._map_schema(metadata.fields)
       elif metadata.field_type in self.TYPE_MAP:
         field |= self.TYPE_MAP[metadata.field_type]
@@ -167,10 +170,8 @@ class BigQueryConnection(ConnectionInterface):
           malloy_type |= self.TYPE_MAP[schema_field["type"]]
           field["fields"] = [malloy_type]
       elif schema_field["type"] in ["STRUCT", "RECORD"]:
-        field |= self._to_inner_struct_def(
-          schema_field["name"],
-          schema_field["mode"]
-        )
+        field |= self._to_inner_struct_def(schema_field["name"],
+                                           schema_field["mode"])
         field["fields"] = self._map_sql_block_schema(schema_field)
       elif schema_field["type"] in self.TYPE_MAP:
         field |= self.TYPE_MAP[schema_field["type"]]

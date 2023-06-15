@@ -71,6 +71,9 @@ class Runtime():
     self._connection_manager.add_connection(connection)
     return self
 
+  def shutdown(self):
+    self._service_manager.shutdown()
+
   def load_file(self, file):
     self._is_file = True
     file_path = Path(file).resolve()
@@ -86,7 +89,7 @@ class Runtime():
     if import_path is None:
       import_path = os.getcwd()
     self._file_dir = Path(import_path).resolve()
-    self._file_name = Path(self._file_dir, "__inline-souce__.malloy")
+    self._file_name = Path(self._file_dir, "__inline-source__.malloy")
     self._log.debug("Loading source: %s", source)
     self._log.debug("  import_path: %s", self._file_dir)
     self._log.debug("  file_name: %s", self._file_name)
@@ -269,7 +272,7 @@ class Runtime():
     sql = self._last_response.sql_block.sql
     name = self._last_response.sql_block.name
     schema = connection.get_schema_for_sql_block(name, sql)
-    self._log.debug("  schema:\n%s", json.dumps(schema))
+    self._log.debug("  schema:\n%s", json.dumps(schema, indent=2))
     request = CompileRequest(type=CompileRequest.Type.SQL_BLOCK_SCHEMAS,
                              sql_block_schemas=[
                                  SqlBlockSchema(name=name,
@@ -298,7 +301,7 @@ class Runtime():
 
     last_response_hash = hashlib.md5(
         self._last_response.SerializeToString(deterministic=True)).digest()
-    self._log.debug("Last Response ID: %s", last_response_hash)
+    self._log.debug("Last Response ID: %s", last_response_hash.hex())
 
     if last_response_hash in self._seen_responses:
       self._log.error("Request loop detected, ending session")

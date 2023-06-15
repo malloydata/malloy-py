@@ -30,12 +30,12 @@ from malloy.service import ServiceManager
 
 def test_is_ready_is_false_when_not_ready():
   sm = ServiceManager()
-  assert sm.is_ready() == False
+  assert sm.is_ready() is False
 
 
 def test_is_ready_is_false_when_external_service_not_ready():
   sm = ServiceManager(external_service="localhost:54321")
-  assert sm.is_ready() == False
+  assert sm.is_ready() is False
 
 
 @pytest.mark.asyncio
@@ -47,7 +47,7 @@ async def test_returns_local_service():
   service = await sm.get_service()
   assert service == sm._internal_service
   assert sm.is_ready()
-  sm._kill_service()
+  sm.shutdown()
   await asyncio.sleep(0.05)
 
 
@@ -62,4 +62,4 @@ async def test_returns_external_service_if_provided():
 
 def test_kill_service_does_not_throw_if_no_proc_started():
   sm = ServiceManager()
-  sm._kill_service()
+  sm.shutdown()

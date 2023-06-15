@@ -54,7 +54,7 @@ async def service_manager():
   service_manager = ServiceManager()
   await service_manager.get_service()
   yield service_manager
-  service_manager._kill_service()
+  service_manager.shutdown()
   await asyncio.sleep(0.1)
 
 
@@ -84,7 +84,7 @@ async def test_returns_sql(service_manager):
   rt.load_file(test_file_01)
   sql = await rt.get_sql(query=query_by_state)
   assert sql == """
-SELECT 
+SELECT
    airports."state" as "state",
    COUNT( 1) as "airport_count"
 FROM 'data/airports.parquet' as airports
