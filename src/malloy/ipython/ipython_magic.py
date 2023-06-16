@@ -29,6 +29,7 @@ from malloy.data.bigquery import BigQueryConnection
 from malloy.data.duckdb import DuckDbConnection
 from malloy.data.connection_manager import DefaultConnectionManager
 from malloy.service import ServiceManager
+from duckdb import DuckDBPyConnection
 
 nest_asyncio.apply()
 
@@ -72,7 +73,10 @@ async def _malloy_query(line, cell):
   if model:
     job = await model.run("default_connection", cell)
     if job:
-      results = job.to_dataframe()
+      if isinstance(job, DuckDBPyConnection):
+        results = job.fetch_df()
+      else:
+        results = job.to_dataframe()
       if results_var:
         IPython.get_ipython().user_ns[results_var] = results
         print("Stored in", results_var)
@@ -98,7 +102,6 @@ def load_ipython_extension(ipython):
   global runtime
   print("Malloy ahoy")
   user_malloy_service = IPython.get_ipython().user_ns.get("MALLOY_SERVICE")
-  print(user_malloy_service)
   service_manager = ServiceManager(user_malloy_service)
   connection_manager = DefaultConnectionManager()
   runtime = malloy.Runtime(connection_manager, service_manager)
