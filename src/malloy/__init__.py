@@ -25,7 +25,10 @@
 __version__ = "2023.1010"
 
 from malloy.runtime import (Runtime)
-from malloy.ipython.ipython_magic import (load_ipython_extension,
-                                          unload_ipython_extension)
+try:
+  from malloy.ipython.ipython_magic import (load_ipython_extension,
+                                            unload_ipython_extension)
+except ModuleNotFoundError:
+  pass
 
 __all__ = ["Runtime", "load_ipython_extension", "unload_ipython_extension"]

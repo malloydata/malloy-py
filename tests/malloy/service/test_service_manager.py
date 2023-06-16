@@ -45,6 +45,7 @@ def test_is_ready_is_false_when_external_service_not_ready():
 async def test_returns_local_service():
   sm = ServiceManager()
   service = await sm.get_service()
+  # pylint: disable=protected-access
   assert service == sm._internal_service
   assert sm.is_ready()
   sm.shutdown()

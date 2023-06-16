@@ -21,6 +21,7 @@
 
 # __init__.py
 """Module provides IPython magics"""
-from malloy.ipython.ipython_magic import (malloy_model, malloy_query)
+from malloy.ipython.ipython_magic import (load_ipython_extension,
+                                          unload_ipython_extension)
 
-__all__ = ["malloy_model", "malloy_query"]
+__all__ = ["load_ipython_extension", "unload_ipython_extension"]

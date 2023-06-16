@@ -25,6 +25,9 @@ import atexit
 import malloy
 import nest_asyncio
 from malloy.data.bigquery import BigQueryConnection
+from malloy.data.duckdb import DuckDbConnection
+from malloy.data.connection_manager import DefaultConnectionManager
+from malloy.service import ServiceManager
 
 nest_asyncio.apply()
 
@@ -64,9 +67,9 @@ async def _malloy_query(line, cell):
   model_var = var_names[0] or DEFAULT_MODEL_VAR
   results_var = var_names[1] if len(var_names) > 1 else None
 
-  model = IPython.get_ipython().user_ns[model_var]
+  model = IPython.get_ipython().user_ns.get(model_var)
   if model:
-    job = await model.run("bigquery", cell)
+    job = await model.run("default_connection", cell)
     if job:
       results = job.to_dataframe()
       if results_var:
@@ -93,11 +96,18 @@ def malloy_query(line, cell):
 def load_ipython_extension(ipython):
   global runtime
   print("Malloy ahoy")
-  runtime = malloy.Runtime()
+  user_malloy_service = IPython.get_ipython().user_ns.get("MALLOY_SERVICE")
+  print(user_malloy_service)
+  service_manager = ServiceManager(user_malloy_service)
+  connection_manager = DefaultConnectionManager()
+  runtime = malloy.Runtime(connection_manager, service_manager)
+
   runtime.add_connection(BigQueryConnection())
+  runtime.add_connection(DuckDbConnection())
+
   ipython.register_magic_function(malloy_model, "cell")
   ipython.register_magic_function(malloy_query, "cell")
 
 
-def unload_ipython_extension(ipython):
+def unload_ipython_extension(_ipython):
   _cleanup_runtime()

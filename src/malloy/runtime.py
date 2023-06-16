@@ -132,6 +132,10 @@ class Runtime():
     if sql is None:
       return None
 
+    connections = re.search(r"^-- connection: (.*)", sql)
+    if connections:
+      connection = connections.group(1)
+
     return self._connection_manager.get_connection(connection).run_query(sql)
 
   def __aiter__(self):
