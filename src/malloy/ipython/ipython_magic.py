@@ -18,6 +18,7 @@
 # CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+"""Malloy IPython magics"""
 
 import IPython
 import asyncio
@@ -109,5 +110,6 @@ def load_ipython_extension(ipython):
   ipython.register_magic_function(malloy_query, "cell")
 
 
-def unload_ipython_extension(_ipython):
+# pylint: disable=unused-argument
+def unload_ipython_extension(ipython):
   _cleanup_runtime()
