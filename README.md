@@ -4,7 +4,7 @@
 
 Malloy is an experimental language for describing data relationships and transformations. It is both a semantic modeling language and a querying language that runs queries against a relational database. Malloy currently connects to BigQuery, and natively supports DuckDB. We've built a Visual Studio Code extension to facilitate building Malloy data models, querying and transforming data, and creating simple visualizations and dashboards.
 
-*Note: These APIs are still in development and are subject to change.*
+_Note: These APIs are still in development and are subject to change._
 
 ## How do I get it?
 
@@ -15,6 +15,7 @@ python3 -m pip install malloy
 ```
 
 ## Resources
+
 - [Malloy Language GitHub](https://github.com/looker-open-source/malloy/) - Primary location for the malloy language source, documentation, and information
 - [Malloy Language](https://looker-open-source.github.io/malloy/documentation/language/basic.html) - A quick introduction to the language
 - [eCommerce Example Analysis](https://looker-open-source.github.io/malloy/documentation/examples/ecommerce.html) - A walkthrough of the basics on an ecommerce dataset (BigQuery public dataset)
@@ -71,11 +72,11 @@ async def main():
         sql = await runtime.load_file(home_dir +"/2_flights.malloy").get_sql(
                 query="""
                   query: flights -> {
-                    where: carrier ? 'WN' | 'DL', dep_time ? @2002-03-03 
-                    group_by: 
+                    where: carrier ? 'WN' | 'DL', dep_time ? @2002-03-03
+                    group_by:
                       flight_date is dep_time.day
                       carrier
-                    aggregate: 
+                    aggregate:
                       daily_flight_count is flight_count
                       aircraft.aircraft_count
                     nest: per_plane_data is {
@@ -140,4 +141,27 @@ async def main():
 if __name__ == "__main__":
     asyncio.run(main())
 
+```
+
+## Development
+
+### Initial setup
+
+```sh
+git submodule init
+git submodule update
+python3 -m pip install -r requirements.dev.txt
+scripts/gen-services.sh
+```
+
+### Regenerate Protobuf files
+
+```sh
+scripts/gen-protos.sh
+```
+
+### Tests
+
+```sh
+python3 -m pytest
 ```
