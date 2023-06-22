@@ -1,4 +1,11 @@
 steps:
+  - name: "gcr.io/cloud-builders/git"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        git submodule set-url submodules/malloy-service https://github.com/malloydata/malloy-service
+        git submodule update --init --recursive
   - name: "docker.io/library/python:3.9"
     entrypoint: "python"
     args: ["-m", "pip", "install", "--upgrade", "pip", "--user"]
@@ -18,6 +25,10 @@ steps:
   - name: "docker.io/library/python:3.9"
     entrypoint: "python"
     args: ["-m", "pylint", "src"]
+
+  - name: "node:16"
+    entrypoint: "bash"
+    args: ["./scripts/gen-services.sh"]
 
   - name: "docker.io/library/python:3.9"
     entrypoint: "python"

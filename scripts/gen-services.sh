@@ -1,9 +1,9 @@
 #!/bin/sh
 
-cd ../malloy-service
+pushd ./submodules/malloy-service
 
-npm run build && npm run package
+npm install && npm run build && npm run package
 
-cd $OLDPWD
+popd
 
-cp -r ../malloy-service/pkg/@malloydata/* src/malloy/service
+cp -r submodules/malloy-service/pkg/@malloydata/* src/malloy/service
