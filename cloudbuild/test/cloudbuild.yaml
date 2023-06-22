@@ -4,7 +4,7 @@ steps:
     args:
       - "-c"
       - |
-        git submodule set-url malloydata/malloy-service https://github.com/malloydata/malloy-service
+        git submodule set-url submodules/malloy-service https://github.com/malloydata/malloy-service
         git submodule update --init --recursive
   - name: "docker.io/library/python:3.9"
     entrypoint: "python"

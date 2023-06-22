@@ -1,3 +1,5 @@
 [submodule "submodules/malloy-service"]
 	path = submodules/malloy-service
 	url = git@github.com:malloydata/malloy-service
+[submodule "malloydata/malloy-service"]
+	url = https://github.com/malloydata/malloy-service
