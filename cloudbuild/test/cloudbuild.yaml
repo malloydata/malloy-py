@@ -19,6 +19,10 @@ steps:
     entrypoint: "python"
     args: ["-m", "pylint", "src"]
 
+  - name: "node:16"
+    entrypoint: "bash"
+    args: ["./scripts/gen-services.sh"]
+
   - name: "docker.io/library/python:3.9"
     entrypoint: "python"
     args: ["-m", "pytest", "--junitxml=${SHORT_SHA}_test_log.xml", "-rxXs"]
