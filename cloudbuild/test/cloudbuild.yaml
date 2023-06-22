@@ -20,6 +20,10 @@ steps:
 
   - name: "docker.io/library/python:3.9"
     entrypoint: "python"
+    args: ["-m", "pip", "install", "-r", "requirements.ipython.txt", "--user"]
+
+  - name: "docker.io/library/python:3.9"
+    entrypoint: "python"
     args: ["-m", "pip", "install", "-e", ".", "--user"]
 
   - name: "docker.io/library/python:3.9"
