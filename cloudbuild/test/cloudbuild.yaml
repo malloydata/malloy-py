@@ -1,4 +1,7 @@
 steps:
+  - name: "gcr.io/cloud-builders/git"
+    args: ["submodule", "update", "--init", "--recursive"]
+
   - name: "docker.io/library/python:3.9"
     entrypoint: "python"
     args: ["-m", "pip", "install", "--upgrade", "pip", "--user"]
