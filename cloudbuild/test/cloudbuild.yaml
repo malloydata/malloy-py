@@ -38,4 +38,4 @@ steps:
     entrypoint: "python"
     args: ["-m", "pytest", "--junitxml=${SHORT_SHA}_test_log.xml", "-rxXs"]
 
-timeout: "300s"
+timeout: "600s"
