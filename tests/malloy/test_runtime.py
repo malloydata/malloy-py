@@ -71,8 +71,9 @@ async def test_logs_error_and_returns_none_if_file_not_found(
   rt = Runtime(service_manager=service_manager)
   rt.add_connection(DuckDbConnection(home_dir=home_dir))
   rt.load_file(fake_file)
-  sql = await rt.get_sql(query=query_by_state)
+  [sql, connections] = await rt.get_sql(query=query_by_state)
   assert sql is None
+  assert connections == []
   assert "[Errno 2] No such file or directory: '{}'".format(
       fake_file) in caplog.text
 
@@ -82,9 +83,9 @@ async def test_returns_sql(service_manager):
   rt = Runtime(service_manager=service_manager)
   rt.add_connection(DuckDbConnection(home_dir=home_dir))
   rt.load_file(test_file_01)
-  sql = await rt.get_sql(query=query_by_state)
+  [sql, connections] = await rt.get_sql(query=query_by_state)
   assert sql == """
-SELECT
+SELECT\x20
    airports."state" as "state",
    COUNT( 1) as "airport_count"
 FROM 'data/airports.parquet' as airports
@@ -92,6 +93,7 @@ WHERE airports."state" IS NOT NULL
 GROUP BY 1
 ORDER BY 2 desc NULLS LAST
 """.lstrip()
+  assert connections == ["duckdb"]
 
 
 @pytest.mark.asyncio
