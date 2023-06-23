@@ -55,7 +55,7 @@ class ServiceManager:
     service_path = f"{Path(Path(__file__).parent, service_name).resolve()}"
     return service_path
 
-  def __init__(self, external_service=None):
+  def __init__(self, external_service: str = None):
     self._log = logging.getLogger(__name__)
     self._is_ready = asyncio.Event()
     self._external_service = external_service
@@ -63,6 +63,9 @@ class ServiceManager:
 
   def is_ready(self):
     return self._is_ready.is_set()
+
+  def shutdown(self):
+    return self._kill_service()
 
   async def get_service(self):
     if not self._is_ready.is_set():

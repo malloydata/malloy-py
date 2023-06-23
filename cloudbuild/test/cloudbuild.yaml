@@ -20,6 +20,10 @@ steps:
 
   - name: "docker.io/library/python:3.9"
     entrypoint: "python"
+    args: ["-m", "pip", "install", "-r", "requirements.ipython.txt", "--user"]
+
+  - name: "docker.io/library/python:3.9"
+    entrypoint: "python"
     args: ["-m", "pip", "install", "-e", ".", "--user"]
 
   - name: "docker.io/library/python:3.9"
@@ -34,4 +38,4 @@ steps:
     entrypoint: "python"
     args: ["-m", "pytest", "--junitxml=${SHORT_SHA}_test_log.xml", "-rxXs"]
 
-timeout: "300s"
+timeout: "600s"

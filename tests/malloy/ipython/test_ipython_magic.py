@@ -19,48 +19,17 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-# test_service_manager.py
+# test_ipython_magic.py
+"""IPython magic test"""
 
 import pytest
-import asyncio
 from pathlib import Path
 
 from malloy.service import ServiceManager
 
 
-def test_is_ready_is_false_when_not_ready():
-  sm = ServiceManager()
-  assert sm.is_ready() is False
-
-
-def test_is_ready_is_false_when_external_service_not_ready():
-  sm = ServiceManager(external_service="localhost:54321")
-  assert sm.is_ready() is False
-
-
-@pytest.mark.asyncio
 @pytest.mark.skipif(not Path(ServiceManager.service_path()).exists(),
                     reason="Could not find: {}".format(
                         ServiceManager.service_path()))
-async def test_returns_local_service():
-  sm = ServiceManager()
-  service = await sm.get_service()
-  # pylint: disable=protected-access
-  assert service == sm._internal_service
-  assert sm.is_ready()
-  sm.shutdown()
-  await asyncio.sleep(0.05)
-
-
-@pytest.mark.asyncio
-async def test_returns_external_service_if_provided():
-  external_service = "localhost:54321"
-  sm = ServiceManager(external_service=external_service)
-  service = await sm.get_service()
-  assert sm.is_ready()
-  assert service == external_service
-
-
-def test_kill_service_does_not_throw_if_no_proc_started():
-  sm = ServiceManager()
-  sm.shutdown()
+def test_notebook(nb_regression):
+  nb_regression.check("tests/malloy/ipython/test_data/test.ipynb")

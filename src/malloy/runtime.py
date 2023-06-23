@@ -71,6 +71,9 @@ class Runtime():
     self._connection_manager.add_connection(connection)
     return self
 
+  def shutdown(self):
+    self._service_manager.shutdown()
+
   def load_file(self, file):
     self._is_file = True
     file_path = Path(file).resolve()
@@ -86,7 +89,7 @@ class Runtime():
     if import_path is None:
       import_path = os.getcwd()
     self._file_dir = Path(import_path).resolve()
-    self._file_name = Path(self._file_dir, "__inline-souce__.malloy")
+    self._file_name = Path(self._file_dir, "__inline-source__.malloy")
     self._log.debug("Loading source: %s", source)
     self._log.debug("  import_path: %s", self._file_dir)
     self._log.debug("  file_name: %s", self._file_name)
@@ -94,6 +97,7 @@ class Runtime():
 
   async def get_sql(self, named_query=None, query=None):
     self._sql = None
+    self._connections = []
     if named_query is None and query is None:
       self._log.error("Parameter named_query or query is required to get_sql()")
       return
@@ -121,13 +125,18 @@ class Runtime():
       else:
         raise ValueError("Channel not in ready state", state)
 
-    return self._sql
+    return [self._sql, self._connections]
 
   async def run(self, connection, query=None, named_query=None):
-    sql = await self.get_sql(query=query, named_query=named_query)
+    [sql, connections] = await self.get_sql(query=query,
+                                            named_query=named_query)
     self._log.debug(sql)
+    self._log.debug(connections)
     if sql is None:
       return None
+
+    if connections and len(connections):
+      connection = self._connections[0]
 
     return self._connection_manager.get_connection(connection).run_query(sql)
 
@@ -269,7 +278,7 @@ class Runtime():
     sql = self._last_response.sql_block.sql
     name = self._last_response.sql_block.name
     schema = connection.get_schema_for_sql_block(name, sql)
-    self._log.debug("  schema:\n%s", json.dumps(schema))
+    self._log.debug("  schema:\n%s", json.dumps(schema, indent=2))
     request = CompileRequest(type=CompileRequest.Type.SQL_BLOCK_SCHEMAS,
                              sql_block_schemas=[
                                  SqlBlockSchema(name=name,
@@ -298,7 +307,7 @@ class Runtime():
 
     last_response_hash = hashlib.md5(
         self._last_response.SerializeToString(deterministic=True)).digest()
-    self._log.debug("Last Response ID: %s", last_response_hash)
+    self._log.debug("Last Response ID: %s", last_response_hash.hex())
 
     if last_response_hash in self._seen_responses:
       self._log.error("Request loop detected, ending session")
@@ -310,6 +319,7 @@ class Runtime():
     if self._last_response.type == CompilerRequest.Type.COMPLETE:
       self._log.debug("Received compile COMPLETE, ending session")
       self._sql = self._last_response.content
+      self._connections = self._last_response.connections
       self._compile_completed.set()
       return
 

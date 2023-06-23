@@ -24,7 +24,8 @@ dependencies = [
 requires-python = ">3.7"
 
 [project.optional-dependencies]
-dev = ["grpcio-tools", "pylint", "pytest", "pip-tools", "pytest-asyncio", "pandas", "toml", "yapf", "twine", "bumpver"]
+dev = ["db-dtypes", "grpcio-tools", "pylint", "pytest", "pip-tools", "pytest-asyncio", "pandas", "toml", "yapf", "twine", "bumpver"]
+ipython = ["ipykernel", "ipython", "pytest-notebook"]
 
 [project.urls]
 Github = "https://github.com/malloydata/malloy-py"
@@ -65,6 +66,10 @@ based_on_style = "google"
 indent_width = 2
 
 [tool.pytest.ini_options]
+nb_diff_ignore = [
+  "/metadata/language_info",
+  "/cells/*/execution_count"
+]
 # addopts = "--log-cli-level 10" #DEBUG
 # addopts = "--log-cli-level 20" #INFO
 # addopts = "--log-cli-level 30" #WARNING
