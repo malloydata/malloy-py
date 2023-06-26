@@ -20,6 +20,7 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 # test_service_manager.py
+"""Test service_manager.py"""
 
 import pytest
 import asyncio
@@ -40,8 +41,7 @@ def test_is_ready_is_false_when_external_service_not_ready():
 
 @pytest.mark.asyncio
 @pytest.mark.skipif(not Path(ServiceManager.service_path()).exists(),
-                    reason="Could not find: {}".format(
-                        ServiceManager.service_path()))
+                    reason=f"Could not find: {ServiceManager.service_path()}")
 async def test_returns_local_service():
   sm = ServiceManager()
   service = await sm.get_service()

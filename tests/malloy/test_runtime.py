@@ -20,6 +20,7 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 # test_runtime.py
+"""Test runtime.py"""
 
 import asyncio
 import pytest
@@ -33,14 +34,14 @@ from malloy.data.duckdb import DuckDbConnection
 
 pytestmark = pytest.mark.skipif(
     not Path(ServiceManager.service_path()).exists(),
-    reason="Could not find: {}".format(ServiceManager.service_path()),
+    reason=f"Could not find: {ServiceManager.service_path()}",
     allow_module_level=True)
 
 logging.basicConfig(level=logging.ERROR)
 
-home_dir = "{}/test_data".format(Path(__file__).parent)
-test_file_01 = "{}/test_file_01.malloy".format(home_dir)
-fake_file = "{}/not_a_real_file.malloy".format(home_dir)
+home_dir = f"{Path(__file__).parent}/test_data"
+test_file_01 = f"{home_dir}/test_file_01.malloy"
+fake_file = f"{home_dir}/not_a_real_file.malloy"
 query_by_state = """
 query: airports -> {
                 where: state != null
@@ -49,8 +50,8 @@ query: airports -> {
             }"""
 
 
-@pytest_asyncio.fixture(scope="module")
-async def service_manager():
+@pytest_asyncio.fixture(scope="module", name="service_manager")
+async def fixture_service_manager():
   service_manager = ServiceManager()
   await service_manager.get_service()
   yield service_manager
@@ -74,8 +75,7 @@ async def test_logs_error_and_returns_none_if_file_not_found(
   [sql, connections] = await rt.get_sql(query=query_by_state)
   assert sql is None
   assert connections == []
-  assert "[Errno 2] No such file or directory: '{}'".format(
-      fake_file) in caplog.text
+  assert f"[Errno 2] No such file or directory: '{fake_file}'" in caplog.text
 
 
 @pytest.mark.asyncio
@@ -103,7 +103,7 @@ async def test_runs_sql(service_manager):
   rt.load_file(test_file_01)
   data = (await rt.run("duckdb", query=query_by_state)).df()
   print(data)
-  assert data['state'][0] == "TX"
-  assert data['airport_count'][0] == 1845
-  assert data['state'][22] == "NC"
-  assert data['airport_count'][22] == 400
+  assert data["state"][0] == "TX"
+  assert data["airport_count"][0] == 1845
+  assert data["state"][22] == "NC"
+  assert data["airport_count"][22] == 400

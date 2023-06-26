@@ -29,7 +29,6 @@ from malloy.service import ServiceManager
 
 
 @pytest.mark.skipif(not Path(ServiceManager.service_path()).exists(),
-                    reason="Could not find: {}".format(
-                        ServiceManager.service_path()))
+                    reason=f"Could not find: {ServiceManager.service_path()}")
 def test_notebook(nb_regression):
   nb_regression.check("tests/malloy/ipython/test_data/test.ipynb")
