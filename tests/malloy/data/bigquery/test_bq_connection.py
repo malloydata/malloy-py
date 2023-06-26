@@ -19,7 +19,8 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-# test_duckdb_connection.py
+# test_bq_connection.py
+"""Test bq_connection.py"""
 
 from collections import namedtuple
 from malloy.data.connection import ConnectionInterface
@@ -128,6 +129,7 @@ def _make_field_metadata(field):
     "field,expected", type_test_data)
 def test_maps_db_types(field, expected):
   conn = BigQueryConnection()
+  # pylint: disable=protected-access
   fields = conn._map_schema([_make_field_metadata(field)])
 
   assert fields[0] is not None, (
@@ -138,6 +140,7 @@ def test_maps_db_types(field, expected):
     "field,expected", type_test_data)
 def test_maps_sql_block_types(field, expected):
   conn = BigQueryConnection()
+  # pylint: disable=protected-access
   fields = conn._map_sql_block_schema({"fields": [field]})
 
   assert fields[0] is not None, (

@@ -20,12 +20,14 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 # test_connection_manager.py
+"""Test connection_manager.py"""
 
 from malloy.data.connection import ConnectionInterface
 from malloy.data.connection_manager import ConnectionManagerInterface, DefaultConnectionManager
 
 
 class FakeConnection(ConnectionInterface):
+  """Fake connection for test purposes"""
 
   def __init__(self, name="Test-Connection"):
     self._name = name

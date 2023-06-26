@@ -28,7 +28,7 @@ steps:
 
   - name: "docker.io/library/python:3.9"
     entrypoint: "python"
-    args: ["-m", "pylint", "src"]
+    args: ["-m", "pylint", "src", "tests"]
 
   - name: "node:16"
     entrypoint: "bash"
