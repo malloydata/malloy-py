@@ -30,6 +30,10 @@ steps:
     entrypoint: "python"
     args: ["-m", "pylint", "src", "tests"]
 
+  - name: "docker.io/library/python:3.9"
+    entrypoint: "python"
+    args: ["-m", "yapf", "--diff", "--recursive", "src", "tests"]
+
   - name: "node:16"
     entrypoint: "bash"
     args: ["./scripts/gen-services.sh"]

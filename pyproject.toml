@@ -56,9 +56,9 @@ push = true
 
 [tool.yapfignore]
 ignore_patterns = [
-    "**/*.pb2_grpc.py",
-    "**/*.pb2.py",
-    "**/*.pb2.pyi",
+    "**/*_pb2_grpc.py",
+    "**/*_pb2.py",
+    "**/*_pb2.pyi",
 ]
 
 [tool.yapf]

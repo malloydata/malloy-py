@@ -89,8 +89,7 @@ def parent_dir_str():
 
 
 def fetch_setting(conn, setting):
-  return conn.execute(
-      f"SELECT current_setting('{setting}')").fetchall()[0][0]
+  return conn.execute(f"SELECT current_setting('{setting}')").fetchall()[0][0]
 
 
 def init_test_table(duckdb: DuckDbConnection):
