@@ -62,6 +62,7 @@ type_test_data = [
     ("integer_col_1", "number", "integer", None),
     ("array_col_1", "struct", "number", True),
     ("struct_col_1", "struct", "number", False),
+    ("unsupported_col_1", "unsupported", "uuid", None),
 ]
 
 
@@ -82,7 +83,10 @@ def test_maps_db_types(field_name, expected_type, expected_other_type,
     assert field["structRelationship"]["isArray"] == is_array
     assert field["fields"][0]["type"] == expected_other_type
   elif expected_other_type is not None:
-    assert field["numberType"] == expected_other_type
+    if expected_type == "number":
+      assert field["numberType"] == expected_other_type
+    else:
+      assert field["rawType"] == expected_other_type
 
 
 # Utility Methods
@@ -113,6 +117,7 @@ CREATE TABLE test_table (
     integer_col_1           INTEGER,
     array_col_1             INTEGER[],
     struct_col_1            STRUCT(a INTEGER, b STRING),
+    unsupported_col_1       UUID,
 );
     """)
 

@@ -32,6 +32,10 @@ import logging
 import re
 
 
+class DuckDbException(Exception):
+  pass
+
+
 class DuckDbConnection(ConnectionInterface):
   """Basic implementation of a Malloy ConnectionInterface for DuckDb. """
 
@@ -136,7 +140,8 @@ class DuckDbConnection(ConnectionInterface):
       if column_match:
         schema.append([column_match.group(1), column_match.group(2)])
       else:
-        raise Exception(f"Badly form Structure definition ${schema_string}")
+        raise DuckDbException(
+            f"Badly form Structure definition ${schema_string}")
     return schema
 
   def _map_fields(self, schema):
@@ -177,6 +182,10 @@ class DuckDbConnection(ConnectionInterface):
         }
         fields.append(inner_struct_def)
       else:
+        if field_type in self.TYPE_MAP:
+          mapped_type = self.TYPE_MAP[field_type]
+        else:
+          mapped_type = {"type": "unsupported", "rawType": field_type.lower()}
         if is_array:
           inner_struct_def = {
               "type": "struct",
@@ -192,15 +201,11 @@ class DuckDbConnection(ConnectionInterface):
               },
               "fields": [{
                   "name": "value",
-              } | self.TYPE_MAP[field_type]],
+              } | mapped_type],
           }
           fields.append(inner_struct_def)
         else:
-          if field_type in self.TYPE_MAP:
-            field |= self.TYPE_MAP[field_type]
-          else:
-            field["type"] = "unsupported"
-            field["rawType"] = field_type.lower()
+          field |= mapped_type
           fields.append(field)
 
     return fields
