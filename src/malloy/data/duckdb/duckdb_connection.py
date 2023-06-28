@@ -84,6 +84,7 @@ class DuckDbConnection(ConnectionInterface):
     return schema
 
   def run_query(self, sql: str):
+    """Run a SQL query against this connection"""
     self._log.debug("Running Query:")
     self._log.debug(sql)
     con = self.get_connection()
@@ -106,20 +107,101 @@ class DuckDbConnection(ConnectionInterface):
         "fields": self._map_fields(schema)
     }
 
+  def _split_columns(self, schema_string):
+    columns = []
+    parens = 0
+    column = ""
+    eat_spaces = True
+    for c in schema_string:
+      if not eat_spaces or c != " ":
+        eat_spaces = False
+        if not parens and c == ",":
+          columns.append(column)
+          column = ""
+          eat_spaces = True
+        else:
+          column += c
+        if c == "(":
+          parens += 1
+        elif c == ")":
+          parens -= 1
+    columns.append(column)
+    return columns
+
+  def _string_to_schema(self, schema_string):
+    schema = []
+    columns = self._split_columns(schema_string)
+    for column in columns:
+      column_match = re.match(r"^([^\s]+) (.*)$", column)
+      if column_match:
+        schema.append([column_match.group(1), column_match.group(2)])
+      else:
+        raise Exception(f"Badly form Structure definition ${schema_string}")
+    return schema
+
   def _map_fields(self, schema):
     fields = []
     for metadata in schema:
-      field = {"name": metadata[0]}
-      field_type = metadata[1]
+      [name, field_type, *_] = metadata
+      field = {"name": name}
+
+      # Arrays are <field_type>[]
+      array_match = re.match(r"^(.*)\[\]$", field_type)
+      is_array = array_match is not None
+      if is_array:
+        field_type = array_match.group(1)
+
       # DECIMAL type includes precision ex. DECIMAL(18,3)
       if field_type.startswith("DECIMAL"):
         field_type = "DECIMAL"
-      if field_type in self.TYPE_MAP:
-        field |= self.TYPE_MAP[field_type]
+
+      # Structs are STRUCT(field1,field2,...)
+      struct_match = re.match(r"^STRUCT\((.*)\)$", field_type)
+      is_struct = struct_match is not None
+
+      if is_struct:
+        sub_schema = self._string_to_schema(struct_match.group(1))
+        inner_struct_def = {
+            "type": "struct",
+            "name": name,
+            "dialect": "duckdb",
+            "structSource": {
+                "type": "nested" if is_array else "inline"
+            },
+            "structRelationship": {
+                "type": "nested" if is_array else "inline",
+                "field": name,
+                "isArray": False,
+            },
+            "fields": self._map_fields(sub_schema),
+        }
+        fields.append(inner_struct_def)
       else:
-        field["type"] = "unsupported"
-        field["rawType"] = field_type.lower()
-      fields.append(field)
+        if is_array:
+          inner_struct_def = {
+              "type": "struct",
+              "name": name,
+              "dialect": "duckdb",
+              "structSource": {
+                  "type": "nested"
+              },
+              "structRelationship": {
+                  "type": "nested",
+                  "field": name,
+                  "isArray": True,
+              },
+              "fields": [{
+                  "name": "value",
+              } | self.TYPE_MAP[field_type]],
+          }
+          fields.append(inner_struct_def)
+        else:
+          if field_type in self.TYPE_MAP:
+            field |= self.TYPE_MAP[field_type]
+          else:
+            field["type"] = "unsupported"
+            field["rawType"] = field_type.lower()
+          fields.append(field)
 
     return fields
 
@@ -152,6 +234,34 @@ class DuckDbConnection(ConnectionInterface):
           "type": "boolean"
       },
       "INTEGER": {
+          "type": "number",
+          "numberType": "integer"
+      },
+      "TINYINT": {
+          "type": "number",
+          "numberType": "integer"
+      },
+      "SMALLINT": {
+          "type": "number",
+          "numberType": "integer"
+      },
+      "UBIGINT": {
+          "type": "number",
+          "numberType": "integer"
+      },
+      "UINTEGER": {
+          "type": "number",
+          "numberType": "integer"
+      },
+      "UTINYINT": {
+          "type": "number",
+          "numberType": "integer"
+      },
+      "USMALLINT": {
+          "type": "number",
+          "numberType": "integer"
+      },
+      "HUGEINT": {
           "type": "number",
           "numberType": "integer"
       },

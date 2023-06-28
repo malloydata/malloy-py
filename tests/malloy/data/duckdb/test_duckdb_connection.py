@@ -51,21 +51,24 @@ def test_creates_connection_with_search_path():
 
 
 type_test_data = [
-    ("varchar_col_1", "string", None),
-    ("bigint_col_1", "number", "integer"),
-    ("double_col_1", "number", "float"),
-    ("date_col_1", "date", None),
-    ("timestamp_col_1", "timestamp", None),
-    ("time_col_1", "string", None),
-    ("decimal_col_1", "number", "float"),
-    ("boolean_col_1", "boolean", None),
-    ("integer_col_1", "number", "integer"),
+    ("varchar_col_1", "string", None, None),
+    ("bigint_col_1", "number", "integer", None),
+    ("double_col_1", "number", "float", None),
+    ("date_col_1", "date", None, None),
+    ("timestamp_col_1", "timestamp", None, None),
+    ("time_col_1", "string", None, None),
+    ("decimal_col_1", "number", "float", None),
+    ("boolean_col_1", "boolean", None, None),
+    ("integer_col_1", "number", "integer", None),
+    ("array_col_1", "struct", "number", True),
+    ("struct_col_1", "struct", "number", False),
 ]
 
 
-@pytest.mark.parametrize("field_name,expected_type,expected_num_type",
-                         type_test_data)
-def test_maps_db_types(field_name, expected_type, expected_num_type):
+@pytest.mark.parametrize(
+    "field_name,expected_type,expected_other_type,is_array", type_test_data)
+def test_maps_db_types(field_name, expected_type, expected_other_type,
+                       is_array):
   duckdb = DuckDbConnection()
   init_test_table(duckdb)
 
@@ -75,8 +78,11 @@ def test_maps_db_types(field_name, expected_type, expected_num_type):
   assert field is not None, f"Database column not found: {field_name}"
   assert field["name"] == field_name
   assert field["type"] == expected_type
-  if expected_num_type is not None:
-    assert field["numberType"] == expected_num_type
+  if is_array is not None:
+    assert field["structRelationship"]["isArray"] == is_array
+    assert field["fields"][0]["type"] == expected_other_type
+  elif expected_other_type is not None:
+    assert field["numberType"] == expected_other_type
 
 
 # Utility Methods
@@ -105,6 +111,8 @@ CREATE TABLE test_table (
     decimal_col_1           DECIMAL,
     boolean_col_1           BOOLEAN,
     integer_col_1           INTEGER,
+    array_col_1             INTEGER[],
+    struct_col_1            STRUCT(a INTEGER, b STRING),
 );
     """)
 
