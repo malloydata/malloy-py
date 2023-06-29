@@ -63,7 +63,7 @@ class Runtime():
     return self
 
   def __exit__(self, *ex):
-    self._service_manager._kill_service()
+    self._service_manager.shutdown()
     self._was_entered = False
 
   def add_connection(self, connection: ConnectionInterface) -> Runtime:

@@ -107,3 +107,30 @@ async def test_runs_sql(service_manager):
   assert data["airport_count"][0] == 1845
   assert data["state"][22] == "NC"
   assert data["airport_count"][22] == 400
+
+
+@pytest.mark.asyncio
+async def test_with():
+  with Runtime() as rt:
+    rt.add_connection(DuckDbConnection(home_dir=home_dir))
+    rt.load_file(test_file_01)
+    data = (await rt.run("duckdb", query=query_by_state)).df()
+    print(data)
+    assert data["state"][0] == "TX"
+    assert data["airport_count"][0] == 1845
+    assert data["state"][22] == "NC"
+    assert data["airport_count"][22] == 400
+
+
+@pytest.mark.asyncio
+async def test_another_with():
+  """Verify that service manager can be re-used"""
+  with Runtime() as rt:
+    rt.add_connection(DuckDbConnection(home_dir=home_dir))
+    rt.load_file(test_file_01)
+    data = (await rt.run("duckdb", query=query_by_state)).df()
+    print(data)
+    assert data["state"][0] == "TX"
+    assert data["airport_count"][0] == 1845
+    assert data["state"][22] == "NC"
+    assert data["airport_count"][22] == 400

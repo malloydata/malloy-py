@@ -65,7 +65,8 @@ class ServiceManager:
     return self._is_ready.is_set()
 
   def shutdown(self):
-    return self._kill_service()
+    self._kill_service()
+    self._is_ready.clear()
 
   async def get_service(self):
     if not self._is_ready.is_set():
