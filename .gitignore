@@ -12,3 +12,6 @@ scratch
 
 # Jetbrains IDEs
 .idea/
+
+# Code coverage
+.coverage*
