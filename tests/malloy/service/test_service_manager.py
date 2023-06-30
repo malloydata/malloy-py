@@ -61,6 +61,6 @@ async def test_returns_external_service_if_provided():
   assert service == external_service
 
 
-def test_kill_service_does_not_throw_if_no_proc_started():
+def test_shutdown_does_not_throw_if_no_proc_started():
   sm = ServiceManager()
   sm.shutdown()
