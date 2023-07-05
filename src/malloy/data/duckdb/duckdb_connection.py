@@ -106,7 +106,7 @@ class DuckDbConnection(ConnectionInterface):
         },
         "structRelationship": {
             "type": "basetable",
-            "connectionName": "fake"
+            "connectionName": self.get_name()
         },
         "fields": self._map_fields(schema)
     }

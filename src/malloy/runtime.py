@@ -97,7 +97,7 @@ class Runtime():
 
   async def get_sql(self, named_query=None, query=None):
     self._sql = None
-    self._connections = []
+    self._connection = self.default_connection
     if named_query is None and query is None:
       self._log.error("Parameter named_query or query is required to get_sql()")
       return
@@ -125,18 +125,15 @@ class Runtime():
       else:
         raise ValueError("Channel not in ready state", state)
 
-    return [self._sql, self._connections]
+    return [self._sql, self._connection]
 
   async def run(self, connection, query=None, named_query=None):
-    [sql, connections] = await self.get_sql(query=query,
+    [sql, connection] = await self.get_sql(query=query,
                                             named_query=named_query)
     self._log.debug(sql)
-    self._log.debug(connections)
+    self._log.debug(connection)
     if sql is None:
       return None
-
-    if connections and len(connections):
-      connection = self._connections[0]
 
     return self._connection_manager.get_connection(connection).run_query(sql)
 
@@ -319,7 +316,7 @@ class Runtime():
     if self._last_response.type == CompilerRequest.Type.COMPLETE:
       self._log.debug("Received compile COMPLETE, ending session")
       self._sql = self._last_response.content
-      self._connections = self._last_response.connections
+      self._connection = self._last_response.connection
       self._compile_completed.set()
       return
 
