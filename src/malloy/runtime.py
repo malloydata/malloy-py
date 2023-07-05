@@ -128,8 +128,7 @@ class Runtime():
     return [self._sql, self._connection]
 
   async def run(self, connection, query=None, named_query=None):
-    [sql, connection] = await self.get_sql(query=query,
-                                            named_query=named_query)
+    [sql, connection] = await self.get_sql(query=query, named_query=named_query)
     self._log.debug(sql)
     self._log.debug(connection)
     if sql is None:

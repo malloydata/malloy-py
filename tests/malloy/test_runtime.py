@@ -74,7 +74,7 @@ async def test_logs_error_and_returns_none_if_file_not_found(
   rt.load_file(fake_file)
   [sql, connection] = await rt.get_sql(query=query_by_state)
   assert sql is None
-  assert connection == 'default_connection'
+  assert connection == "default_connection"
   assert f"[Errno 2] No such file or directory: '{fake_file}'" in caplog.text
 
 
