@@ -101,7 +101,7 @@ async def test_runs_sql(service_manager):
   rt = Runtime(service_manager=service_manager)
   rt.add_connection(DuckDbConnection(home_dir=home_dir))
   rt.load_file(test_file_01)
-  data = (await rt.run("duckdb", query=query_by_state)).df()
+  data = (await rt.run(query=query_by_state)).df()
   print(data)
   assert data["state"][0] == "TX"
   assert data["airport_count"][0] == 1845
@@ -114,7 +114,7 @@ async def test_with():
   with Runtime() as rt:
     rt.add_connection(DuckDbConnection(home_dir=home_dir))
     rt.load_file(test_file_01)
-    data = (await rt.run("duckdb", query=query_by_state)).df()
+    data = (await rt.run(query=query_by_state)).df()
     print(data)
     assert data["state"][0] == "TX"
     assert data["airport_count"][0] == 1845
@@ -128,7 +128,7 @@ async def test_another_with():
   with Runtime() as rt:
     rt.add_connection(DuckDbConnection(home_dir=home_dir))
     rt.load_file(test_file_01)
-    data = (await rt.run("duckdb", query=query_by_state)).df()
+    data = (await rt.run(query=query_by_state)).df()
     print(data)
     assert data["state"][0] == "TX"
     assert data["airport_count"][0] == 1845

@@ -71,7 +71,7 @@ async def _malloy_query(line, cell):
 
   model = IPython.get_ipython().user_ns.get(model_var)
   if model:
-    job = await model.run("default_connection", cell)
+    job = await model.run(query=cell)
     if job:
       if isinstance(job, DuckDBPyConnection):
         results = job.fetch_df()
