@@ -72,9 +72,9 @@ async def test_logs_error_and_returns_none_if_file_not_found(
   rt = Runtime(service_manager=service_manager)
   rt.add_connection(DuckDbConnection(home_dir=home_dir))
   rt.load_file(fake_file)
-  [sql, connections] = await rt.get_sql(query=query_by_state)
+  [sql, connection] = await rt.get_sql(query=query_by_state)
   assert sql is None
-  assert connections == []
+  assert connection == "default_connection"
   assert f"[Errno 2] No such file or directory: '{fake_file}'" in caplog.text
 
 
@@ -83,7 +83,7 @@ async def test_returns_sql(service_manager):
   rt = Runtime(service_manager=service_manager)
   rt.add_connection(DuckDbConnection(home_dir=home_dir))
   rt.load_file(test_file_01)
-  [sql, connections] = await rt.get_sql(query=query_by_state)
+  [sql, connection] = await rt.get_sql(query=query_by_state)
   assert sql == """
 SELECT\x20
    airports."state" as "state",
@@ -93,7 +93,7 @@ WHERE airports."state" IS NOT NULL
 GROUP BY 1
 ORDER BY 2 desc NULLS LAST
 """.lstrip()
-  assert connections == ["duckdb"]
+  assert connection == "duckdb"
 
 
 @pytest.mark.asyncio
@@ -101,7 +101,7 @@ async def test_runs_sql(service_manager):
   rt = Runtime(service_manager=service_manager)
   rt.add_connection(DuckDbConnection(home_dir=home_dir))
   rt.load_file(test_file_01)
-  data = (await rt.run("duckdb", query=query_by_state)).df()
+  data = (await rt.run(query=query_by_state)).df()
   print(data)
   assert data["state"][0] == "TX"
   assert data["airport_count"][0] == 1845
@@ -114,7 +114,7 @@ async def test_with():
   with Runtime() as rt:
     rt.add_connection(DuckDbConnection(home_dir=home_dir))
     rt.load_file(test_file_01)
-    data = (await rt.run("duckdb", query=query_by_state)).df()
+    data = (await rt.run(query=query_by_state)).df()
     print(data)
     assert data["state"][0] == "TX"
     assert data["airport_count"][0] == 1845
@@ -128,7 +128,7 @@ async def test_another_with():
   with Runtime() as rt:
     rt.add_connection(DuckDbConnection(home_dir=home_dir))
     rt.load_file(test_file_01)
-    data = (await rt.run("duckdb", query=query_by_state)).df()
+    data = (await rt.run(query=query_by_state)).df()
     print(data)
     assert data["state"][0] == "TX"
     assert data["airport_count"][0] == 1845

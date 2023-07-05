@@ -47,10 +47,11 @@ class CompileResponse(_message.Message):
     def __init__(self, model: _Optional[str] = ..., sql: _Optional[str] = ...) -> None: ...
 
 class CompilerRequest(_message.Message):
-    __slots__ = ["content", "import_urls", "sql_block", "table_schemas", "type"]
+    __slots__ = ["connection", "content", "import_urls", "sql_block", "table_schemas", "type"]
     class Type(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
     COMPLETE: CompilerRequest.Type
+    CONNECTION_FIELD_NUMBER: _ClassVar[int]
     CONTENT_FIELD_NUMBER: _ClassVar[int]
     IMPORT: CompilerRequest.Type
     IMPORT_URLS_FIELD_NUMBER: _ClassVar[int]
@@ -60,12 +61,13 @@ class CompilerRequest(_message.Message):
     TABLE_SCHEMAS_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
     UNKNOWN: CompilerRequest.Type
+    connection: str
     content: str
     import_urls: _containers.RepeatedScalarFieldContainer[str]
     sql_block: SqlBlock
     table_schemas: _containers.RepeatedScalarFieldContainer[str]
     type: CompilerRequest.Type
-    def __init__(self, type: _Optional[_Union[CompilerRequest.Type, str]] = ..., import_urls: _Optional[_Iterable[str]] = ..., table_schemas: _Optional[_Iterable[str]] = ..., sql_block: _Optional[_Union[SqlBlock, _Mapping]] = ..., content: _Optional[str] = ...) -> None: ...
+    def __init__(self, type: _Optional[_Union[CompilerRequest.Type, str]] = ..., import_urls: _Optional[_Iterable[str]] = ..., table_schemas: _Optional[_Iterable[str]] = ..., sql_block: _Optional[_Union[SqlBlock, _Mapping]] = ..., connection: _Optional[str] = ..., content: _Optional[str] = ...) -> None: ...
 
 class SqlBlock(_message.Message):
     __slots__ = ["name", "sql"]

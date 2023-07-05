@@ -43,7 +43,7 @@ async def main():
     with malloy.Runtime() as runtime:
         runtime.add_connection(DuckDbConnection(home_dir=home_dir))
 
-        data = await runtime.load_file(home_dir + "/1_names.malloy").run("duckdb", named_query="j_names")
+        data = await runtime.load_file(home_dir + "/1_names.malloy").run(named_query="j_names")
 
         dataframe = data.df()
         print(dataframe)
@@ -69,7 +69,7 @@ async def main():
     with malloy.Runtime() as runtime:
         runtime.add_connection(DuckDbConnection(home_dir=home_dir))
 
-        sql = await runtime.load_file(home_dir +"/2_flights.malloy").get_sql(
+        [sql] = await runtime.load_file(home_dir +"/2_flights.malloy").get_sql(
                 query="""
                   query: flights -> {
                     where: carrier ? 'WN' | 'DL', dep_time ? @2002-03-03
@@ -125,7 +125,7 @@ async def main():
             recall_count is count()
             percent_of_recalls is recall_count/all(recall_count)*100
         }
-        """).run("duckdb", query="""
+        """).run(query="""
         query: auto_recalls -> {
           group_by: Manufacturer
           aggregate:
