@@ -80,6 +80,8 @@ class BigQueryConnection(ConnectionInterface):
             "type": "basetable",
             "connectionName": self.get_name(),
         },
+        # TODO: Fix protected-access when alternative available
+        # pylint: disable=protected-access
         "fields":
             self._map_sql_block_schema(query_job._job_statistics()["schema"]),
     }
