@@ -39,6 +39,10 @@ from malloy.services.v1.compiler_pb2_grpc import CompilerStub
 from malloy.services.v1.compiler_pb2 import CompileRequest, CompileDocument, CompilerRequest, SqlBlockSchema
 
 
+class MalloyRuntimeError(Exception):
+  pass
+
+
 class Runtime():
   """Malloy runtime class for loading, compiling, and running .malloy files"""
   ready_state = [grpc.ChannelConnectivity.READY]
@@ -83,7 +87,7 @@ class Runtime():
     self._log.debug("  import_path: %s", self._file_dir)
     return self
 
-  def load_source(self, source, import_path=None):
+  def load_source(self, source: str, import_path: str = None):
     self._is_file = False
     self._source = source
     if import_path is None:
@@ -95,7 +99,7 @@ class Runtime():
     self._log.debug("  file_name: %s", self._file_name)
     return self
 
-  async def get_sql(self, named_query=None, query=None):
+  async def get_sql(self, named_query: str = None, query: str = None):
     self._sql = None
     self._connection = None
     if named_query is None and query is None:
@@ -127,7 +131,7 @@ class Runtime():
 
     return [self._sql, self._connection]
 
-  async def run(self, query=None, named_query=None):
+  async def run(self, query: str = None, named_query: str = None):
     [sql, connection_name] = await self.get_sql(query=query,
                                                 named_query=named_query)
     #TODO: Remove this when default connections go away
@@ -136,11 +140,39 @@ class Runtime():
       self._log.debug("  default connection: %s", connection_name)
     self._log.debug(sql)
     self._log.debug(connection_name)
+    if self._error:
+      raise MalloyRuntimeError(self._error)
     if sql is None:
       return None
-
     return self._connection_manager.get_connection(connection_name).run_query(
         sql)
+
+  async def compile(self):
+    service = await self._service_manager.get_service()
+
+    if not self._service_manager.is_ready():
+      self._log.error(
+          "Service manager failed to report ready state, compile ending")
+      return
+
+    self._log.debug("Using compiler service: %s", service)
+    self._init_compile_state()
+
+    async with grpc.aio.insecure_channel(service) as channel:
+      stub = CompilerStub(channel)
+      self._response_stream = stub.CompileStream(self)
+      state = channel.get_state()
+      while state not in self.ready_state and state not in self.error_state:
+        await channel.wait_for_state_change(state)
+        state = channel.get_state()
+
+      if state in self.ready_state:
+        await self._compile_completed.wait()
+      else:
+        raise ValueError("Channel not in ready state", state)
+
+      if self._error:
+        raise MalloyRuntimeError(self._error)
 
   def __aiter__(self):
     return self
@@ -197,12 +229,15 @@ class Runtime():
     self._seen_responses = []
     self._last_response = None
     self._sql = None
-    if named_query is None:
+    if query is not None:
       self._query_type = "query"
       self._query = query
-    else:
+    elif named_query is not None:
       self._query_type = "named"
       self._query = named_query
+    else:
+      self._query_type = "compile"
+    self._error = None
 
   def _generate_initial_compile_request(self):
     self._log.debug("Generating initial compile request")
@@ -216,7 +251,7 @@ class Runtime():
                                            self._file_name, internal=True))
     if self._query_type == "query":
       compile_request.query = self._query
-    else:
+    elif self._query_type == "named":
       compile_request.named_query = self._query
     return compile_request
 
@@ -259,19 +294,22 @@ class Runtime():
         self._log.debug("  default connection: %s", connection_name)
 
       connection = self._connection_manager.get_connection(connection_name)
-      # tables = tables_per_connection_to_fetch.get(connection)
-      self._log.debug("  tables: %s", tables)
-      schemas = connection.get_schema_for_tables(tables)
+      if connection:
+        # tables = tables_per_connection_to_fetch.get(connection)
+        self._log.debug("  tables: %s", tables)
+        schemas = connection.get_schema_for_tables(tables)
 
-      #TODO: Remove this when default connections go away
-      for key in schemas["schemas"]:
-        schemas["schemas"][key]["structRelationship"][
-            "connectionName"] = orig_connection_name
+        #TODO: Remove this when default connections go away
+        for key in schemas["schemas"]:
+          schemas["schemas"][key]["structRelationship"][
+              "connectionName"] = orig_connection_name
 
-      combined_schemas["schemas"] = {
-          **combined_schemas["schemas"],
-          **schemas["schemas"]
-      }
+        combined_schemas["schemas"] = {
+            **combined_schemas["schemas"],
+            **schemas["schemas"]
+        }
+      else:
+        raise MalloyRuntimeError(f"Unknown connection {connection_name}")
 
     request = CompileRequest(type=CompileRequest.Type.TABLE_SCHEMAS,
                              schema=json.dumps(combined_schemas))
@@ -330,6 +368,12 @@ class Runtime():
       self._log.debug("Received compile COMPLETE, ending session")
       self._sql = self._last_response.content
       self._connection = self._last_response.connection
+      self._compile_completed.set()
+      return
+
+    if self._last_response.type == CompilerRequest.Type.ERROR:
+      self._log.info("Received response type ERROR")
+      self._error = self._last_response.content
       self._compile_completed.set()
       return
 

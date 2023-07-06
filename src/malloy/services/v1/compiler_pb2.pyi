@@ -53,6 +53,7 @@ class CompilerRequest(_message.Message):
     COMPLETE: CompilerRequest.Type
     CONNECTION_FIELD_NUMBER: _ClassVar[int]
     CONTENT_FIELD_NUMBER: _ClassVar[int]
+    ERROR: CompilerRequest.Type
     IMPORT: CompilerRequest.Type
     IMPORT_URLS_FIELD_NUMBER: _ClassVar[int]
     SQL_BLOCK_FIELD_NUMBER: _ClassVar[int]

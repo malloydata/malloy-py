@@ -29,16 +29,19 @@ from malloy.data.bigquery import BigQueryConnection
 from malloy.data.duckdb import DuckDbConnection
 from malloy.data.connection_manager import DefaultConnectionManager
 from malloy.service import ServiceManager
+from malloy import Runtime
+from malloy.runtime import MalloyRuntimeError
 from duckdb import DuckDBPyConnection
 
 nest_asyncio.apply()
 
 DEFAULT_MODEL_VAR = "model"
 
-runtime = None
+runtime: Runtime = None
 
 
 def _cleanup_runtime():
+  """Tear down runtime when the magic is unloaded or the process exits"""
   if runtime:
     print("Malloy out")
     runtime.shutdown()
@@ -49,7 +52,7 @@ atexit.register(_cleanup_runtime)
 loop = asyncio.get_event_loop()
 
 
-def malloy_model(line, cell):
+async def _malloy_model(line, cell):
   """Dispatch a malloy model cell to the malloy client.
 
   Args:
@@ -58,37 +61,64 @@ def malloy_model(line, cell):
   """
   var_name = line.strip() or DEFAULT_MODEL_VAR
 
-  model = runtime.load_source(cell)
-  IPython.get_ipython().user_ns[var_name] = model
-  print("Stored in", var_name)
+  model = runtime.load_source("\n" + cell)
+  try:
+    await model.compile()
+
+    IPython.get_ipython().user_ns[var_name] = model
+    print("✅ Stored in", var_name)
+  except MalloyRuntimeError as e:
+    print(f"🚫 {e.args[0]}")
+    IPython.get_ipython().user_ns[var_name] = None
 
 
-async def _malloy_query(line, cell):
-  """Async backend to malloy_query()"""
+def malloy_model(line, cell):
+  """Dispatch a malloy model cell to the malloy client.
+
+  Args:
+    line: Storage location
+    cell: Malloy model
+  """
+  loop.run_until_complete(_malloy_model(line, cell))
+
+
+async def _malloy_query(line: str, cell: str):
+  """Async backend to malloy_query()
+  
+  Args:
+    line: Model name and query storage variable as whitespace
+    separated swing
+    cell: Malloy query
+  """
   var_names = line.strip().split()
   model_var = var_names[0] or DEFAULT_MODEL_VAR
   results_var = var_names[1] if len(var_names) > 1 else None
+  if results_var:
+    IPython.get_ipython().user_ns[results_var] = None
 
   model = IPython.get_ipython().user_ns.get(model_var)
   if model:
-    job = await model.run(query=cell)
-    if job:
-      if isinstance(job, DuckDBPyConnection):
-        results = job.fetch_df()
+    try:
+      job = await model.run(query="\n" + cell)
+      if job:
+        if isinstance(job, DuckDBPyConnection):
+          results = job.fetch_df()
+        else:
+          results = job.to_dataframe()
+        if results_var:
+          IPython.get_ipython().user_ns[results_var] = results
+          print("✅ Stored in", results_var)
+        else:
+          return results
       else:
-        results = job.to_dataframe()
-      if results_var:
-        IPython.get_ipython().user_ns[results_var] = results
-        print("Stored in", results_var)
-      else:
-        return results
-    else:
-      print("No results")
+        print("No results")
+    except MalloyRuntimeError as e:
+      print(f"🚫 {e.args[0]}")
   else:
     print("Please run the cell containing the model")
 
 
-def malloy_query(line, cell):
+def malloy_query(line: str, cell: str):
   """Dispatch a malloy query cell to the malloy client.
 
   Args:
