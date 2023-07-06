@@ -37,13 +37,12 @@ import asyncio
 import malloy
 from malloy.data.duckdb import DuckDbConnection
 
-
 async def main():
-    home_dir = "/path/to/samples/duckdb/names"
+    home_dir = "/path/to/samples/duckdb/imdb"
     with malloy.Runtime() as runtime:
         runtime.add_connection(DuckDbConnection(home_dir=home_dir))
 
-        data = await runtime.load_file(home_dir + "/1_names.malloy").run(named_query="j_names")
+        data = await runtime.load_file(home_dir + "/5_movie_complex.malloy").run(named_query="horror_combo")
 
         dataframe = data.df()
         print(dataframe)
@@ -69,7 +68,7 @@ async def main():
     with malloy.Runtime() as runtime:
         runtime.add_connection(DuckDbConnection(home_dir=home_dir))
 
-        [sql] = await runtime.load_file(home_dir +"/2_flights.malloy").get_sql(
+        [sql, connection] = await runtime.load_file(home_dir +"/flights.malloy").get_sql(
                 query="""
                   query: flights -> {
                     where: carrier ? 'WN' | 'DL', dep_time ? @2002-03-03
