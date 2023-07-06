@@ -42,8 +42,9 @@ async def main():
     with malloy.Runtime() as runtime:
         runtime.add_connection(DuckDbConnection(home_dir=home_dir))
 
-        data = await runtime.load_file(home_dir + "/5_movie_complex.malloy").run(named_query="horror_combo")
-
+        data = await runtime.load_file(home_dir + "/5_movie_complex.malloy").run(
+            named_query="horror_combo")
+            
         dataframe = data.df()
         print(dataframe)
 
