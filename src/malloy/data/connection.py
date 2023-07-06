@@ -42,7 +42,7 @@ class ConnectionInterface(metaclass=abc.ABCMeta):
     raise NotImplementedError
 
   @abc.abstractmethod
-  def get_schema_for_tables(self, tables: Sequence[str]):
+  def get_schema_for_tables(self, tables: Sequence[(str, str)]):
     raise NotImplementedError
 
   @abc.abstractmethod

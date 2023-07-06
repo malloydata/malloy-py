@@ -74,17 +74,14 @@ class DuckDbConnection(ConnectionInterface):
         self._con.execute(sql)
     return self._con
 
-  def get_schema_for_tables(self, tables: Sequence[str]):
+  def get_schema_for_tables(self, tables: Sequence[(str, str)]):
     self._log.debug("Fetching schema for tables...")
     schema = {"schemas": {}}
     con = self.get_connection()
-    for table in tables:
-      table_name = table[table.find(":") + 1:]
+    for (key, table_name) in tables:
       self._log.debug("Fetching %s", table_name)
       con.execute(f"DESCRIBE SELECT * FROM \"{table_name}\"")
-      schema["schemas"][
-          f"{self.get_name()}:{table_name}"] = self._to_struct_def(
-              table_name, con.fetchall())
+      schema["schemas"][key] = self._to_struct_def(table_name, con.fetchall())
     return schema
 
   def run_query(self, sql: str):

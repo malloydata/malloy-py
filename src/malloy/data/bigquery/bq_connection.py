@@ -46,13 +46,12 @@ class BigQueryConnection(ConnectionInterface):
     self._client_options = options
     return self
 
-  def get_schema_for_tables(self, tables: Sequence[str]):
+  def get_schema_for_tables(self, tables: Sequence[(str, str)]):
     schema = {"schemas": {}}
-    for table in tables:
-      table_only = table[table.find(":") + 1:]
-      schema["schemas"][table] = self._to_struct_def(
-          table_only,
-          bigquery.Client(self._client_options).get_table(table_only).schema)
+    for (key, table) in tables:
+      schema["schemas"][key] = self._to_struct_def(
+          table,
+          bigquery.Client(self._client_options).get_table(table).schema)
     return schema
 
   def run_query(self, sql: str):
