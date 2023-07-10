@@ -65,17 +65,19 @@ class CompilerRequest(_message.Message):
     content: str
     import_urls: _containers.RepeatedScalarFieldContainer[str]
     sql_block: SqlBlock
-    table_schemas: _containers.RepeatedScalarFieldContainer[str]
+    table_schemas: _containers.RepeatedCompositeFieldContainer[TableSchema]
     type: CompilerRequest.Type
-    def __init__(self, type: _Optional[_Union[CompilerRequest.Type, str]] = ..., import_urls: _Optional[_Iterable[str]] = ..., table_schemas: _Optional[_Iterable[str]] = ..., sql_block: _Optional[_Union[SqlBlock, _Mapping]] = ..., connection: _Optional[str] = ..., content: _Optional[str] = ...) -> None: ...
+    def __init__(self, type: _Optional[_Union[CompilerRequest.Type, str]] = ..., import_urls: _Optional[_Iterable[str]] = ..., table_schemas: _Optional[_Iterable[_Union[TableSchema, _Mapping]]] = ..., sql_block: _Optional[_Union[SqlBlock, _Mapping]] = ..., connection: _Optional[str] = ..., content: _Optional[str] = ...) -> None: ...
 
 class SqlBlock(_message.Message):
-    __slots__ = ["name", "sql"]
+    __slots__ = ["connection", "name", "sql"]
+    CONNECTION_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     SQL_FIELD_NUMBER: _ClassVar[int]
+    connection: str
     name: str
     sql: str
-    def __init__(self, name: _Optional[str] = ..., sql: _Optional[str] = ...) -> None: ...
+    def __init__(self, name: _Optional[str] = ..., sql: _Optional[str] = ..., connection: _Optional[str] = ...) -> None: ...
 
 class SqlBlockSchema(_message.Message):
     __slots__ = ["name", "schema", "sql"]
@@ -86,3 +88,13 @@ class SqlBlockSchema(_message.Message):
     schema: str
     sql: str
     def __init__(self, name: _Optional[str] = ..., sql: _Optional[str] = ..., schema: _Optional[str] = ...) -> None: ...
+
+class TableSchema(_message.Message):
+    __slots__ = ["connection", "key", "table"]
+    CONNECTION_FIELD_NUMBER: _ClassVar[int]
+    KEY_FIELD_NUMBER: _ClassVar[int]
+    TABLE_FIELD_NUMBER: _ClassVar[int]
+    connection: str
+    key: str
+    table: str
+    def __init__(self, key: _Optional[str] = ..., connection: _Optional[str] = ..., table: _Optional[str] = ...) -> None: ...

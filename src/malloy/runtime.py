@@ -29,7 +29,6 @@ import hashlib
 import json
 import logging
 import os
-import re
 
 from pathlib import Path
 
@@ -45,6 +44,7 @@ class Runtime():
   ready_state = [grpc.ChannelConnectivity.READY]
   error_state = [grpc.ChannelConnectivity.TRANSIENT_FAILURE]
 
+  #TODO: Remove this when default connections go away
   default_connection = "default_connection"
 
   def __init__(
@@ -97,7 +97,7 @@ class Runtime():
 
   async def get_sql(self, named_query=None, query=None):
     self._sql = None
-    self._connection = self.default_connection
+    self._connection = None
     if named_query is None and query is None:
       self._log.error("Parameter named_query or query is required to get_sql()")
       return
@@ -128,13 +128,19 @@ class Runtime():
     return [self._sql, self._connection]
 
   async def run(self, query=None, named_query=None):
-    [sql, connection] = await self.get_sql(query=query, named_query=named_query)
+    [sql, connection_name] = await self.get_sql(query=query,
+                                                named_query=named_query)
+    #TODO: Remove this when default connections go away
+    if connection_name == self.default_connection:
+      connection_name = self._connection_manager.get_default_connection_name()
+      self._log.debug("  default connection: %s", connection_name)
     self._log.debug(sql)
-    self._log.debug(connection)
+    self._log.debug(connection_name)
     if sql is None:
       return None
 
-    return self._connection_manager.get_connection(connection).run_query(sql)
+    return self._connection_manager.get_connection(connection_name).run_query(
+        sql)
 
   def __aiter__(self):
     return self
@@ -229,14 +235,16 @@ class Runtime():
     self._log.debug("  requested table schemas:\n%s",
                     self._last_response.table_schemas)
     for table_schema in self._last_response.table_schemas:
-      m = re.search(pattern=r"^(.+):(.+)$", string=table_schema)
-      connection_name = m.group(1)
-      table_name = table_schema
+      table_key = table_schema.key
+      connection_name = table_schema.connection
+      table_name = table_schema.table
 
       if connection_name in tables_per_connection_to_fetch:
-        tables_per_connection_to_fetch[connection_name].append(table_name)
+        tables_per_connection_to_fetch[connection_name].append(
+            (table_key, table_name))
       else:
-        tables_per_connection_to_fetch[connection_name] = [table_name]
+        tables_per_connection_to_fetch[connection_name] = [(table_key,
+                                                            table_name)]
 
     # self._log.debug("  fetching table schemas:\n{}".format(
     #     tables_per_connection_to_fetch))
@@ -244,6 +252,8 @@ class Runtime():
     for connection_name, tables in tables_per_connection_to_fetch.items():
       self._log.debug("  using connection: %s", connection_name)
 
+      #TODO: Remove this when default connections go away
+      orig_connection_name = connection_name
       if connection_name == self.default_connection:
         connection_name = self._connection_manager.get_default_connection_name()
         self._log.debug("  default connection: %s", connection_name)
@@ -252,6 +262,12 @@ class Runtime():
       # tables = tables_per_connection_to_fetch.get(connection)
       self._log.debug("  tables: %s", tables)
       schemas = connection.get_schema_for_tables(tables)
+
+      #TODO: Remove this when default connections go away
+      for key in schemas["schemas"]:
+        schemas["schemas"][key]["structRelationship"][
+            "connectionName"] = orig_connection_name
+
       combined_schemas["schemas"] = {
           **combined_schemas["schemas"],
           **schemas["schemas"]
@@ -265,9 +281,7 @@ class Runtime():
   def _generate_sql_block_schemas_request(self):
     # Compiler should really be telling us which connection to use per table...
     self._log.debug(self._last_response.sql_block.sql)
-    m = re.search(pattern=r"^md5:/(.+)//.+$",
-                  string=self._last_response.sql_block.name)
-    connection_name = m.group(1)
+    connection_name = self._last_response.sql_block.connection
     self._log.debug("  fetching sql_block schema from connection: %s",
                     connection_name)
     connection = self._connection_manager.get_connection(connection_name)

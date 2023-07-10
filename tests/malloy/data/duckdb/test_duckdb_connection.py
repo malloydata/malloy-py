@@ -73,7 +73,8 @@ def test_maps_db_types(field_name, expected_type, expected_other_type,
   duckdb = DuckDbConnection()
   init_test_table(duckdb)
 
-  field = get_field_def(schema=duckdb.get_schema_for_tables(["test_table"]),
+  field = get_field_def(schema=duckdb.get_schema_for_tables([("test_key",
+                                                              "test_table")]),
                         col=field_name)
   print(field)
   assert field is not None, f"Database column not found: {field_name}"
@@ -123,7 +124,7 @@ CREATE TABLE test_table (
 
 
 def get_field_def(schema, col):
-  for field in schema["schemas"]["duckdb:test_table"]["fields"]:
+  for field in schema["schemas"]["test_key"]["fields"]:
     if field["name"] == col:
       return field
   return None
