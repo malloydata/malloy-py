@@ -16,7 +16,7 @@ bumpver==2022.1119
     # via malloy (pyproject.toml)
 cachetools==5.2.0
     # via google-auth
-certifi==2022.9.24
+certifi==2023.7.22
     # via requests
 cffi==1.15.1
     # via cryptography
