@@ -35,12 +35,12 @@ googleapis-common-protos==1.56.4
     # via
     #   google-api-core
     #   grpcio-status
-grpcio==1.53.0
+grpcio==1.54.2
     # via
     #   google-api-core
     #   google-cloud-bigquery
     #   grpcio-status
-grpcio-status==1.54.2
+grpcio-status==1.50.0
     # via google-api-core
 idna==3.4
     # via requests
