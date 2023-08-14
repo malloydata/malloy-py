@@ -40,6 +40,7 @@ from malloy.services.v1.compiler_pb2 import CompileRequest, CompileDocument, Com
 
 from duckdb import DuckDBPyConnection
 
+
 class MalloyRuntimeError(Exception):
   pass
 
@@ -100,7 +101,8 @@ class Runtime():
     self._log.debug("  file_name: %s", self._file_name)
     return self
 
-  async def compile_and_render(self, named_query: str = None,
+  async def compile_and_render(self,
+                               named_query: str = None,
                                query: str = None):
     self._sql = None
     self._connection = None
@@ -332,13 +334,13 @@ class Runtime():
     connection_name = self._last_response.connection
     connection = self._connection_manager.get_connection(connection_name)
     self._log.debug(
-      "Running query and getting results from default connection: %s",
-      connection_name)
+        "Running query and getting results from default connection: %s",
+        connection_name)
     sql = self._last_response.content
     job = connection.run_query(sql)
     total_rows = 0
     if isinstance(job, DuckDBPyConnection):
-      self._job_result =job.fetch_df()
+      self._job_result = job.fetch_df()
       total_rows = len(self._job_result.index)
     else:
       self._job_result = job.to_dataframe()
@@ -347,9 +349,8 @@ class Runtime():
     self._log.debug("Sending results to service.")
     return CompileRequest(type=CompileRequest.Type.RESULTS,
                           query_result=QueryResult(
-                            data=json.dumps(results_json),
-                            total_rows=total_rows)
-                          )
+                              data=json.dumps(results_json),
+                              total_rows=total_rows))
 
   def _generate_sql_block_schemas_request(self):
     # Compiler should really be telling us which connection to use per table...
