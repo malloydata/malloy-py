@@ -15,15 +15,17 @@ class CompileDocument(_message.Message):
     def __init__(self, url: _Optional[str] = ..., content: _Optional[str] = ...) -> None: ...
 
 class CompileRequest(_message.Message):
-    __slots__ = ["document", "named_query", "query", "references", "schema", "sql_block_schemas", "type"]
+    __slots__ = ["document", "named_query", "query", "query_result", "references", "schema", "sql_block_schemas", "type"]
     class Type(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
     COMPILE: CompileRequest.Type
     DOCUMENT_FIELD_NUMBER: _ClassVar[int]
     NAMED_QUERY_FIELD_NUMBER: _ClassVar[int]
     QUERY_FIELD_NUMBER: _ClassVar[int]
+    QUERY_RESULT_FIELD_NUMBER: _ClassVar[int]
     REFERENCES: CompileRequest.Type
     REFERENCES_FIELD_NUMBER: _ClassVar[int]
+    RESULTS: CompileRequest.Type
     SCHEMA_FIELD_NUMBER: _ClassVar[int]
     SQL_BLOCK_SCHEMAS: CompileRequest.Type
     SQL_BLOCK_SCHEMAS_FIELD_NUMBER: _ClassVar[int]
@@ -32,22 +34,25 @@ class CompileRequest(_message.Message):
     document: CompileDocument
     named_query: str
     query: str
+    query_result: QueryResult
     references: _containers.RepeatedCompositeFieldContainer[CompileDocument]
     schema: str
     sql_block_schemas: _containers.RepeatedCompositeFieldContainer[SqlBlockSchema]
     type: CompileRequest.Type
-    def __init__(self, type: _Optional[_Union[CompileRequest.Type, str]] = ..., document: _Optional[_Union[CompileDocument, _Mapping]] = ..., references: _Optional[_Iterable[_Union[CompileDocument, _Mapping]]] = ..., schema: _Optional[str] = ..., sql_block_schemas: _Optional[_Iterable[_Union[SqlBlockSchema, _Mapping]]] = ..., query: _Optional[str] = ..., named_query: _Optional[str] = ...) -> None: ...
+    def __init__(self, type: _Optional[_Union[CompileRequest.Type, str]] = ..., document: _Optional[_Union[CompileDocument, _Mapping]] = ..., references: _Optional[_Iterable[_Union[CompileDocument, _Mapping]]] = ..., schema: _Optional[str] = ..., sql_block_schemas: _Optional[_Iterable[_Union[SqlBlockSchema, _Mapping]]] = ..., query: _Optional[str] = ..., named_query: _Optional[str] = ..., query_result: _Optional[_Union[QueryResult, _Mapping]] = ...) -> None: ...
 
 class CompileResponse(_message.Message):
-    __slots__ = ["model", "sql"]
+    __slots__ = ["model", "query_results", "sql"]
     MODEL_FIELD_NUMBER: _ClassVar[int]
+    QUERY_RESULTS_FIELD_NUMBER: _ClassVar[int]
     SQL_FIELD_NUMBER: _ClassVar[int]
     model: str
+    query_results: str
     sql: str
-    def __init__(self, model: _Optional[str] = ..., sql: _Optional[str] = ...) -> None: ...
+    def __init__(self, model: _Optional[str] = ..., sql: _Optional[str] = ..., query_results: _Optional[str] = ...) -> None: ...
 
 class CompilerRequest(_message.Message):
-    __slots__ = ["connection", "content", "import_urls", "sql_block", "table_schemas", "type"]
+    __slots__ = ["connection", "content", "import_urls", "render_content", "sql_block", "table_schemas", "type"]
     class Type(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
     COMPLETE: CompilerRequest.Type
@@ -56,6 +61,8 @@ class CompilerRequest(_message.Message):
     ERROR: CompilerRequest.Type
     IMPORT: CompilerRequest.Type
     IMPORT_URLS_FIELD_NUMBER: _ClassVar[int]
+    RENDER_CONTENT_FIELD_NUMBER: _ClassVar[int]
+    RUN: CompilerRequest.Type
     SQL_BLOCK_FIELD_NUMBER: _ClassVar[int]
     SQL_BLOCK_SCHEMAS: CompilerRequest.Type
     TABLE_SCHEMAS: CompilerRequest.Type
@@ -65,10 +72,19 @@ class CompilerRequest(_message.Message):
     connection: str
     content: str
     import_urls: _containers.RepeatedScalarFieldContainer[str]
+    render_content: str
     sql_block: SqlBlock
     table_schemas: _containers.RepeatedCompositeFieldContainer[TableSchema]
     type: CompilerRequest.Type
-    def __init__(self, type: _Optional[_Union[CompilerRequest.Type, str]] = ..., import_urls: _Optional[_Iterable[str]] = ..., table_schemas: _Optional[_Iterable[_Union[TableSchema, _Mapping]]] = ..., sql_block: _Optional[_Union[SqlBlock, _Mapping]] = ..., connection: _Optional[str] = ..., content: _Optional[str] = ...) -> None: ...
+    def __init__(self, type: _Optional[_Union[CompilerRequest.Type, str]] = ..., import_urls: _Optional[_Iterable[str]] = ..., table_schemas: _Optional[_Iterable[_Union[TableSchema, _Mapping]]] = ..., sql_block: _Optional[_Union[SqlBlock, _Mapping]] = ..., connection: _Optional[str] = ..., render_content: _Optional[str] = ..., content: _Optional[str] = ...) -> None: ...
+
+class QueryResult(_message.Message):
+    __slots__ = ["data", "total_rows"]
+    DATA_FIELD_NUMBER: _ClassVar[int]
+    TOTAL_ROWS_FIELD_NUMBER: _ClassVar[int]
+    data: str
+    total_rows: int
+    def __init__(self, data: _Optional[str] = ..., total_rows: _Optional[int] = ...) -> None: ...
 
 class SqlBlock(_message.Message):
     __slots__ = ["connection", "name", "sql"]

@@ -21,6 +21,7 @@
 """Malloy IPython magics"""
 
 import IPython
+from IPython import display
 import asyncio
 import atexit
 import malloy
@@ -96,20 +97,16 @@ async def _malloy_query(line: str, cell: str):
   if results_var:
     IPython.get_ipython().user_ns[results_var] = None
 
-  model = IPython.get_ipython().user_ns.get(model_var)
-  if model:
+  if model := IPython.get_ipython().user_ns.get(model_var):
     try:
-      job = await model.run(query="\n" + cell)
-      if job:
-        if isinstance(job, DuckDBPyConnection):
-          results = job.fetch_df()
-        else:
-          results = job.to_dataframe()
-        if results_var:
-          IPython.get_ipython().user_ns[results_var] = results
-          print("✅ Stored in", results_var)
-        else:
-          return results
+      [job_result, html_content] = await model.run(query="\n" + cell)
+      if job_result is not None:
+        if html_content:
+          display.display(display.HTML(html_content))
+        if not results_var:
+          return job_result
+        IPython.get_ipython().user_ns[results_var] = job_result
+        print("✅ Stored in", results_var)
       else:
         print("No results")
     except MalloyRuntimeError as e:
