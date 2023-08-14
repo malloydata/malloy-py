@@ -32,7 +32,6 @@ from malloy.data.connection_manager import DefaultConnectionManager
 from malloy.service import ServiceManager
 from malloy import Runtime
 from malloy.runtime import MalloyRuntimeError
-from duckdb import DuckDBPyConnection
 
 nest_asyncio.apply()
 

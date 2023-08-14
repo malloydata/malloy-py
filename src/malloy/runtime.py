@@ -100,7 +100,8 @@ class Runtime():
     self._log.debug("  file_name: %s", self._file_name)
     return self
 
-  async def compile_and_render(self, named_query: str = None, query: str = None):
+  async def compile_and_render(self, named_query: str = None,
+                               query: str = None):
     self._sql = None
     self._connection = None
     if named_query is None and query is None:
@@ -215,7 +216,7 @@ class Runtime():
         request = self._generate_sql_block_schemas_request()
         self._last_response = None
         return request
-      
+
       if self._last_response.type == CompilerRequest.Type.RUN:
         self._log.debug("  generating run sql request")
         request = self._generate_results_request()
@@ -330,7 +331,9 @@ class Runtime():
     self._log.debug(self._last_response.sql_block.sql)
     connection_name = self._last_response.connection
     connection = self._connection_manager.get_connection(connection_name)
-    self._log.debug("Running query and getting results from default connection: %s", connection_name)
+    self._log.debug(
+      "Running query and getting results from default connection: %s",
+      connection_name)
     sql = self._last_response.content
     job = connection.run_query(sql)
     total_rows = 0
@@ -343,8 +346,9 @@ class Runtime():
     results_json = self._job_result.to_json(orient="records")
     self._log.debug("Sending results to service.")
     return CompileRequest(type=CompileRequest.Type.RESULTS,
-                          query_result=QueryResult(data=json.dumps(results_json),
-                                                   total_rows=total_rows)
+                          query_result=QueryResult(
+                            data=json.dumps(results_json),
+                            total_rows=total_rows)
                           )
 
   def _generate_sql_block_schemas_request(self):
