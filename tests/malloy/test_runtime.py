@@ -72,7 +72,7 @@ async def test_logs_error_and_returns_none_if_file_not_found(
   rt = Runtime(service_manager=service_manager)
   rt.add_connection(DuckDbConnection(home_dir=home_dir))
   rt.load_file(fake_file)
-  [sql, connection] = await rt.compile_and_render(query=query_by_state)
+  [sql, connection] = await rt.compile_and_maybe_execute(query=query_by_state)
   assert sql is None
   assert connection is None
   assert f"[Errno 2] No such file or directory: '{fake_file}'" in caplog.text
@@ -83,7 +83,7 @@ async def test_returns_sql(service_manager):
   rt = Runtime(service_manager=service_manager)
   rt.add_connection(DuckDbConnection(home_dir=home_dir))
   rt.load_file(test_file_01)
-  [sql, connection] = await rt.compile_and_render(query=query_by_state)
+  [sql, connection] = await rt.compile_and_maybe_execute(query=query_by_state)
   assert sql == """
 SELECT\x20
    airports."state" as "state",

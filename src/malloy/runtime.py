@@ -57,10 +57,15 @@ class Runtime():
       self,
       connection_manager: ConnectionManagerInterface = DefaultConnectionManager(
       ),
-      service_manager=ServiceManager()):
+      service_manager=ServiceManager(),
+      notebook_mode="COMPILE_AND_RENDER"):
     self._log = logging.getLogger(__name__)
     self._connection_manager = connection_manager
     self._service_manager = service_manager
+    if notebook_mode == "COMPILE_ONLY":
+      self._notebook_mode = CompileRequest.Mode.COMPILE_ONLY
+    else:
+      self._notebook_mode = CompileRequest.Mode.COMPILE_AND_RENDER
     self._was_entered = False
     self._log.debug("Runtime initialized")
 
@@ -101,7 +106,7 @@ class Runtime():
     self._log.debug("  file_name: %s", self._file_name)
     return self
 
-  async def compile_and_render(self,
+  async def compile_and_maybe_execute(self,
                                named_query: str = None,
                                query: str = None):
     self._sql = None
@@ -135,24 +140,16 @@ class Runtime():
     return [self._sql, self._connection]
 
   async def run(self, query: str = None, named_query: str = None):
-    # [sql, connection_name] = await self.compile_and_render(query=query,
-    #                                             named_query=named_query)
-    # #TODO: Remove this when default connections go away
-    # if connection_name == self.default_connection:
-    #   connection_name = self._connection_manager.get_default_connection_name()
-    #   self._log.debug("  default connection: %s", connection_name)
-    # self._log.debug(sql)
-    # self._log.debug(connection_name)
-    # if self._error:
-    #   raise MalloyRuntimeError(self._error)
-    # if sql is None:
-    #   return None
-    # return self._connection_manager.get_connection(connection_name).run_query(
-    #     sql)
-    await self.compile_and_render(query=query, named_query=named_query)
+    [sql, connection_name] = await self.compile_and_maybe_execute(query=query,
+                                                named_query=named_query)
+
+    # Service does not drive query execution in COMPILE_ONLY mode.
+    if self._notebook_mode == CompileRequest.Mode.COMPILE_ONLY:
+      self._run_sql(sql, connection_name)
+
     return [self._job_result, self._html_content]
 
-  async def compile(self):
+  async def compile_model(self):
     service = await self._service_manager.get_service()
 
     if not self._service_manager.is_ready():
@@ -178,6 +175,27 @@ class Runtime():
 
       if self._error:
         raise MalloyRuntimeError(self._error)
+
+  def _run_sql(self, sql: str, connection_name: str):
+    if connection_name == self.default_connection:
+      connection_name = self._connection_manager.get_default_connection_name()
+    self._log.debug(
+      "Running query and getting results from connection: %s", connection_name)
+    self._log.debug(sql)
+    if self._error:
+      raise MalloyRuntimeError(self._error)
+    if sql is None:
+      return None
+    job = self._connection_manager.get_connection(connection_name).run_query(
+        sql)
+    total_rows = 0
+    if isinstance(job, DuckDBPyConnection):
+      self._job_result = job.fetch_df()
+      total_rows = len(self._job_result.index)
+    else:
+      self._job_result = job.to_dataframe()
+      total_rows = job.result().total_rows
+    return [self._job_result, total_rows]
 
   def __aiter__(self):
     return self
@@ -256,10 +274,12 @@ class Runtime():
     self._log.debug("Generating initial compile request")
     if self._is_file:
       compile_request = CompileRequest(type=CompileRequest.Type.COMPILE,
+                                       mode=self._notebook_mode,
                                        document=self._create_document(
                                            self._file_name))
     else:
       compile_request = CompileRequest(type=CompileRequest.Type.COMPILE,
+                                       mode=self._notebook_mode,
                                        document=self._create_document(
                                            self._file_name, internal=True))
     if self._query_type == "query":
@@ -332,19 +352,8 @@ class Runtime():
   def _generate_results_request(self):
     self._log.debug(self._last_response.sql_block.sql)
     connection_name = self._last_response.connection
-    connection = self._connection_manager.get_connection(connection_name)
-    self._log.debug(
-        "Running query and getting results from default connection: %s",
-        connection_name)
     sql = self._last_response.content
-    job = connection.run_query(sql)
-    total_rows = 0
-    if isinstance(job, DuckDBPyConnection):
-      self._job_result = job.fetch_df()
-      total_rows = len(self._job_result.index)
-    else:
-      self._job_result = job.to_dataframe()
-      total_rows = job.result().total_rows
+    [_, total_rows] = self._run_sql(sql, connection_name)
     results_json = self._job_result.to_json(orient="records")
     self._log.debug("Sending results to service.")
     return CompileRequest(type=CompileRequest.Type.RESULTS,

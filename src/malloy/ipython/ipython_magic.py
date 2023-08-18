@@ -63,7 +63,7 @@ async def _malloy_model(line, cell):
 
   model = runtime.load_source("\n" + cell)
   try:
-    await model.compile()
+    await model.compile_model()
 
     IPython.get_ipython().user_ns[var_name] = model
     print("✅ Stored in", var_name)
@@ -125,12 +125,18 @@ def malloy_query(line: str, cell: str):
 
 
 def load_ipython_extension(ipython):
+  notebook_mode = IPython.get_ipython().user_ns.get("NOTEBOOK_MODE")
+  if (notebook_mode is not None
+      and notebook_mode != "COMPILE_ONLY"
+      and notebook_mode != "COMPILE_AND_RENDER"):
+    print(f"🚫 Invalid Notebook Mode!: {notebook_mode}")
+    return
   global runtime
   print("Malloy ahoy")
   user_malloy_service = IPython.get_ipython().user_ns.get("MALLOY_SERVICE")
   service_manager = ServiceManager(user_malloy_service)
   connection_manager = DefaultConnectionManager()
-  runtime = malloy.Runtime(connection_manager, service_manager)
+  runtime = malloy.Runtime(connection_manager, service_manager, notebook_mode)
 
   runtime.add_connection(BigQueryConnection())
   runtime.add_connection(DuckDbConnection())
