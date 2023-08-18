@@ -107,8 +107,8 @@ class Runtime():
     return self
 
   async def compile_and_maybe_execute(self,
-                               named_query: str = None,
-                               query: str = None):
+                                      named_query: str = None,
+                                      query: str = None):
     self._sql = None
     self._connection = None
     if named_query is None and query is None:
@@ -140,8 +140,9 @@ class Runtime():
     return [self._sql, self._connection]
 
   async def run(self, query: str = None, named_query: str = None):
-    [sql, connection_name] = await self.compile_and_maybe_execute(query=query,
-                                                named_query=named_query)
+    [sql, connection_name
+    ] = await self.compile_and_maybe_execute(query=query,
+                                             named_query=named_query)
 
     # Service does not drive query execution in COMPILE_ONLY mode.
     if self._notebook_mode == CompileRequest.Mode.COMPILE_ONLY:
@@ -179,8 +180,8 @@ class Runtime():
   def _run_sql(self, sql: str, connection_name: str):
     if connection_name == self.default_connection:
       connection_name = self._connection_manager.get_default_connection_name()
-    self._log.debug(
-      "Running query and getting results from connection: %s", connection_name)
+    self._log.debug("Running query and getting results from connection: %s",
+                    connection_name)
     self._log.debug(sql)
     if self._error:
       raise MalloyRuntimeError(self._error)

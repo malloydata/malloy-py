@@ -126,9 +126,8 @@ def malloy_query(line: str, cell: str):
 
 def load_ipython_extension(ipython):
   notebook_mode = IPython.get_ipython().user_ns.get("NOTEBOOK_MODE")
-  if (notebook_mode is not None
-      and notebook_mode != "COMPILE_ONLY"
-      and notebook_mode != "COMPILE_AND_RENDER"):
+  if (notebook_mode is not None and notebook_mode != "COMPILE_ONLY" and
+      notebook_mode != "COMPILE_AND_RENDER"):
     print(f"🚫 Invalid Notebook Mode!: {notebook_mode}")
     return
   global runtime
