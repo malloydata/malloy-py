@@ -32,6 +32,7 @@ from malloy.data.connection_manager import DefaultConnectionManager
 from malloy.service import ServiceManager
 from malloy import Runtime
 from malloy.runtime import MalloyRuntimeError
+from .tab_renderer import get_initial_css_js, render_results_tab
 
 nest_asyncio.apply()
 
@@ -98,10 +99,11 @@ async def _malloy_query(line: str, cell: str):
 
   if model := IPython.get_ipython().user_ns.get(model_var):
     try:
-      [job_result, html_content] = await model.run(query="\n" + cell)
+      [job_result, html_content, sql] = await model.run(query="\n" + cell)
       if job_result is not None:
         if html_content:
-          display.display(display.HTML(html_content))
+          tabbed_html = render_results_tab(html_content, sql)
+          display.display(display.HTML(tabbed_html))
         if not results_var:
           return job_result
         IPython.get_ipython().user_ns[results_var] = job_result
@@ -139,6 +141,7 @@ def load_ipython_extension(ipython):
 
   runtime.add_connection(BigQueryConnection())
   runtime.add_connection(DuckDbConnection())
+  display.display(display.HTML(get_initial_css_js()))
 
   ipython.register_magic_function(malloy_model, "cell")
   ipython.register_magic_function(malloy_query, "cell")

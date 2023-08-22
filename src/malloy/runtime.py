@@ -148,7 +148,7 @@ class Runtime():
     if self._notebook_mode == CompileRequest.Mode.COMPILE_ONLY:
       self._run_sql(sql, connection_name)
 
-    return [self._job_result, self._html_content]
+    return [self._job_result, self._html_content, self._sql]
 
   async def compile_model(self):
     service = await self._service_manager.get_service()
