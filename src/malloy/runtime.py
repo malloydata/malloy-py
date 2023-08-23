@@ -179,6 +179,8 @@ class Runtime():
       if self._error:
         raise MalloyRuntimeError(self._error)
 
+    return json.loads(self._sql)
+
   def _run_sql(self, sql: str, connection_name: str):
     if connection_name == self.default_connection:
       connection_name = self._connection_manager.get_default_connection_name()

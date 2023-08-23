@@ -34,6 +34,7 @@ from malloy.data.connection_manager import DefaultConnectionManager
 from malloy.service import ServiceManager
 from malloy import Runtime
 from malloy.runtime import MalloyRuntimeError
+from .schema_view import render_schema
 from .tab_renderer import get_initial_css_js, render_results_tab
 
 nest_asyncio.apply()
@@ -85,15 +86,17 @@ async def _malloy_model(line, cell):
   var_name = args.modelname
 
   if args.import_file:
-    model = runtime.load_file(args.import_file)
+    runtime.load_file(args.import_file)
   else:
-    model = runtime.load_source("\n" + cell)
+    runtime.load_source("\n" + cell)
 
   try:
-    await model.compile_model()
+    model = await runtime.compile_model()
 
-    IPython.get_ipython().user_ns[var_name] = model
+    IPython.get_ipython().user_ns[var_name] = runtime
     print("✅ Stored in", var_name)
+    if model:
+      display.display(display.HTML(render_schema(model)))
   except MalloyRuntimeError as e:
     print(f"🚫 {e.args[0]}")
     IPython.get_ipython().user_ns[var_name] = None
