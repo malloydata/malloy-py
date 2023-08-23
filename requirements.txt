@@ -4,24 +4,24 @@
 #
 #    pip-compile pyproject.toml
 #
-cachetools==5.2.0
+cachetools==5.3.1
     # via google-auth
 certifi==2023.7.22
     # via requests
-charset-normalizer==2.1.1
+charset-normalizer==3.1.0
     # via requests
-duckdb==0.8.0
+duckdb==0.8.1
     # via malloy (pyproject.toml)
-google-api-core[grpc]==2.10.2
+google-api-core[grpc]==2.11.1
     # via
     #   google-cloud-bigquery
     #   google-cloud-bigquery-storage
     #   google-cloud-core
-google-auth==2.14.0
+google-auth==2.20.0
     # via
     #   google-api-core
     #   google-cloud-core
-google-cloud-bigquery==3.3.5
+google-cloud-bigquery==3.11.1
     # via malloy (pyproject.toml)
 google-cloud-bigquery-storage==2.16.2
     # via google-cloud-bigquery
@@ -29,9 +29,9 @@ google-cloud-core==2.3.2
     # via google-cloud-bigquery
 google-crc32c==1.5.0
     # via google-resumable-media
-google-resumable-media==2.4.0
+google-resumable-media==2.5.0
     # via google-cloud-bigquery
-googleapis-common-protos==1.56.4
+googleapis-common-protos==1.59.1
     # via
     #   google-api-core
     #   grpcio-status
@@ -40,19 +40,19 @@ grpcio==1.54.2
     #   google-api-core
     #   google-cloud-bigquery
     #   grpcio-status
-grpcio-status==1.50.0
+grpcio-status==1.54.2
     # via google-api-core
 idna==3.4
     # via requests
 numpy==1.23.4
     # via pyarrow
-packaging==21.3
+packaging==23.1
     # via google-cloud-bigquery
-proto-plus==1.22.1
+proto-plus==1.22.2
     # via
     #   google-cloud-bigquery
     #   google-cloud-bigquery-storage
-protobuf==4.21.9
+protobuf==4.23.3
     # via
     #   google-api-core
     #   google-cloud-bigquery
@@ -62,11 +62,11 @@ protobuf==4.21.9
     #   proto-plus
 pyarrow==9.0.0
     # via google-cloud-bigquery
-pyasn1==0.4.8
+pyasn1==0.5.0
     # via
     #   pyasn1-modules
     #   rsa
-pyasn1-modules==0.2.8
+pyasn1-modules==0.3.0
     # via google-auth
 pyparsing==3.0.9
     # via packaging
@@ -83,5 +83,5 @@ six==1.16.0
     #   google-auth
     #   grpcio
     #   python-dateutil
-urllib3==1.26.12
+urllib3==1.26.16
     # via requests

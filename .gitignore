@@ -6,6 +6,7 @@ malloy.egg-info
 .pytest_cache
 test.py
 scratch
+third_party.txt
 
 # Avoid checking in binaries
 /src/malloy/service/malloy-service-*
