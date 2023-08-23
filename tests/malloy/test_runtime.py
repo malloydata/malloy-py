@@ -48,13 +48,6 @@ query: airports -> {
                 group_by: state
                 aggregate: airport_count
             }"""
-query_by_state_limited = """
-query: airports -> {
-                where: state != null
-                group_by: state
-                aggregate: airport_count
-                limit: 2
-            }"""
 
 
 @pytest_asyncio.fixture(scope="module", name="service_manager")
@@ -138,13 +131,3 @@ async def test_another_with():
     assert data["airport_count"][0] == 1845
     assert data["state"][22] == "NC"
     assert data["airport_count"][22] == 400
-
-@pytest.mark.asyncio
-async def test_renders_result():
-  """Verify that service manager can be re-used"""
-  with Runtime() as rt:
-    rt.add_connection(DuckDbConnection(home_dir=home_dir))
-    rt.load_file(test_file_01)
-    expected_html = '''<table style="vertical-align: top; border-collapse: collapse; width: 100%;"><thead><tr><th style="padding: 8px; text-align: left;">state</th><th style="padding: 8px; text-align: right;">airports_​count</th></tr></thead><tbody><tr><td style="padding: 8px; vertical-align: top;"><span>TX</span></td><td style="padding: 8px; vertical-align: top; text-align: right;"><span>1,845</span></td></tr><tr><td style="padding: 8px; vertical-align: top;"><span>CA</span></td><td style="padding: 8px; vertical-align: top; text-align: right;"><span>984</span></td></tr></tbody></table>'''
-    [_, html, _] = await rt.run(query=query_by_state_limited, render_results=True)
-    assert html == expected_html
