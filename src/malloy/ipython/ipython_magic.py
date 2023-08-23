@@ -99,17 +99,17 @@ async def _malloy_query(line: str, cell: str):
 
   if model := IPython.get_ipython().user_ns.get(model_var):
     try:
-      [job_result, html_content, sql] = await model.run(query="\n" + cell)
-      if job_result is not None:
-        if html_content:
-          tabbed_html = render_results_tab(html_content, sql)
-          display.display(display.HTML(tabbed_html))
-        if not results_var:
-          return job_result
+      render_results = results_var is None
+      [job_result, html_content,
+       sql] = await model.run(query="\n" + cell, render_results=render_results)
+      if job_result is None:
+        print("No results")
+      elif results_var:
         IPython.get_ipython().user_ns[results_var] = job_result
         print("✅ Stored in", results_var)
-      else:
-        print("No results")
+      elif html_content:
+        tabbed_html = render_results_tab(html_content, sql)
+        display.display(display.HTML(tabbed_html))
     except MalloyRuntimeError as e:
       print(f"🚫 {e.args[0]}")
   else:
@@ -127,17 +127,12 @@ def malloy_query(line: str, cell: str):
 
 
 def load_ipython_extension(ipython):
-  notebook_mode = IPython.get_ipython().user_ns.get("NOTEBOOK_MODE")
-  if (notebook_mode is not None and notebook_mode != "COMPILE_ONLY" and
-      notebook_mode != "COMPILE_AND_RENDER"):
-    print(f"🚫 Invalid Notebook Mode!: {notebook_mode}")
-    return
   global runtime
   print("Malloy ahoy")
   user_malloy_service = IPython.get_ipython().user_ns.get("MALLOY_SERVICE")
   service_manager = ServiceManager(user_malloy_service)
   connection_manager = DefaultConnectionManager()
-  runtime = malloy.Runtime(connection_manager, service_manager, notebook_mode)
+  runtime = malloy.Runtime(connection_manager, service_manager)
 
   runtime.add_connection(BigQueryConnection())
   runtime.add_connection(DuckDbConnection())
