@@ -57,15 +57,10 @@ class Runtime():
       self,
       connection_manager: ConnectionManagerInterface = DefaultConnectionManager(
       ),
-      service_manager=ServiceManager(),
-      notebook_mode="COMPILE_AND_RENDER"):
+      service_manager=ServiceManager()):
     self._log = logging.getLogger(__name__)
     self._connection_manager = connection_manager
     self._service_manager = service_manager
-    if notebook_mode == "COMPILE_ONLY":
-      self._notebook_mode = CompileRequest.Mode.COMPILE_ONLY
-    else:
-      self._notebook_mode = CompileRequest.Mode.COMPILE_AND_RENDER
     self._was_entered = False
     self._log.debug("Runtime initialized")
 
@@ -139,16 +134,23 @@ class Runtime():
         raise ValueError("Channel not in ready state", state)
     return [self._sql, self._connection]
 
-  async def run(self, query: str = None, named_query: str = None):
+  async def run(self,
+                query: str = None,
+                named_query: str = None,
+                render_results: bool = True):
+    if render_results:
+      self._service_mode = CompileRequest.Mode.COMPILE_AND_RENDER
+    else:
+      self._service_mode = CompileRequest.Mode.COMPILE_ONLY
     [sql, connection_name
     ] = await self.compile_and_maybe_execute(query=query,
                                              named_query=named_query)
 
     # Service does not drive query execution in COMPILE_ONLY mode.
-    if self._notebook_mode == CompileRequest.Mode.COMPILE_ONLY:
+    if self._service_mode == CompileRequest.Mode.COMPILE_ONLY:
       self._run_sql(sql, connection_name)
 
-    return [self._job_result, self._html_content]
+    return [self._job_result, self._html_content, self._sql]
 
   async def compile_model(self):
     service = await self._service_manager.get_service()
@@ -258,6 +260,7 @@ class Runtime():
     self._first_request_sent = False
     self._seen_responses = []
     self._last_response = None
+    self._service_mode = CompileRequest.Mode.COMPILE_AND_RENDER
     self._job_result = None
     self._html_content = None
     self._sql = None
@@ -275,12 +278,12 @@ class Runtime():
     self._log.debug("Generating initial compile request")
     if self._is_file:
       compile_request = CompileRequest(type=CompileRequest.Type.COMPILE,
-                                       mode=self._notebook_mode,
+                                       mode=self._service_mode,
                                        document=self._create_document(
                                            self._file_name))
     else:
       compile_request = CompileRequest(type=CompileRequest.Type.COMPILE,
-                                       mode=self._notebook_mode,
+                                       mode=self._service_mode,
                                        document=self._create_document(
                                            self._file_name, internal=True))
     if self._query_type == "query":
