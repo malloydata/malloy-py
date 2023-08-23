@@ -22,10 +22,12 @@
 
 import IPython
 from IPython import display
+import argparse
 import asyncio
 import atexit
 import malloy
 import nest_asyncio
+import shlex
 from malloy.data.bigquery import BigQueryConnection
 from malloy.data.duckdb import DuckDbConnection
 from malloy.data.connection_manager import DefaultConnectionManager
@@ -36,9 +38,28 @@ from .tab_renderer import get_initial_css_js, render_results_tab
 
 nest_asyncio.apply()
 
-DEFAULT_MODEL_VAR = "model"
+DEFAULT_MODEL_VAR = "__malloy_model"
 
 runtime: Runtime = None
+
+# Argument parser for the %%malloy_model magic
+model_arg_parser = argparse.ArgumentParser(
+    prog="%%malloy_model",
+    description="Malloy Model cell magic",
+    exit_on_error=False)
+model_arg_parser.add_argument("modelname", default=DEFAULT_MODEL_VAR, nargs="?")
+model_arg_parser.add_argument("-i",
+                              "--import",
+                              required=False,
+                              dest="import_file")
+
+# Argument parser for the %%malloy_query magic
+query_arg_parser = argparse.ArgumentParser(
+    prog="%%malloy_query",
+    description="Malloy Query cell magic",
+    exit_on_error=False)
+query_arg_parser.add_argument("modelname", default=DEFAULT_MODEL_VAR, nargs="?")
+query_arg_parser.add_argument("varname", default=None, nargs="?")
 
 
 def _cleanup_runtime():
@@ -60,9 +81,14 @@ async def _malloy_model(line, cell):
     line: Storage location
     cell: Malloy model
   """
-  var_name = line.strip() or DEFAULT_MODEL_VAR
+  args = model_arg_parser.parse_args(shlex.split(line))
+  var_name = args.modelname
 
-  model = runtime.load_source("\n" + cell)
+  if args.import_file:
+    model = runtime.load_file(args.import_file)
+  else:
+    model = runtime.load_source("\n" + cell)
+
   try:
     await model.compile_model()
 
@@ -73,7 +99,7 @@ async def _malloy_model(line, cell):
     IPython.get_ipython().user_ns[var_name] = None
 
 
-def malloy_model(line, cell):
+def malloy_model(line, cell=None):
   """Dispatch a malloy model cell to the malloy client.
 
   Args:
@@ -91,9 +117,12 @@ async def _malloy_query(line: str, cell: str):
     separated swing
     cell: Malloy query
   """
-  var_names = line.strip().split()
-  model_var = var_names[0] or DEFAULT_MODEL_VAR
-  results_var = var_names[1] if len(var_names) > 1 else None
+
+  args = query_arg_parser.parse_args(shlex.split(line))
+
+  model_var = args.modelname
+  results_var = args.varname
+
   if results_var:
     IPython.get_ipython().user_ns[results_var] = None
 
@@ -138,7 +167,7 @@ def load_ipython_extension(ipython):
   runtime.add_connection(DuckDbConnection())
   display.display(display.HTML(get_initial_css_js()))
 
-  ipython.register_magic_function(malloy_model, "cell")
+  ipython.register_magic_function(malloy_model, "line_cell")
   ipython.register_magic_function(malloy_query, "cell")
 
 
