@@ -30,7 +30,6 @@ from pathlib import Path
 import duckdb
 import logging
 import re
-import pandas
 
 
 # Implememting QueryResultsInterface methods

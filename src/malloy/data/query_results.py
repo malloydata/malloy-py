@@ -22,7 +22,6 @@
 # connection.py
 """An object capable of returning data needed for compiling a malloy source."""
 import abc
-from collections.abc import Sequence
 
 
 class QueryResultsInterface(metaclass=abc.ABCMeta):
