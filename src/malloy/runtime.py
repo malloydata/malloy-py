@@ -42,6 +42,10 @@ from duckdb import DuckDBPyConnection
 
 
 class MalloyRuntimeError(Exception):
+  """
+  Errors that can be handled by the front end and shouldn't necessarily
+  produce stack traces in notebooks.
+  """
   pass
 
 
@@ -131,7 +135,7 @@ class Runtime():
       if state in self.ready_state:
         await self._compile_completed.wait()
       else:
-        raise ValueError("Channel not in ready state", state)
+        raise MalloyRuntimeError("Channel not in ready state", state)
     return [self._sql, self._connection]
 
   async def run(self,
@@ -174,7 +178,7 @@ class Runtime():
       if state in self.ready_state:
         await self._compile_completed.wait()
       else:
-        raise ValueError("Channel not in ready state", state)
+        raise MalloyRuntimeError("Channel not in ready state", state)
 
       if self._error:
         raise MalloyRuntimeError(self._error)

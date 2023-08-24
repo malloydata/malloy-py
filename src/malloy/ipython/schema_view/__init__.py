@@ -26,12 +26,36 @@ from .icons import get_icon_path
 
 
 def field_sort(a):
+  """
+  Sorts fields in an order similar to the VS Code extension:
+  1. Turtles
+  2. Dimensions
+  3. Measures
+  4. Joins
+  """
   is_aggregate = a.get("expressionType") == "aggregate"
   return (0 if a["type"] == "turtle" else
-          4 if a["type"] == "struct" else 2 if is_aggregate else 1, a["name"])
+          3 if a["type"] == "struct" else 2 if is_aggregate else 1, a["name"])
 
 
-def render_fields(root):
+def build_title(field, path):
+  """
+  Creates a tool type similar to the VS Code extension.
+  """
+  field_type = field.get("type")
+  field_name = field_name = field.get("as") or field.get("name")
+  if field_type == "struct":
+    return field_name
+  return f"""{field.get("as") or field.get("name")}
+Path: {f"{path}{'.' if path else ''}{field_name}"}
+Type: {field.get("type")}"""
+
+
+def render_fields(root, path=""):
+  """
+  Render one level of the schema tree. Used recursively to handle
+  nested schemas.
+  """
   html = ""
   fields = root["fields"]
   join_relationship = root.get("structRelationship")
@@ -41,7 +65,12 @@ def render_fields(root):
   icon_type = join_type if join_type else "struct_base"
   schema_name = root.get("as") or root.get("name")
   html += f"""
-<li class="schema hidden" onclick="toggleClass(event, 'hidden');"; return false;">
+<li 
+  class="schema hidden"
+  title="{build_title(root, path)}"
+  onclick="toggleClass(event, 'hidden');"; 
+  return false;"
+>
 {get_icon_path(icon_type, False)} <b class="schema_name">{schema_name}</b>
 <ul>
 """
@@ -50,12 +79,12 @@ def render_fields(root):
     field_name = field.get("as") or field.get("name")
     if field_type == "struct":
       html += "<ul>"
-      html += render_fields(field)
+      html += render_fields(field, f"{path}{'.' if path else ''}{field_name}")
       html += "</ul>"
     else:
       is_aggregate = field.get("expressionType") == "aggregate"
       html += f"""
-    <li>
+    <li title="{build_title(field, path)}">
       {get_icon_path(field_type, is_aggregate)}
       <span class="field_name">{field_name}</span>
     </li>
@@ -68,7 +97,9 @@ def render_fields(root):
 
 
 def render_schema(model):
-  """Render a model into a schema tree"""
+  """
+  Render a model into a schema tree.
+  """
   html = schema_styles + schema_scripts
   html += "<ul>\n"
   for schema_name in model["contents"]:
