@@ -157,13 +157,19 @@ async def _malloy_query(line: str, cell: str):
 
   if model := IPython.get_ipython().user_ns.get(model_var):
     try:
+      query = "\n" + cell
       render_results = results_var is None
-      [job_result, html_content,
-       sql] = await model.run(query="\n" + cell, render_results=render_results)
+      job_result = None
+      html_content = None
+      sql = None
+      if render_results:
+        [job_result, html_content, sql] = await model.render(query=query)
+      else:
+        [job_result, sql] = await model.get_sql_and_run(query=query)
       if job_result is None:
         print("No results")
       elif results_var:
-        IPython.get_ipython().user_ns[results_var] = job_result
+        IPython.get_ipython().user_ns[results_var] = job_result.to_dataframe()
         print("✅ Stored in", results_var)
       elif html_content:
         tabbed_html = render_results_tab(html_content, sql)

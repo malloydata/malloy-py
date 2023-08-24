@@ -38,19 +38,19 @@ import malloy
 from malloy.data.duckdb import DuckDbConnection
 
 async def main():
-    home_dir = "/path/to/samples/duckdb/imdb"
-    with malloy.Runtime() as runtime:
-        runtime.add_connection(DuckDbConnection(home_dir=home_dir))
+  home_dir = "/path/to/samples/duckdb/imdb"
+  with malloy.Runtime() as runtime:
+    runtime.add_connection(DuckDbConnection(home_dir=home_dir))
 
-        data = await runtime.load_file(home_dir + "/5_movie_complex.malloy").run(
-            named_query="horror_combo")
-            
-        dataframe = data.df()
-        print(dataframe)
+    data = await runtime.load_file(home_dir + "/5_movie_complex.malloy").run(
+        named_query="horror_combo")
+
+    dataframe = data.df()
+    print(dataframe)
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+  asyncio.run(main())
 
 
 ```
@@ -65,12 +65,12 @@ from malloy.data.duckdb import DuckDbConnection
 
 
 async def main():
-    home_dir = "/path/to/samples/duckdb/faa"
-    with malloy.Runtime() as runtime:
-        runtime.add_connection(DuckDbConnection(home_dir=home_dir))
+  home_dir = "/path/to/samples/duckdb/faa"
+  with malloy.Runtime() as runtime:
+    runtime.add_connection(DuckDbConnection(home_dir=home_dir))
 
-        [sql, connection] = await runtime.load_file(home_dir +"/flights.malloy").get_sql(
-                query="""
+    [sql, connection
+    ] = await runtime.load_file(home_dir + "/flights.malloy").get_sql(query="""
                   query: flights -> {
                     where: carrier ? 'WN' | 'DL', dep_time ? @2002-03-03
                     group_by:
@@ -97,11 +97,12 @@ async def main():
                 }
             """)
 
-        print(sql)
+    print(sql)
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+  asyncio.run(main())
+
 
 ```
 
@@ -115,11 +116,11 @@ from malloy.data.duckdb import DuckDbConnection
 
 
 async def main():
-    home_dir = "/path/to/samples/duckdb/auto_recalls"
-    with malloy.Runtime() as runtime:
-        runtime.add_connection(DuckDbConnection(home_dir=home_dir))
+  home_dir = "/path/to/samples/duckdb/auto_recalls"
+  with malloy.Runtime() as runtime:
+    runtime.add_connection(DuckDbConnection(home_dir=home_dir))
 
-        data = await runtime.load_source("""
+    data = await runtime.load_source("""
         source: auto_recalls is table('duckdb:auto_recalls.csv') {
           declare:
             recall_count is count()
@@ -134,12 +135,12 @@ async def main():
         }
         """)
 
-        dataframe = data.df()
-        print(dataframe)
+    dataframe = data.df()
+    print(dataframe)
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+  asyncio.run(main())
 
 ```
 

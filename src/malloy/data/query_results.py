@@ -23,33 +23,16 @@
 """An object capable of returning data needed for compiling a malloy source."""
 import abc
 from collections.abc import Sequence
-from malloy.data.query_results import QueryResultsInterface
 
 
-class ConnectionInterface(metaclass=abc.ABCMeta):
+class QueryResultsInterface(metaclass=abc.ABCMeta):
   """Basic definition of a Malloy connection interface. """
 
   @classmethod
   def __subclasshook__(cls, subclass):
-    return (hasattr(subclass, "get_schema_for_tables") and
-            callable(subclass.get_schema_for_tables) and
-            hasattr(subclass, "run_query") and callable(subclass.run_query) and
-            hasattr(subclass, "get_name") and callable(subclass.get_name) and
-            hasattr(subclass, "get_schema_for_sql_block") and
-            callable(subclass.get_schema_for_sql_block))
+    return (hasattr(subclass, "to_dataframe") and
+            callable(subclass.to_dataframe))
 
   @abc.abstractmethod
-  def get_name(self, sql: str):
-    raise NotImplementedError
-
-  @abc.abstractmethod
-  def get_schema_for_tables(self, tables: Sequence[(str, str)]):
-    raise NotImplementedError
-
-  @abc.abstractmethod
-  def get_schema_for_sql_block(self, name: str, sql: str):
-    raise NotImplementedError
-
-  @abc.abstractmethod
-  def run_query(self, sql: str) -> QueryResultsInterface:
+  def to_dataframe(self):
     raise NotImplementedError

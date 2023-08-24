@@ -30,6 +30,15 @@ from pathlib import Path
 import duckdb
 import logging
 import re
+import pandas
+
+
+# Implememting QueryResultsInterface methods
+def to_dataframe(self):
+  return self.fetch_df()
+
+
+duckdb.DuckDBPyConnection.to_dataframe = to_dataframe
 
 
 class DuckDbException(Exception):
