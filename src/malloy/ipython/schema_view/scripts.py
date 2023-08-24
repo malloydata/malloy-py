@@ -14,7 +14,7 @@
 schema_scripts = """
 <script>
 function toggleClass(event, value) {
-  event.target.classList.toggle(value)
+  event.currentTarget.classList.toggle(value)
   event.preventDefault();
   event.stopPropagation();
 }
