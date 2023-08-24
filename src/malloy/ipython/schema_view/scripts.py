@@ -11,40 +11,12 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """Malloy schema renderer styles"""
 
-schema_styles = """
-<style>
-b {
- font-size: 12px;
+schema_scripts = """
+<script>
+function toggleClass(event, value) {
+  event.target.classList.toggle(value)
+  event.preventDefault();
+  event.stopPropagation();
 }
-
-ul {
-  margin: 5px 0;
-  padding: 0 1em;
-  list-style-type: none;
-}
-
-li.schema {
-  list-style: "▼";
-  padding-left: 5px;
-}
-
-li.schema.hidden {
-  list-style: "▶"
-}
-
-.hidden ul {
-  display: none;
-}
-
-li.field {
-  margin: 2px 0;
-}
-
-svg,
-.field_name,
-.schema_name {
-  vertical-align: middle;
-  display: inline-block;
-}
-</style>
+</script>
 """

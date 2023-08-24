@@ -20,48 +20,60 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """Malloy schema renderer"""
 
+from .scripts import schema_scripts
 from .styles import schema_styles
-from .icons import get_icon_path, view_container_icon
+from .icons import get_icon_path
 
 
 def field_sort(a):
   is_aggregate = a.get("expressionType") == "aggregate"
-  return (0 if a["type"] == "turtle" else (2 if is_aggregate else 1), a["name"])
+  return (0 if a["type"] == "turtle" else
+          4 if a["type"] == "struct" else 2 if is_aggregate else 1, a["name"])
+
+
+def render_fields(root):
+  html = ""
+  fields = root["fields"]
+  join_relationship = root.get("structRelationship")
+  join_type = None
+  if join_relationship:
+    join_type = join_relationship.get("type")
+  icon_type = join_type if join_type else "struct_base"
+  schema_name = root.get("as") or root.get("name")
+  html += f"""
+<li class="schema hidden" onclick="toggleClass(event, 'hidden');"; return false;">
+{get_icon_path(icon_type, False)} <b class="schema_name">{schema_name}</b>
+<ul>
+"""
+  for field in sorted(fields, key=field_sort):
+    field_type = field.get("type")
+    field_name = field.get("as") or field.get("name")
+    if field_type == "struct":
+      html += "<ul>"
+      html += render_fields(field)
+      html += "</ul>"
+    else:
+      is_aggregate = field.get("expressionType") == "aggregate"
+      html += f"""
+    <li>
+      {get_icon_path(field_type, is_aggregate)}
+      <span class="field_name">{field_name}</span>
+    </li>
+  """
+  html += """
+</ul>
+</li>
+"""
+  return html
 
 
 def render_schema(model):
   """Render a model into a schema tree"""
-  html = schema_styles
-  html += """
-<h1>Malloy Schema</h1>
-"""
+  html = schema_styles + schema_scripts
   html += "<ul>\n"
   for schema_name in model["contents"]:
     schema = model["contents"][schema_name]
-    html += f"""
-<li class="schema hidden" onclick="this.classList.toggle('hidden')">
-  {view_container_icon} <b class="schema_name">{schema_name}</b>
-"""
-    html += """
-<ul>
-"""
-    fields = schema["fields"]
-    for field in sorted(fields, key=field_sort):
-      is_aggregate = field.get("expressionType") == "aggregate"
-      html += f"""
-<li>
-  {get_icon_path(field["type"], is_aggregate)}
-  <span class="field_name">{field['name']}</span>
-</li>
-"""
-    html += """
-</ul>
-"""
-    html += """
-</li>
-"""
-  html += """
-</ul>
-"""
+    html += render_fields(schema)
+  html += "</ul>\n"
 
   return html

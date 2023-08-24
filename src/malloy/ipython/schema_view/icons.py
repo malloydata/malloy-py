@@ -88,7 +88,7 @@ malloy_icon_percent_icon = """
 </svg>"""
 
 many_to_one_icon = """
-<svg width="25px" height="25px" viewBox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="16px" height="16px" viewBox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <title>join_icon_one_to_many</title>
     <g id="join_icon_one_to_many" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="Group" transform="translate(12.759300, 12.500000) rotate(-180.000000) translate(-12.759300, -12.500000) translate(4.000000, 3.712487)" fill="#4284F3">
@@ -122,7 +122,7 @@ number_icon = """
 """
 
 one_to_many_icon = """
-<svg width="25px" height="25px" viewBox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="16px" height="16px" viewBox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <title>join_icon_many_to_one</title>
     <g id="join_icon_many_to_one" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <polygon id="Path-Copy-14" fill="#4284F3" fill-rule="nonzero" transform="translate(10.382256, 12.736227) scale(-1, 1) rotate(180.000000) translate(-10.382256, -12.736227) " points="6.80570594 7.41828749 7.48860316 6.68777302 13.9588058 12.7362273 7.48860316 18.7846815 6.80570594 18.0541671 12.494 12.736"></polygon>
@@ -136,7 +136,7 @@ one_to_many_icon = """
 """
 
 one_to_one_icon = """
-<svg width="25px" height="25px" viewBox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="16px" height="16px" viewBox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <title>join_icon_one_to_one</title>
     <g id="join_icon_one_to_one" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <rect id="Rectangle-Copy-89" fill="#4284F3" x="4" y="10.7362273" width="4" height="4"></rect>
@@ -221,13 +221,13 @@ def get_icon_path(field_type: str, is_aggregate: bool):
       image_file_name = string_icon
     elif field_type in ["date", "timestamp"]:
       image_file_name = time_icon
-    elif field_type == "struct_base":
+    elif field_type in ["struct_base", "basetable"]:
       image_file_name = struct_icon
-    elif field_type == "struct_one_to_many":
+    elif field_type == "one":
       image_file_name = one_to_many_icon
-    elif field_type == "struct_one_to_one":
+    elif field_type == "inline":
       image_file_name = one_to_one_icon
-    elif field_type == "struct_many_to_one":
+    elif field_type in ["many", "cross", "nested"]:
       image_file_name = many_to_one_icon
     elif field_type == "boolean":
       image_file_name = boolean_icon

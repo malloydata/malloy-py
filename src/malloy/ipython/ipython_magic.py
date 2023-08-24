@@ -94,7 +94,6 @@ async def _malloy_model(line, cell):
     model = await runtime.compile_model()
 
     IPython.get_ipython().user_ns[var_name] = runtime
-    print("✅ Stored in", var_name)
     if model:
       display.display(display.HTML(render_schema(model)))
   except MalloyRuntimeError as e:
