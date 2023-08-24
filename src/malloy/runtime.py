@@ -136,6 +136,10 @@ class Runtime():
         await self._compile_completed.wait()
       else:
         raise MalloyRuntimeError("Channel not in ready state", state)
+
+      if self._error:
+        raise MalloyRuntimeError(self._error)
+
     return [self._sql, self._connection]
 
   async def run(self,
