@@ -34,6 +34,7 @@ from pathlib import Path
 
 from malloy.data.connection import ConnectionInterface
 from malloy.data.connection_manager import ConnectionManagerInterface, DefaultConnectionManager
+from malloy.data.schema_cache import SchemaCache
 from malloy.service import ServiceManager
 from malloy.services.v1.compiler_pb2_grpc import CompilerStub
 from malloy.services.v1.compiler_pb2 import CompileRequest, CompileDocument, CompilerRequest, SqlBlockSchema, QueryResult
@@ -64,6 +65,7 @@ class Runtime():
     self._connection_manager = connection_manager
     self._service_manager = service_manager
     self._was_entered = False
+    self._schema_cache = SchemaCache()
     self._log.debug("Runtime initialized")
 
   def __enter__(self):
@@ -337,8 +339,8 @@ class Runtime():
       if connection:
         # tables = tables_per_connection_to_fetch.get(connection)
         self._log.debug("  tables: %s", tables)
-        schemas = connection.get_schema_for_tables(tables)
-
+        schemas = self._schema_cache.get_schema_for_tables(
+            connection_name, connection, tables)
         #TODO: Remove this when default connections go away
         for key in schemas["schemas"]:
           schemas["schemas"][key]["structRelationship"][
