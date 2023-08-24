@@ -41,10 +41,28 @@ nest_asyncio.apply()
 
 DEFAULT_MODEL_VAR = "__malloy_model"
 
+
+class MalloyArgumentError(Exception):
+  """Exception thrown by MalloyMagicArgumentParser when a parsing
+  error occurs.
+  """
+  pass
+
+
+class MalloyMagicArgumentParser(argparse.ArgumentParser):
+  """ArgumentParser sub-class that throws a MalloyArgumentError
+  exception instead of calling sys.exit().
+  """
+
+  def exit(self, status=0, message=None):
+    if message:
+      raise MalloyArgumentError(message)
+
+
 runtime: Runtime = None
 
 # Argument parser for the %%malloy_model magic
-model_arg_parser = argparse.ArgumentParser(
+model_arg_parser = MalloyMagicArgumentParser(
     prog="%%malloy_model",
     description="Malloy Model cell magic",
     exit_on_error=False)
@@ -55,7 +73,7 @@ model_arg_parser.add_argument("-i",
                               dest="import_file")
 
 # Argument parser for the %%malloy_query magic
-query_arg_parser = argparse.ArgumentParser(
+query_arg_parser = MalloyMagicArgumentParser(
     prog="%%malloy_query",
     description="Malloy Query cell magic",
     exit_on_error=False)
@@ -82,7 +100,12 @@ async def _malloy_model(line, cell):
     line: Storage location
     cell: Malloy model
   """
-  args = model_arg_parser.parse_args(shlex.split(line))
+  try:
+    args = model_arg_parser.parse_args(shlex.split(line))
+  except MalloyArgumentError as e:
+    print(f"🚫 {e.args[0]}")
+    return
+
   var_name = args.modelname
 
   if args.import_file:
@@ -120,7 +143,11 @@ async def _malloy_query(line: str, cell: str):
     cell: Malloy query
   """
 
-  args = query_arg_parser.parse_args(shlex.split(line))
+  try:
+    args = query_arg_parser.parse_args(shlex.split(line))
+  except MalloyArgumentError as e:
+    print(f"🚫 {e.args[0]}")
+    return
 
   model_var = args.modelname
   results_var = args.varname
