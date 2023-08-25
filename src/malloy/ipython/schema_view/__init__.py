@@ -51,6 +51,42 @@ Path: {f"{path}{'.' if path else ''}{field_name}"}
 Type: {field.get("type")}"""
 
 
+def field_sorter(fields):
+  """
+  Bucket fields into queries, dimensions, measures and structs
+  """
+  queries = []
+  dimensions = []
+  measures = []
+  structs = []
+
+  for field in fields:
+    is_aggregate = field.get("expressionType") == "aggregate"
+    field_type = field.get("type")
+
+    if is_aggregate:
+      measures.append(field)
+    elif field_type == "turtle":
+      queries.append(field)
+    elif field_type == "struct":
+      structs.append(field)
+    else:
+      dimensions.append(field)
+
+  return [queries, dimensions, measures, structs]
+
+
+def render_field(field, path):
+  field_type = field.get("type")
+  is_aggregate = field.get("expressionType") == "aggregate"
+  field_name = field.get("as") or field.get("name")
+
+  return f"""<div class="field" title="{build_title(field, path)}">
+  {get_icon_path(field_type, is_aggregate)}
+  <span class="field_name">{field_name}</span>
+</div>"""
+
+
 def render_fields(root, path=""):
   """
   Render one level of the schema tree. Used recursively to handle
@@ -74,23 +110,37 @@ def render_fields(root, path=""):
 {get_icon_path(icon_type, False)} <b class="schema_name">{schema_name}</b>
 <ul>
 """
-  for field in sorted(fields, key=field_sort):
-    field_type = field.get("type")
-    field_name = field.get("as") or field.get("name")
-    if field_type == "struct":
+  [queries, dimensions, measures, structs] = field_sorter(fields)
+
+  if len(queries) > 0:
+    html += """<li class="fields"><label>Queries</label> """
+    html += " ".join(
+        render_field(field, path) for field in sorted(queries, key=field_sort))
+    html += "</li>"
+
+  if len(dimensions) > 0:
+    html += """<li class="fields"><label>Dimensions</label> """
+    html += " ".join(
+        render_field(field, path)
+        for field in sorted(dimensions, key=field_sort))
+    html += "</li>"
+
+  if len(measures) > 0:
+    html += """<li class="fields"><label>Measures</label> """
+    html += " ".join(
+        render_field(field, path) for field in sorted(measures, key=field_sort))
+    html += "</li>"
+
+  if len(structs) > 1:
+    html += """<li class="fields"><label>Relations</label> """
+    for field in sorted(structs, key=field_sort):
+      field_name = field.get("as") or field.get("name")
       html += "<ul>"
       html += render_fields(field, f"{path}{'.' if path else ''}{field_name}")
       html += "</ul>"
-    else:
-      is_aggregate = field.get("expressionType") == "aggregate"
-      html += f"""
-    <li title="{build_title(field, path)}">
-      {get_icon_path(field_type, is_aggregate)}
-      <span class="field_name">{field_name}</span>
-    </li>
-  """
+    html += "</li>"
   html += """
-</ul>
+  </ul>
 </li>
 """
   return html
