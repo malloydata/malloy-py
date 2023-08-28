@@ -71,6 +71,8 @@ steps:
       ]
       
 timeout: "600s"
+options:
+  logging: CLOUD_LOGGING_ONLY
 availableSecrets:
   secretManager:
     - versionName: projects/malloy-303216/secrets/vscode-extension-gh-pat/versions/latest
