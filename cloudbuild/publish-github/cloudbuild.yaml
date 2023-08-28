@@ -1,0 +1,69 @@
+steps:
+  - name: "gcr.io/cloud-builders/git"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        git submodule set-url submodules/malloy-service https://github.com/malloydata/malloy-service
+        git submodule update --init --recursive
+  - name: "docker.io/library/python:3.9"
+    id: "Install pip"
+    entrypoint: "python"
+    args: ["-m", "pip", "install", "--upgrade", "pip", "--user"]
+
+  - name: "docker.io/library/python:3.9"
+    id: "Install tools"
+    entrypoint: "python"
+    args: ["-m", "pip", "install", "pip-tools", "--user"]
+
+  - name: "docker.io/library/python:3.9"
+    id: "Install requirements"
+    entrypoint: "python"
+    args: ["-m", "pip", "install", "-r", "requirements.dev.txt", "--user"]
+
+  - name: "docker.io/library/python:3.9"
+    id: "Install iPython requirements"
+    entrypoint: "python"
+    args: ["-m", "pip", "install", "-r", "requirements.ipython.txt", "--user"]
+
+  - name: "docker.io/library/python:3.9"
+    id: "Install malloy"
+    entrypoint: "python"
+    args: ["-m", "pip", "install", "-e", ".", "--user"]
+
+  - name: "docker.io/library/python:3.9"
+    id: "Run lint checks"
+    entrypoint: "python"
+    args: ["-m", "pylint", "src", "tests"]
+
+  - name: "docker.io/library/python:3.9"
+    id: "Run format checks"
+    entrypoint: "python"
+    args: ["-m", "yapf", "--diff", "--recursive", "src", "tests"]
+
+  - name: "node:16"
+    id: "Build service"
+    entrypoint: "bash"
+    args: ["./scripts/gen-services.sh"]
+
+  - name: "docker.io/library/python:3.9"
+    id: "Run integration tests"
+    entrypoint: "python"
+    args: ["-m", "pytest", "--junitxml=${SHORT_SHA}_test_log.xml", "-rxXs"]
+
+  - name: "docker.io/library/python:3.9"
+    id: "Bump version number"
+    entrypoint: "python"
+    args: ["-m bumpver update --tag dev"]
+
+  - name: "docker.io/library/python:3.9"
+    id: "Build packages"
+    entrypoint: "python"
+    args: ["-m build"]
+
+  - name: "docker.io/library/python:3.9"
+    id: "Build packages"
+    entrypoint: "python"
+    args: ["scripts do-github-release.py"]
+
+timeout: "600s"
