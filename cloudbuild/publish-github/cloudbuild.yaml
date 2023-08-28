@@ -71,6 +71,9 @@ steps:
     id: "Bump version number"
     entrypoint: "python"
     args: ["-m", "bumpver", "update", "--tag", "dev", "--allow-dirty"]
+    volumes:
+      - name: "ssh"
+        path: /root/.ssh
 
   - name: "docker.io/library/python:3.9"
     id: "Build packages"
