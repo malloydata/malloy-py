@@ -62,7 +62,7 @@ steps:
     args: ["-m build"]
 
   - name: "docker.io/library/python:3.9"
-    id: "Build packages"
+    id: "Create github release"
     entrypoint: "python"
     args: ["scripts do-github-release.py"]
     secretEnv:
