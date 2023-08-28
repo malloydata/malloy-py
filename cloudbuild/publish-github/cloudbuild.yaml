@@ -19,7 +19,7 @@ steps:
       - |
         git submodule set-url submodules/malloy-service https://github.com/malloydata/malloy-service
         git submodule update --init --recursive
-        git remote set-url origin git@github.com:malloydata/malloy
+        git remote set-url origin git@github.com:malloydata/malloy-py
         git config --global user.email "malloy-ci-bot@google.com"
         git config --global user.name "Malloy CI Bot"
   - name: "docker.io/library/python:3.9"
