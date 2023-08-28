@@ -36,8 +36,29 @@ li.schema.hidden {
   display: none;
 }
 
-li.field {
+li.fields {
   margin: 2px 0;
+}
+
+li.fields label {
+  text-transform: uppercase;
+  font-size: 10px;
+  display: block;
+  margin-left: 5px;
+}
+
+div.field {
+  white-space: nowrap;
+  display: inline-flex;
+  vertical-align: middle;
+  border: 1px solid rgba(128, 128, 128, 0.5);
+  border-radius: 12px;
+  padding: 2px 5px;
+  margin: 2px;
+}
+
+.field_name {
+  padding-left: 3px;
 }
 
 svg,
