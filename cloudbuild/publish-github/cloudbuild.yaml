@@ -65,5 +65,13 @@ steps:
     id: "Build packages"
     entrypoint: "python"
     args: ["scripts do-github-release.py"]
-
+    secretEnv:
+      [
+        'GHAPI_PAT',
+      ]
+      
 timeout: "600s"
+availableSecrets:
+  secretManager:
+    - versionName: projects/malloy-303216/secrets/vscode-extension-gh-pat/versions/latest
+      env: 'GHAPI_PAT'
