@@ -54,17 +54,17 @@ steps:
   - name: "docker.io/library/python:3.9"
     id: "Bump version number"
     entrypoint: "python"
-    args: ["-m bumpver update --tag dev"]
+    args: ["-m", "bumpver", "update", "--tag", "dev"]
 
   - name: "docker.io/library/python:3.9"
     id: "Build packages"
     entrypoint: "python"
-    args: ["-m build"]
+    args: ["-m", "build"]
 
   - name: "docker.io/library/python:3.9"
     id: "Create github release"
     entrypoint: "python"
-    args: ["scripts do-github-release.py"]
+    args: ["scripts/do-github-release.py"]
     secretEnv:
       [
         'GHAPI_PAT',
