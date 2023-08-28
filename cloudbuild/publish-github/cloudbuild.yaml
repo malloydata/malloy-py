@@ -54,7 +54,7 @@ steps:
   - name: "docker.io/library/python:3.9"
     id: "Bump version number"
     entrypoint: "python"
-    args: ["-m", "bumpver", "update", "--tag", "dev"]
+    args: ["-m", "bumpver", "update", "--tag", "dev", "--allow-dirty"]
 
   - name: "docker.io/library/python:3.9"
     id: "Build packages"
