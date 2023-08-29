@@ -22,7 +22,7 @@
 # __init__.py
 """Base module of the Malloy python runtime."""
 # Version of the python malloy package
-__version__ = "2023.1019-dev"
+__version__ = "2023.1020-dev"
 
 from malloy.runtime import (Runtime)
 try:
