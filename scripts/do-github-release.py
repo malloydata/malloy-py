@@ -53,7 +53,7 @@ def create_release(assets):
                                'name': version,
                                'draft': False,
                                'prerelease': tag != 'final',
-                               'generate_release_notes': False,
+                               'generate_release_notes': True,
                            })
 
   if response.status_code != 201:
