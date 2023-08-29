@@ -169,7 +169,13 @@ async def _malloy_query(line: str, cell: str):
       if job_result is None:
         print("No results")
       elif results_var:
-        IPython.get_ipython().user_ns[results_var] = job_result.to_dataframe()
+        # Since renderer converts to dataframe internally
+        # we don't need to do it here
+        if render_results:
+          IPython.get_ipython().user_ns[results_var] = job_result
+        else:
+          IPython.get_ipython().user_ns[results_var] = job_result.to_dataframe()
+
         print("✅ Stored in", results_var)
       elif html_content:
         tabbed_html = render_results_tab(html_content, sql)
