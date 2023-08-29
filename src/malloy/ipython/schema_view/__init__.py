@@ -124,20 +124,23 @@ def render_fields(explore, path=""):
   [queries, dimensions, measures, structs] = field_sorter(fields)
 
   if len(queries) > 0:
-    html += """<li class="fields"><label>Queries</label><div class="field_list">"""
+    html += """<li class="fields">"""
+    html += """<label>Queries</label><div class="field_list">"""
     html += " ".join(
         render_field(field, path) for field in sorted(queries, key=field_sort))
     html += "</div></li>"
 
   if len(dimensions) > 0:
-    html += """<li class="fields"><label>Dimensions</label><div class="field_list">"""
+    html += """<li class="fields">"""
+    html += """<label>Dimensions</label><div class="field_list">"""
     html += " ".join(
         render_field(field, path)
         for field in sorted(dimensions, key=field_sort))
     html += "</div></li>"
 
   if len(measures) > 0:
-    html += """<li class="fields"><label>Measures</label><div class="field_list">"""
+    html += """<li class="fields">"""
+    html += """<label>Measures</label><div class="field_list">"""
     html += " ".join(
         render_field(field, path) for field in sorted(measures, key=field_sort))
     html += "<div></li>"
