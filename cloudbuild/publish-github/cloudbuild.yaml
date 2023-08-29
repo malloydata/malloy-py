@@ -17,6 +17,7 @@ steps:
     args:
       - "-c"
       - |
+        git branch -m main
         git submodule set-url submodules/malloy-service https://github.com/malloydata/malloy-service
         git submodule update --init --recursive
         git remote set-url origin git@github.com:malloydata/malloy-py
