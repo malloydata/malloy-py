@@ -190,6 +190,9 @@ class Runtime():
       if self._error:
         raise MalloyRuntimeError(self._error)
 
+    if self._sql is None:
+      return None
+
     return json.loads(self._sql)
 
   def _run_sql(self, sql: str, connection_name: str):
