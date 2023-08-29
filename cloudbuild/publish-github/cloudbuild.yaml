@@ -93,5 +93,5 @@ availableSecrets:
   secretManager:
     - versionName: projects/malloy-303216/secrets/vscode-extension-gh-pat/versions/latest
       env: 'GHAPI_PAT'
-    - versionName: projects/malloy-303216/secrets/github-ssh-key/versions/latest
+    - versionName: projects/malloy-303216/secrets/github-malloy-py/versions/latest
       env: "GITHUB_SSH_KEY"
