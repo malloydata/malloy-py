@@ -22,23 +22,63 @@
 
 import IPython
 from IPython import display
+import argparse
 import asyncio
 import atexit
 import malloy
 import nest_asyncio
+import shlex
 from malloy.data.bigquery import BigQueryConnection
 from malloy.data.duckdb import DuckDbConnection
 from malloy.data.connection_manager import DefaultConnectionManager
 from malloy.service import ServiceManager
 from malloy import Runtime
 from malloy.runtime import MalloyRuntimeError
+from .schema_view import render_schema
 from .tab_renderer import get_initial_css_js, render_results_tab
 
 nest_asyncio.apply()
 
-DEFAULT_MODEL_VAR = "model"
+DEFAULT_MODEL_VAR = "__malloy_model"
+
+
+class MalloyArgumentError(Exception):
+  """Exception thrown by MalloyMagicArgumentParser when a parsing
+  error occurs.
+  """
+  pass
+
+
+class MalloyMagicArgumentParser(argparse.ArgumentParser):
+  """ArgumentParser sub-class that throws a MalloyArgumentError
+  exception instead of calling sys.exit().
+  """
+
+  def exit(self, status=0, message=None):
+    if message:
+      raise MalloyArgumentError(message)
+
 
 runtime: Runtime = None
+
+# Argument parser for the %%malloy_model magic
+model_arg_parser = MalloyMagicArgumentParser(
+    prog="%%malloy_model",
+    description="Malloy Model cell magic",
+    exit_on_error=False)
+model_arg_parser.add_argument("modelname", default=DEFAULT_MODEL_VAR, nargs="?")
+model_arg_parser.add_argument("-i",
+                              "--import",
+                              required=False,
+                              dest="import_file")
+
+# Argument parser for the %%malloy_query magic
+query_arg_parser = MalloyMagicArgumentParser(
+    prog="%%malloy_query",
+    description="Malloy Query cell magic",
+    exit_on_error=False)
+query_arg_parser.add_argument("modelname", default=DEFAULT_MODEL_VAR, nargs="?")
+query_arg_parser.add_argument("varname", default=None, nargs="?")
 
 
 def _cleanup_runtime():
@@ -60,20 +100,31 @@ async def _malloy_model(line, cell):
     line: Storage location
     cell: Malloy model
   """
-  var_name = line.strip() or DEFAULT_MODEL_VAR
-
-  model = runtime.load_source("\n" + cell)
   try:
-    await model.compile_model()
+    args = model_arg_parser.parse_args(shlex.split(line))
+  except MalloyArgumentError as e:
+    print(f"🚫 {e.args[0]}")
+    return
 
-    IPython.get_ipython().user_ns[var_name] = model
-    print("✅ Stored in", var_name)
+  var_name = args.modelname
+
+  if args.import_file:
+    runtime.load_file(args.import_file)
+  else:
+    runtime.load_source("\n" + cell)
+
+  try:
+    model = await runtime.compile_model()
+
+    IPython.get_ipython().user_ns[var_name] = runtime
+    if model:
+      display.display(display.HTML(render_schema(model)))
   except MalloyRuntimeError as e:
     print(f"🚫 {e.args[0]}")
     IPython.get_ipython().user_ns[var_name] = None
 
 
-def malloy_model(line, cell):
+def malloy_model(line, cell=None):
   """Dispatch a malloy model cell to the malloy client.
 
   Args:
@@ -91,21 +142,40 @@ async def _malloy_query(line: str, cell: str):
     separated swing
     cell: Malloy query
   """
-  var_names = line.strip().split()
-  model_var = var_names[0] or DEFAULT_MODEL_VAR
-  results_var = var_names[1] if len(var_names) > 1 else None
+
+  try:
+    args = query_arg_parser.parse_args(shlex.split(line))
+  except MalloyArgumentError as e:
+    print(f"🚫 {e.args[0]}")
+    return
+
+  model_var = args.modelname
+  results_var = args.varname
+
   if results_var:
     IPython.get_ipython().user_ns[results_var] = None
 
   if model := IPython.get_ipython().user_ns.get(model_var):
     try:
+      query = "\n" + cell
       render_results = results_var is None
-      [job_result, html_content,
-       sql] = await model.run(query="\n" + cell, render_results=render_results)
+      job_result = None
+      html_content = None
+      sql = None
+      if render_results:
+        [job_result, html_content, sql] = await model.render(query=query)
+      else:
+        [job_result, sql] = await model.get_sql_and_run(query=query)
       if job_result is None:
         print("No results")
       elif results_var:
-        IPython.get_ipython().user_ns[results_var] = job_result
+        # Since renderer converts to dataframe internally
+        # we don't need to do it here
+        if render_results:
+          IPython.get_ipython().user_ns[results_var] = job_result
+        else:
+          IPython.get_ipython().user_ns[results_var] = job_result.to_dataframe()
+
         print("✅ Stored in", results_var)
       elif html_content:
         tabbed_html = render_results_tab(html_content, sql)
@@ -138,7 +208,7 @@ def load_ipython_extension(ipython):
   runtime.add_connection(DuckDbConnection())
   display.display(display.HTML(get_initial_css_js()))
 
-  ipython.register_magic_function(malloy_model, "cell")
+  ipython.register_magic_function(malloy_model, "line_cell")
   ipython.register_magic_function(malloy_query, "cell")
 
 

@@ -34,14 +34,17 @@ from pathlib import Path
 
 from malloy.data.connection import ConnectionInterface
 from malloy.data.connection_manager import ConnectionManagerInterface, DefaultConnectionManager
+from malloy.data.schema_cache import SchemaCache
 from malloy.service import ServiceManager
 from malloy.services.v1.compiler_pb2_grpc import CompilerStub
 from malloy.services.v1.compiler_pb2 import CompileRequest, CompileDocument, CompilerRequest, SqlBlockSchema, QueryResult
 
-from duckdb import DuckDBPyConnection
-
 
 class MalloyRuntimeError(Exception):
+  """
+  Errors that can be handled by the front end and shouldn't necessarily
+  produce stack traces in notebooks.
+  """
   pass
 
 
@@ -62,6 +65,7 @@ class Runtime():
     self._connection_manager = connection_manager
     self._service_manager = service_manager
     self._was_entered = False
+    self._schema_cache = SchemaCache()
     self._log.debug("Runtime initialized")
 
   def __enter__(self):
@@ -101,6 +105,10 @@ class Runtime():
     self._log.debug("  file_name: %s", self._file_name)
     return self
 
+  async def get_sql(self, named_query: str = None, query: str = None):
+    return await self.compile_and_maybe_execute(named_query=named_query,
+                                                query=query)
+
   async def compile_and_maybe_execute(self,
                                       named_query: str = None,
                                       query: str = None):
@@ -131,25 +139,28 @@ class Runtime():
       if state in self.ready_state:
         await self._compile_completed.wait()
       else:
-        raise ValueError("Channel not in ready state", state)
+        raise MalloyRuntimeError("Channel not in ready state", state)
+
+      if self._error:
+        raise MalloyRuntimeError(self._error)
+
     return [self._sql, self._connection]
 
-  async def run(self,
-                query: str = None,
-                named_query: str = None,
-                render_results: bool = True):
-    if render_results:
-      self._service_mode = CompileRequest.Mode.COMPILE_AND_RENDER
-    else:
-      self._service_mode = CompileRequest.Mode.COMPILE_ONLY
-    [sql, connection_name
-    ] = await self.compile_and_maybe_execute(query=query,
-                                             named_query=named_query)
+  async def run(self, query: str = None, named_query: str = None):
+    self._service_mode = CompileRequest.Mode.COMPILE_ONLY
+    [sql, connection_name] = await self.get_sql(query=query,
+                                                named_query=named_query)
+    return self._run_sql(sql, connection_name)
 
-    # Service does not drive query execution in COMPILE_ONLY mode.
-    if self._service_mode == CompileRequest.Mode.COMPILE_ONLY:
-      self._run_sql(sql, connection_name)
+  async def get_sql_and_run(self, query: str = None, named_query: str = None):
+    self._service_mode = CompileRequest.Mode.COMPILE_ONLY
+    [sql, connection_name] = await self.get_sql(query=query,
+                                                named_query=named_query)
+    return [self._run_sql(sql, connection_name), sql]
 
+  async def render(self, query: str = None, named_query: str = None):
+    self._service_mode = CompileRequest.Mode.COMPILE_AND_RENDER
+    await self.compile_and_maybe_execute(query=query, named_query=named_query)
     return [self._job_result, self._html_content, self._sql]
 
   async def compile_model(self):
@@ -174,10 +185,12 @@ class Runtime():
       if state in self.ready_state:
         await self._compile_completed.wait()
       else:
-        raise ValueError("Channel not in ready state", state)
+        raise MalloyRuntimeError("Channel not in ready state", state)
 
       if self._error:
         raise MalloyRuntimeError(self._error)
+
+    return json.loads(self._sql)
 
   def _run_sql(self, sql: str, connection_name: str):
     if connection_name == self.default_connection:
@@ -189,16 +202,8 @@ class Runtime():
       raise MalloyRuntimeError(self._error)
     if sql is None:
       return None
-    job = self._connection_manager.get_connection(connection_name).run_query(
+    return self._connection_manager.get_connection(connection_name).run_query(
         sql)
-    total_rows = 0
-    if isinstance(job, DuckDBPyConnection):
-      self._job_result = job.fetch_df()
-      total_rows = len(self._job_result.index)
-    else:
-      self._job_result = job.to_dataframe()
-      total_rows = job.result().total_rows
-    return [self._job_result, total_rows]
 
   def __aiter__(self):
     return self
@@ -334,8 +339,8 @@ class Runtime():
       if connection:
         # tables = tables_per_connection_to_fetch.get(connection)
         self._log.debug("  tables: %s", tables)
-        schemas = connection.get_schema_for_tables(tables)
-
+        schemas = self._schema_cache.get_schema_for_tables(
+            connection_name, connection, tables)
         #TODO: Remove this when default connections go away
         for key in schemas["schemas"]:
           schemas["schemas"][key]["structRelationship"][
@@ -357,13 +362,14 @@ class Runtime():
     self._log.debug(self._last_response.sql_block.sql)
     connection_name = self._last_response.connection
     sql = self._last_response.content
-    [_, total_rows] = self._run_sql(sql, connection_name)
-    results_json = self._job_result.to_json(orient="records")
+    query_result = self._run_sql(sql, connection_name)
+    df_result = query_result.to_dataframe()
+    results_json = df_result.to_json(orient="records")
     self._log.debug("Sending results to service.")
     return CompileRequest(type=CompileRequest.Type.RESULTS,
                           query_result=QueryResult(
                               data=json.dumps(results_json),
-                              total_rows=total_rows))
+                              total_rows=len(df_result.index)))
 
   def _generate_sql_block_schemas_request(self):
     # Compiler should really be telling us which connection to use per table...

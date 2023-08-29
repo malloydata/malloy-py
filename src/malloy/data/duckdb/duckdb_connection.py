@@ -32,6 +32,14 @@ import logging
 import re
 
 
+# Implememting QueryResultsInterface methods
+def to_dataframe(self):
+  return self.fetch_df()
+
+
+duckdb.DuckDBPyConnection.to_dataframe = to_dataframe
+
+
 class DuckDbException(Exception):
   pass
 

@@ -83,7 +83,7 @@ async def test_returns_sql(service_manager):
   rt = Runtime(service_manager=service_manager)
   rt.add_connection(DuckDbConnection(home_dir=home_dir))
   rt.load_file(test_file_01)
-  [sql, connection] = await rt.compile_and_maybe_execute(query=query_by_state)
+  [sql, connection] = await rt.get_sql(query=query_by_state)
   assert sql == """
 SELECT\x20
    airports."state" as "state",
@@ -101,11 +101,12 @@ async def test_runs_sql(service_manager):
   rt = Runtime(service_manager=service_manager)
   rt.add_connection(DuckDbConnection(home_dir=home_dir))
   rt.load_file(test_file_01)
-  [data, _, _] = await rt.run(query=query_by_state)
-  assert data["state"][0] == "TX"
-  assert data["airport_count"][0] == 1845
-  assert data["state"][22] == "NC"
-  assert data["airport_count"][22] == 400
+  data = await rt.run(query=query_by_state)
+  df_data = data.to_dataframe()
+  assert df_data["state"][0] == "TX"
+  assert df_data["airport_count"][0] == 1845
+  assert df_data["state"][22] == "NC"
+  assert df_data["airport_count"][22] == 400
 
 
 @pytest.mark.asyncio
@@ -113,11 +114,12 @@ async def test_with():
   with Runtime() as rt:
     rt.add_connection(DuckDbConnection(home_dir=home_dir))
     rt.load_file(test_file_01)
-    [data, _, _] = await rt.run(query=query_by_state)
-    assert data["state"][0] == "TX"
-    assert data["airport_count"][0] == 1845
-    assert data["state"][22] == "NC"
-    assert data["airport_count"][22] == 400
+    data = await rt.run(query=query_by_state)
+    df_data = data.to_dataframe()
+    assert df_data["state"][0] == "TX"
+    assert df_data["airport_count"][0] == 1845
+    assert df_data["state"][22] == "NC"
+    assert df_data["airport_count"][22] == 400
 
 
 @pytest.mark.asyncio
@@ -126,8 +128,9 @@ async def test_another_with():
   with Runtime() as rt:
     rt.add_connection(DuckDbConnection(home_dir=home_dir))
     rt.load_file(test_file_01)
-    [data, _, _] = await rt.run(query=query_by_state)
-    assert data["state"][0] == "TX"
-    assert data["airport_count"][0] == 1845
-    assert data["state"][22] == "NC"
-    assert data["airport_count"][22] == 400
+    data = await rt.run(query=query_by_state)
+    df_data = data.to_dataframe()
+    assert df_data["state"][0] == "TX"
+    assert df_data["airport_count"][0] == 1845
+    assert df_data["state"][22] == "NC"
+    assert df_data["airport_count"][22] == 400
