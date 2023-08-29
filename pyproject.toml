@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "malloy"
-version = "2023.1018-dev"
+version = "2023.1019-dev"
 description = "Malloy is an experimental language for describing data relationships and transformations"
 readme = "README.md"
 # authors = [{name="", email=""}]
@@ -40,7 +40,7 @@ include-package-data = true
 where = ["src"]
 
 [tool.bumpver]
-current_version = "2023.1018-dev"
+current_version = "2023.1019-dev"
 version_pattern = "YYYY.BUILD[-TAG]"
 commit_message = "bump version {old_version} -> {new_version}"
 commit = true
