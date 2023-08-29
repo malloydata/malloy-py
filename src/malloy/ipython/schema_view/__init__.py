@@ -25,6 +25,16 @@ from .styles import schema_styles
 from .icons import get_icon_path
 
 
+def is_aggregate(field):
+  """
+  Identify aggregate fields by expressionType
+  """
+  return field.get("expressionType") in [
+      "aggregate", "scalar_analytic", "aggregate_analytic"
+      "ungrouped_aggregate"
+  ]
+
+
 def field_sort(a):
   """
   Sorts fields in an order similar to the VS Code extension:
@@ -33,9 +43,9 @@ def field_sort(a):
   3. Measures
   4. Joins
   """
-  is_aggregate = a.get("expressionType") == "aggregate"
   return (0 if a["type"] == "turtle" else
-          3 if a["type"] == "struct" else 2 if is_aggregate else 1, a["name"])
+          3 if a["type"] == "struct" else 2 if is_aggregate(a) else 1,
+          a["name"])
 
 
 def build_title(field, path):
@@ -51,46 +61,100 @@ Path: {f"{path}{'.' if path else ''}{field_name}"}
 Type: {field.get("type")}"""
 
 
-def render_fields(root, path=""):
+def field_sorter(fields):
+  """
+  Bucket fields into queries, dimensions, measures and structs
+  """
+  queries = []
+  dimensions = []
+  measures = []
+  structs = []
+
+  for field in fields:
+    field_type = field.get("type")
+
+    if is_aggregate(field):
+      measures.append(field)
+    elif field_type == "turtle":
+      queries.append(field)
+    elif field_type == "struct":
+      structs.append(field)
+    else:
+      dimensions.append(field)
+
+  return [queries, dimensions, measures, structs]
+
+
+def render_field(field, path):
+  field_type = field.get("type")
+  field_name = field.get("as") or field.get("name")
+
+  return f"""<div class="field" title="{build_title(field, path)}">
+  {get_icon_path(field_type, is_aggregate(field))}
+  <span class="field_name">{field_name}</span>
+</div>"""
+
+
+def render_fields(explore, path=""):
   """
   Render one level of the schema tree. Used recursively to handle
   nested schemas.
   """
   html = ""
-  fields = root["fields"]
-  join_relationship = root.get("structRelationship")
+  fields = explore["fields"]
+  join_relationship = explore.get("structRelationship")
   join_type = None
   if join_relationship:
     join_type = join_relationship.get("type")
   icon_type = join_type if join_type else "struct_base"
-  schema_name = root.get("as") or root.get("name")
+  explore_name = explore.get("as") or explore.get("name")
   html += f"""
 <li 
   class="schema hidden"
-  title="{build_title(root, path)}"
-  onclick="toggleClass(event, 'hidden');"; 
-  return false;"
+  title="{build_title(explore, path)}"
+  return false;
 >
-{get_icon_path(icon_type, False)} <b class="schema_name">{schema_name}</b>
+<div onclick="toggleOpen(event)">\
+<span class="open">▼</span><span class="closed">▶</span> \
+{get_icon_path(icon_type, False)} \
+<b class="explore_name">{explore_name}</b>
+</div>
 <ul>
 """
-  for field in sorted(fields, key=field_sort):
-    field_type = field.get("type")
-    field_name = field.get("as") or field.get("name")
-    if field_type == "struct":
+  [queries, dimensions, measures, structs] = field_sorter(fields)
+
+  if len(queries) > 0:
+    html += """<li class="fields">"""
+    html += """<label>Queries</label><div class="field_list">"""
+    html += " ".join(
+        render_field(field, path) for field in sorted(queries, key=field_sort))
+    html += "</div></li>"
+
+  if len(dimensions) > 0:
+    html += """<li class="fields">"""
+    html += """<label>Dimensions</label><div class="field_list">"""
+    html += " ".join(
+        render_field(field, path)
+        for field in sorted(dimensions, key=field_sort))
+    html += "</div></li>"
+
+  if len(measures) > 0:
+    html += """<li class="fields">"""
+    html += """<label>Measures</label><div class="field_list">"""
+    html += " ".join(
+        render_field(field, path) for field in sorted(measures, key=field_sort))
+    html += "<div></li>"
+
+  if len(structs) > 1:
+    html += """<li class="fields"><label>Relations</label> """
+    for field in sorted(structs, key=field_sort):
+      field_name = field.get("as") or field.get("name")
       html += "<ul>"
       html += render_fields(field, f"{path}{'.' if path else ''}{field_name}")
       html += "</ul>"
-    else:
-      is_aggregate = field.get("expressionType") == "aggregate"
-      html += f"""
-    <li title="{build_title(field, path)}">
-      {get_icon_path(field_type, is_aggregate)}
-      <span class="field_name">{field_name}</span>
-    </li>
-  """
+    html += "</li>"
   html += """
-</ul>
+  </ul>
 </li>
 """
   return html

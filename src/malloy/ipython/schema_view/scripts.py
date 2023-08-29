@@ -13,8 +13,8 @@
 
 schema_scripts = """
 <script>
-function toggleClass(event, value) {
-  event.currentTarget.classList.toggle(value)
+function toggleOpen(event) {
+  event.currentTarget.parentElement.classList.toggle('hidden');
   event.preventDefault();
   event.stopPropagation();
 }

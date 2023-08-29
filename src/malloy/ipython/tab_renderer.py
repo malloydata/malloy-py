@@ -27,30 +27,31 @@ css = '''
 <style>
 /* Style the tab */
 .tab {
-  overflow: hidden;
-  border: 1px solid #ccc;
-  background-color: #f1f1f1;
+  overflow: auto;
+  background-color: inherit;
 }
 
 /* Style the buttons inside the tab */
 .tab button {
+  color: inherit;
+  font-weight: lighter;
   background-color: inherit;
-  float: left;
+  float: right;
   border: none;
   outline: none;
   cursor: pointer;
-  padding: 14px 16px;
-  transition: 0.3s;
+  padding: 10px 10px;
+  transition: 0.1s;
 }
 
 /* Change background color of buttons on hover */
 .tab button:hover {
-  background-color: #ddd;
+  font-weight: 700;
 }
 
 /* Create an active/current tablink class */
 .tab button.active {
-  background-color: #ccc;
+  font-weight: 900;
 }
 
 /* Style the tab content */
@@ -58,17 +59,7 @@ css = '''
   display: none;
   padding: 6px 12px;
   border: 1px solid #ccc;
-  border-top: none;
-}
-/* Style the close button */
-.topright {
-  float: right;
-  cursor: pointer;
-  font-size: 28px;
-}
-
-.topright:hover {
-  color: red;
+  overflow: auto;
 }
 </style>
 '''
@@ -78,6 +69,10 @@ js_script = '''
 <script>
 function openTab(evt, tabName, result_set) {
   var i, tabcontent, tablinks, cur_tabset, cur_tablinks;
+  var shouldClose = false;
+  if (evt.currentTarget.classList.contains("active")) {
+  	shouldClose = true;
+  }
   cur_tabset = "tabset-" + result_set;
   cur_tablinks = "tablinks-" + result_set;
   tabcontent = document.getElementsByClassName(cur_tabset);
@@ -89,8 +84,14 @@ function openTab(evt, tabName, result_set) {
     tablinks[i].className = tablinks[i].className.replace(" active", "");
   }
 
-  document.getElementById(tabName).style.display = "block";
-  evt.currentTarget.className += " active";
+  if (shouldClose) {
+  	evt.currentTarget.className.replace(" active", "");
+    event.preventDefault();
+  	event.stopPropagation();
+  } else {
+  	document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.className += " active";
+  }
 }
 </script>
 '''
@@ -106,16 +107,14 @@ document.getElementById("defaultOpen-{rand}").click();
 html_body = '''
 
 <div class="tab">
-  <button class="tablinks-{rand}" onclick="openTab(event, 'HTML-{rand}', '{rand}')" id="defaultOpen-{rand}">HTML</button>
   <button class="tablinks-{rand}" onclick="openTab(event, 'SQL-{rand}', '{rand}')">SQL</button>
+  <button class="tablinks-{rand}" onclick="openTab(event, 'HTML-{rand}', '{rand}')" id="defaultOpen-{rand}">HTML</button>
 </div>
 
 <div id="HTML-{rand}" class="tabcontent tabset-{rand}">
-  <span onclick="this.parentElement.style.display='none'" class="topright">&times</span>
   {html}
 </div>
 <div id="SQL-{rand}" class="tabcontent tabset-{rand}">
-  <span onclick="this.parentElement.style.display='none'" class="topright">&times</span>
   <pre>{sql}</pre>
 </div>
 

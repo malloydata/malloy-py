@@ -1,0 +1,98 @@
+steps:
+  - name: "gcr.io/cloud-builders/git"
+    id: git-ssh-key
+    secretEnv: ["GITHUB_SSH_KEY"]
+    entrypoint: "bash"
+    args:
+      - -c
+      - |
+        echo "$$GITHUB_SSH_KEY" >> /root/.ssh/id_rsa
+        chmod 400 /root/.ssh/id_rsa
+        cp cloudbuild/known_hosts.github /root/.ssh/known_hosts
+    volumes:
+      - name: "ssh"
+        path: /root/.ssh
+  - name: "gcr.io/cloud-builders/git"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        git branch -m main
+        git submodule set-url submodules/malloy-service https://github.com/malloydata/malloy-service
+        git submodule update --init --recursive
+        git remote set-url origin git@github.com:malloydata/malloy-py
+        git config --global user.email "malloy-ci-bot@google.com"
+        git config --global user.name "Malloy CI Bot"
+  - name: "docker.io/library/python:3.9"
+    id: "Install pip"
+    entrypoint: "python"
+    args: ["-m", "pip", "install", "--upgrade", "pip", "--user"]
+
+  - name: "docker.io/library/python:3.9"
+    id: "Install tools"
+    entrypoint: "python"
+    args: ["-m", "pip", "install", "pip-tools", "--user"]
+
+  - name: "docker.io/library/python:3.9"
+    id: "Install requirements"
+    entrypoint: "python"
+    args: ["-m", "pip", "install", "-r", "requirements.dev.txt", "--user"]
+
+  - name: "docker.io/library/python:3.9"
+    id: "Install iPython requirements"
+    entrypoint: "python"
+    args: ["-m", "pip", "install", "-r", "requirements.ipython.txt", "--user"]
+
+  - name: "docker.io/library/python:3.9"
+    id: "Install malloy"
+    entrypoint: "python"
+    args: ["-m", "pip", "install", "-e", ".", "--user"]
+
+  - name: "docker.io/library/python:3.9"
+    id: "Run lint checks"
+    entrypoint: "python"
+    args: ["-m", "pylint", "src", "tests"]
+
+  - name: "docker.io/library/python:3.9"
+    id: "Run format checks"
+    entrypoint: "python"
+    args: ["-m", "yapf", "--diff", "--recursive", "src", "tests"]
+
+  - name: "node:16"
+    id: "Build service"
+    entrypoint: "bash"
+    args: ["./scripts/gen-services.sh"]
+
+  - name: "docker.io/library/python:3.9"
+    id: "Run integration tests"
+    entrypoint: "python"
+    args: ["-m", "pytest", "--junitxml=${SHORT_SHA}_test_log.xml", "-rxXs"]
+
+  - name: "docker.io/library/python:3.9"
+    id: "Bump version number"
+    entrypoint: "python"
+    args: ["-m", "bumpver", "update", "--tag", "dev", "--allow-dirty"]
+    volumes:
+      - name: "ssh"
+        path: /root/.ssh
+
+  - name: "docker.io/library/python:3.9"
+    id: "Build packages"
+    entrypoint: "python"
+    args: ["-m", "build"]
+
+  - name: "docker.io/library/python:3.9"
+    id: "Create github release"
+    entrypoint: "python"
+    args: ["scripts/do-github-release.py"]
+    secretEnv: ['GHAPI_PAT']
+      
+timeout: "1200s"
+options:
+  logging: CLOUD_LOGGING_ONLY
+availableSecrets:
+  secretManager:
+    - versionName: projects/malloy-303216/secrets/vscode-extension-gh-pat/versions/latest
+      env: 'GHAPI_PAT'
+    - versionName: projects/malloy-303216/secrets/github-malloy-py/versions/latest
+      env: "GITHUB_SSH_KEY"
