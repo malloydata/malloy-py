@@ -13,59 +13,81 @@
 
 schema_styles = """
 <style>
-b {
- font-size: 12px;
-}
+  body {
+    color:  var(--vscode-foreground, inherit);
+  }
 
-ul {
-  margin: 5px 0;
-  padding: 0 1em;
-  list-style-type: none;
-}
+  ul {
+    margin: 5px 0;
+    padding: 0 0.75em;
+    list-style-type: none;
+  }
 
-li.schema {
-  list-style: "▼";
-  padding-left: 5px;
-}
+  li.schema {
+    list-style: none;
+  }
 
-li.schema.hidden {
-  list-style: "▶"
-}
+  .hidden ul {
+    display: none;
+  }
 
-.hidden ul {
-  display: none;
-}
+  li.fields {
+    margin: 2px 0;
+  }
 
-li.fields {
-  margin: 2px 0;
-}
+  li.fields label {
+    display: block;
+    font-size: 10px;
+    margin-left: 5px;
+    text-transform: uppercase;
+  }
 
-li.fields label {
-  text-transform: uppercase;
-  font-size: 10px;
-  display: block;
-  margin-left: 5px;
-}
+  .explore_name {
+    line-height: 2em;
+  }
 
-div.field {
-  white-space: nowrap;
-  display: inline-flex;
-  vertical-align: middle;
-  border: 1px solid rgba(128, 128, 128, 0.5);
-  border-radius: 12px;
-  padding: 2px 5px;
-  margin: 2px;
-}
+  .field {
+    white-space: nowrap;
+    display: flex;
+    vertical-align: middle;
+    border: 1px solid var(--vscode-widget-border, rgba(128, 128, 128, 0.5));
+    border-radius: 20px;
+    padding: 0.5em 1em;
+    margin: 0.25em;
+  }
 
-.field_name {
-  padding-left: 3px;
-}
+  .field_list {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 0.25em;
+  }
 
-svg,
-.field_name,
-.schema_name {
-  vertical-align: middle;
-  display: inline-block;
-}
+  .field_name {
+    padding-left: 3px;
+  }
+
+  .field_name,
+  svg,
+  span,
+  b {
+    vertical-align: middle;
+    display: inline-block;
+  }
+
+  span.closed {
+    display: none;
+  }
+
+  span.open {
+    display: inline-block;
+  }
+
+  .hidden span.closed {
+    display: inline-block;
+  }
+
+  .hidden span.open {
+    display: none;
+  }
 </style>
 """

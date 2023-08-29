@@ -222,7 +222,7 @@ def get_icon_path(field_type: str, is_aggregate: bool):
     elif field_type in ["date", "timestamp"]:
       image_file_name = time_icon
     elif field_type in ["struct_base", "basetable"]:
-      image_file_name = struct_icon
+      image_file_name = ""
     elif field_type == "one":
       image_file_name = one_to_many_icon
     elif field_type == "inline":
