@@ -13,80 +13,82 @@
 
 schema_styles = """
 <style>
-  body {
+  .malloy_schema {
     color:  var(--vscode-foreground, inherit);
   }
 
-  ul {
+  .malloy_schema ul {
     margin: 5px 0;
     padding: 0 0.75em;
     list-style-type: none;
   }
 
-  li.schema {
+  .malloy_schema li.schema {
     list-style: none;
   }
 
-  .hidden ul {
+  .malloy_schema .hidden ul {
     display: none;
   }
 
-  li.fields {
+  .malloy_schema li.fields {
     margin: 2px 0;
   }
 
-  li.fields label {
+  .malloy_schema li.fields label {
     display: block;
     font-size: 10px;
     margin-left: 5px;
+    margin-top: 0.5em;
     text-transform: uppercase;
   }
 
-  .explore_name {
+  .malloy_schema .explore_name {
     line-height: 2em;
+    font-weight: 600;
   }
 
-  .field {
+  .malloy_schema .field {
     white-space: nowrap;
     display: flex;
     vertical-align: middle;
-    border: 1px solid var(--vscode-widget-border, rgba(128, 128, 128, 0.5));
-    border-radius: 20px;
-    padding: 0.5em 1em;
-    margin: 0.25em;
+    border: 1px solid var(--vscode-notebook-cellBorderColor, rgba(128, 128, 128, 0.5));
+    border-radius: 8px;
+    padding: 0.25em 0.75em;
+    margin: 0.2em;
   }
 
-  .field_list {
+  .malloy_schema .field_list {
     display: flex;
     flex-wrap: wrap;
     margin-top: 0.25em;
   }
 
-  .field_name {
+  .malloy_schema .field_name {
     padding-left: 3px;
   }
 
-  .field_name,
-  svg,
-  span,
-  b {
+  .malloy_schema .field_name,
+  .malloy_schema svg,
+  .malloy_schema span,
+  .malloy_schema b {
     vertical-align: middle;
     display: inline-block;
   }
 
-  span.closed {
+  .malloy_schema span.closed {
     display: none;
   }
 
-  span.open {
+  .malloy_schema span.open {
     display: inline-block;
   }
 
-  .hidden span.closed {
+  .malloy_schema .hidden span.closed {
     display: inline-block;
   }
 
-  .hidden span.open {
+  .malloy_schema .hidden span.open {
     display: none;
   }
 </style>

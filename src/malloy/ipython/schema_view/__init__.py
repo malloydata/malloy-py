@@ -165,10 +165,10 @@ def render_schema(model):
   Render a model into a schema tree.
   """
   html = schema_styles + schema_scripts
-  html += "<ul>\n"
+  html += """<div class="malloy_schema"><ul>\n"""
   for schema_name in model["contents"]:
     schema = model["contents"][schema_name]
     html += render_fields(schema)
-  html += "</ul>\n"
+  html += "</ul></div>\n"
 
   return html
