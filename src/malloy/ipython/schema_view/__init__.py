@@ -61,7 +61,11 @@ def field_sorter(fields):
   structs = []
 
   for field in fields:
-    is_aggregate = field.get("expressionType") == "aggregate"
+    is_aggregate = field.get("expressionType") in [
+        "aggregate", "scalar_analytic", "aggregate_analytic"
+        "ungrouped_aggregate"
+    ]
+
     field_type = field.get("type")
 
     if is_aggregate:
