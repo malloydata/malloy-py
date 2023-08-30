@@ -23,17 +23,19 @@
 """A placeholder for a malloy module main entry point."""
 
 import sys
+import asyncio
 
 from malloy.utils.third_party_licenses import output_third_party_licenses
 
-def main():
+
+async def main():
   """Malloy Python Runtime Library"""
   if len(sys.argv) == 1:
     print("Hello Python")
     return
 
   for arg in sys.argv:
-    if arg == 'help' or arg == '-h' or arg == '--help':
+    if arg in ("help", "-h", "--help"):
       print("""
 Usage: python -m malloy [options] [command]
             
@@ -46,9 +48,10 @@ Commands:
             """)
       return
 
-    if arg == 'third_party' or arg == 'third-party':
-      output_third_party_licenses()
+    if arg in ("third_party", "third-party", "--third_party", "--third-party"):
+      await output_third_party_licenses()
       return
 
+
 if __name__ == "__main__":
-  main()
+  asyncio.run(main())

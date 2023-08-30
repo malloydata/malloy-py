@@ -24,7 +24,12 @@
 
 import pytest
 
-from malloy.utils.third_party_licenses import *
+from malloy.utils.third_party_licenses import (extract_project_url,
+                                               get_requirements,
+                                               get_requirements_metadata,
+                                               get_licenses, validate_data,
+                                               METADATA_VERSION, METADATA_NAME,
+                                               REQUIREMENTS_FILES)
 
 PROJECT_URLS = [
     ("Source, https://github.com/duckdb/duckdb/blob/master/tools/pythonpkg",
@@ -37,19 +42,19 @@ PROJECT_URLS = [
 ]
 
 
-@pytest.mark.parametrize("input,expected", PROJECT_URLS)
-def test_extract_project_url(input, expected):
-  actual = extract_project_url(input)
+@pytest.mark.parametrize("input_txt,expected", PROJECT_URLS)
+def test_extract_project_url(input_txt, expected):
+  actual = extract_project_url(input_txt)
   assert actual == expected
 
 
 def test_get_requirements():
   reqs = get_requirements(REQUIREMENTS_FILES)
   assert len(reqs) > 0
-  for key in reqs:
-    assert reqs[key] is not None
-    assert reqs[key][METADATA_VERSION] is not None
-    assert reqs[key][METADATA_NAME] is not None
+  for _, item in reqs.items():
+    assert item is not None
+    assert item[METADATA_VERSION] is not None
+    assert item[METADATA_NAME] is not None
 
 
 def test_get_requirements_metadata():
@@ -58,7 +63,7 @@ def test_get_requirements_metadata():
 
   for key in reqs:
     if len(reqs[key].keys()) < 3:
-      print(f'ERROR: Metadata missing for {key}\n{reqs[key]}')
+      print(f"ERROR: Metadata missing for {key}\n{reqs[key]}")
     assert len(reqs[key].keys()) > 2
 
 
