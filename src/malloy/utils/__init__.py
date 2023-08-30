@@ -19,39 +19,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-# __main__.py
-"""A placeholder for a malloy module main entry point."""
+# __init__.py
+"""This module contains a some Malloy utilities."""
 
-import sys
-import asyncio
-
-from malloy.utils.third_party_licenses import output_third_party_licenses
-
-
-async def main():
-  """Malloy Python Runtime Library"""
-  if len(sys.argv) == 1:
-    print("Hello Python")
-    return
-
-  for arg in sys.argv:
-    if arg in ("help", "-h", "--help"):
-      print("""
-Usage: python -m malloy [options] [command]
-            
-Options:
-  -h, --help        display this help message
-            
-Commands:
-  third-party       output third party license information
-  help [command]    display help for command
-            """)
-      return
-
-    if arg in ("third_party", "third-party", "--third_party", "--third-party"):
-      await output_third_party_licenses()
-      return
-
-
-if __name__ == "__main__":
-  asyncio.run(main())
+__all__ = []

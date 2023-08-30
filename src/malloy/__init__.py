@@ -25,10 +25,15 @@
 __version__ = "2023.1024-dev"
 
 from malloy.runtime import (Runtime)
+from malloy.utils.third_party_licenses import (gen_requirements_file,
+                                               output_third_party_licenses)
 try:
   from malloy.ipython.ipython_magic import (load_ipython_extension,
                                             unload_ipython_extension)
 except ModuleNotFoundError:
   pass
 
-__all__ = ["Runtime", "load_ipython_extension", "unload_ipython_extension"]
+__all__ = [
+    "Runtime", "load_ipython_extension", "unload_ipython_extension",
+    "gen_requirements_file", "output_third_party_licenses"
+]

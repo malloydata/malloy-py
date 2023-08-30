@@ -119,3 +119,13 @@ class TableSchema(_message.Message):
     key: str
     table: str
     def __init__(self, key: _Optional[str] = ..., connection: _Optional[str] = ..., table: _Optional[str] = ...) -> None: ...
+
+class ThirdPartyRequest(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
+class ThirdPartyResponse(_message.Message):
+    __slots__ = ["message"]
+    MESSAGE_FIELD_NUMBER: _ClassVar[int]
+    message: str
+    def __init__(self, message: _Optional[str] = ...) -> None: ...
