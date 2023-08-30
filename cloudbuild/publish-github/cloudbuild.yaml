@@ -77,6 +77,11 @@ steps:
         path: /root/.ssh
 
   - name: "docker.io/library/python:3.9"
+    id: "Generate third party licenses"
+    entrypoint: "python"
+    args: ["-c", "import asyncio; import malloy; asyncio.run(malloy.gen_requirements_file())"]
+
+  - name: "docker.io/library/python:3.9"
     id: "Build packages"
     entrypoint: "python"
     args: ["-m", "build"]
