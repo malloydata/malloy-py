@@ -8,7 +8,7 @@ _Note: These APIs are still in development and are subject to change._
 
 ## How do I get it?
 
-Binary installers for the latest released version are available at the Python Package Index (PyPI). (Currently only available through the test respository)
+Binary installers for the latest released version are available at the [Python Package Index](https://pypi.org/project/malloy/) (PyPI).
 
 ```sh
 python3 -m pip install malloy
