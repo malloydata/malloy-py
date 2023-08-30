@@ -101,7 +101,7 @@ def render_fields(explore, path=""):
   nested schemas.
   """
   html = ""
-  fields = explore["fields"]
+  fields = explore.get("fields") or []
   join_relationship = explore.get("structRelationship")
   join_type = None
   if join_relationship:
