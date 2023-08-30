@@ -168,7 +168,7 @@ def render_schema(model):
   html += """<div class="malloy_schema"><ul>\n"""
   for schema_name in model["contents"]:
     schema = model["contents"][schema_name]
-    if schema.get('type') == "struct":
+    if schema.get("type") == "struct":
       html += render_fields(schema)
   html += "</ul></div>\n"
 
