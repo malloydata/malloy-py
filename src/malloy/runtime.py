@@ -370,9 +370,9 @@ class Runtime():
     results_json = df_result.to_json(orient="records")
     self._log.debug("Sending results to service.")
     return CompileRequest(type=CompileRequest.Type.RESULTS,
-                          query_result=QueryResult(
-                              data=json.dumps(results_json),
-                              total_rows=len(df_result.index)))
+                          query_result=QueryResult(data=results_json,
+                                                   total_rows=len(
+                                                       df_result.index)))
 
   def _generate_sql_block_schemas_request(self):
     # Compiler should really be telling us which connection to use per table...
