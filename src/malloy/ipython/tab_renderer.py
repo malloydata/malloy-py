@@ -22,7 +22,7 @@
 
 import random
 
-# Common CSS block.
+# CSS block.
 css = '''
 <style>
 /* Style the tab */
@@ -64,17 +64,17 @@ css = '''
 </style>
 '''
 
-# Common JS block.
+# JS block.
 js_script = '''
 <script>
-function openTab(evt, tabName, result_set) {
+function openTab_{rand}(evt, tabName) {
   var i, tabcontent, tablinks, cur_tabset, cur_tablinks;
   var shouldClose = false;
   if (evt.currentTarget.classList.contains("active")) {
   	shouldClose = true;
   }
-  cur_tabset = "tabset-" + result_set;
-  cur_tablinks = "tablinks-" + result_set;
+  cur_tabset = "tabset-{rand}";
+  cur_tablinks = "tablinks-{rand}";
   tabcontent = document.getElementsByClassName(cur_tabset);
   for (i = 0; i < tabcontent.length; i++) {
     tabcontent[i].style.display = "none";
@@ -93,12 +93,7 @@ function openTab(evt, tabName, result_set) {
     evt.currentTarget.className += " active";
   }
 }
-</script>
-'''
 
-# Select HTML result tab by default.
-def_tab_js = '''
-<script>
 document.getElementById("defaultOpen-{rand}").click();
 </script>
 '''
@@ -107,8 +102,8 @@ document.getElementById("defaultOpen-{rand}").click();
 html_body = '''
 
 <div class="tab">
-  <button class="tablinks-{rand}" onclick="openTab(event, 'SQL-{rand}', '{rand}')">SQL</button>
-  <button class="tablinks-{rand}" onclick="openTab(event, 'HTML-{rand}', '{rand}')" id="defaultOpen-{rand}">HTML</button>
+  <button class="tablinks-{rand}" onclick="openTab_{rand}(event, 'SQL-{rand}')">SQL</button>
+  <button class="tablinks-{rand}" onclick="openTab_{rand}(event, 'HTML-{rand}')" id="defaultOpen-{rand}">HTML</button>
 </div>
 
 <div id="HTML-{rand}" class="tabcontent tabset-{rand}">
@@ -121,12 +116,9 @@ html_body = '''
 '''
 
 
-def get_initial_css_js():
-  return css + js_script
-
-
 def render_results_tab(html: str = '', sql: str = ''):
   # Separate each result set with a random id.
   random_id = str(random.randrange(100, 999))
-  return html_body.format(rand=random_id, html=html,
-                          sql=sql) + def_tab_js.replace('{rand}', random_id)
+  return css + html_body.format(rand=random_id, html=html,
+                                sql=sql) + js_script.replace(
+                                    '{rand}', random_id)
