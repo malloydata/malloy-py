@@ -35,7 +35,7 @@ from malloy.service import ServiceManager
 from malloy import Runtime
 from malloy.runtime import MalloyRuntimeError
 from .schema_view import render_schema
-from .tab_renderer import get_initial_css_js, render_results_tab
+from .tab_renderer import render_results_tab
 
 nest_asyncio.apply()
 
@@ -206,7 +206,6 @@ def load_ipython_extension(ipython):
 
   runtime.add_connection(BigQueryConnection())
   runtime.add_connection(DuckDbConnection())
-  display.display(display.HTML(get_initial_css_js()))
 
   ipython.register_magic_function(malloy_model, "line_cell")
   ipython.register_magic_function(malloy_query, "cell")
