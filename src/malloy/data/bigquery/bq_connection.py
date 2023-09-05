@@ -51,15 +51,15 @@ class BigQueryConnection(ConnectionInterface):
     for (key, table) in tables:
       schema["schemas"][key] = self._to_struct_def(
           table,
-          bigquery.Client(self._client_options).get_table(table).schema)
+          bigquery.Client(**self._client_options).get_table(table).schema)
     return schema
 
   def run_query(self, sql: str):
-    return bigquery.Client(self._client_options).query(sql)
+    return bigquery.Client(**self._client_options).query(sql)
 
   def get_schema_for_sql_block(self, name, sql):
     job_config = bigquery.QueryJobConfig(dry_run=True, use_query_cache=False)
-    query_job = bigquery.Client(self._client_options).query(
+    query_job = bigquery.Client(**self._client_options).query(
         sql, job_config=job_config)
     return {
         "type":
