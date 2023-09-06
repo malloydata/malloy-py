@@ -23,7 +23,7 @@
 """Test bq_connection.py"""
 
 from collections import namedtuple
-from google.cloud import bigquery
+# from google.cloud import bigquery
 from pandas.testing import assert_frame_equal
 from malloy.data.connection import ConnectionInterface
 from malloy.data.bigquery import BigQueryConnection
