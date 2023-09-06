@@ -37,7 +37,7 @@ class BigQueryConnection(ConnectionInterface):
   def __init__(self, name: str = "bigquery"):
     self._name = name
     self._log = logging.getLogger(__name__)
-    self._client_options = None
+    self._client_options = {}
 
   def get_name(self) -> str:
     return self._name
