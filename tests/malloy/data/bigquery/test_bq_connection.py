@@ -254,8 +254,8 @@ def test_maps_sql_block_types(field, expected):
   assert fields[0] == expected
 
 
-@pytest.mark.skipif(bigquery.Client().project is None,
-                    reason="Need project for real bq tests")
+# @pytest.mark.skipif(bigquery.Client().project is None,
+#                     reason="Need project for real bq tests")
 def test_runs_query():
   conn = BigQueryConnection()
 
