@@ -23,10 +23,13 @@
 """Test bq_connection.py"""
 
 from collections import namedtuple
+from google.cloud import bigquery
+from pandas.testing import assert_frame_equal
 from malloy.data.connection import ConnectionInterface
 from malloy.data.bigquery import BigQueryConnection
 
 import pytest
+import pandas
 
 
 def test_is_connection_interface():
@@ -249,3 +252,220 @@ def test_maps_sql_block_types(field, expected):
 
   assert fields[0] is not None, (f"Database column not found: {field['name']}")
   assert fields[0] == expected
+
+
+@pytest.mark.skipif(bigquery.Client().project is None,
+                    reason="Need project for real bq tests")
+def test_runs_query():
+  conn = BigQueryConnection()
+
+  data = conn.run_query(TEST_QUERY_1["sql"])
+  df_data = data.to_dataframe()
+
+  assert_frame_equal(df_data, TEST_QUERY_1["dataframe"])
+
+
+TEST_QUERY_1 = {
+    "sql":
+        "SELECT * FROM malloy-data.faa.airports ORDER BY id LIMIT 5;",
+    "dataframe":
+        pandas.read_json("""
+  {
+  "id": {
+    "0": 1,
+    "1": 2,
+    "2": 3,
+    "3": 4,
+    "4": 5
+  },
+  "code": {
+    "0": "ADK",
+    "1": "AKK",
+    "2": "Z13",
+    "3": "KKI",
+    "4": "AKI"
+  },
+  "site_number": {
+    "0": "50009.*A",
+    "1": "50016.1*A",
+    "2": "50017.*A",
+    "3": "50017.1*C",
+    "4": "50020.*A"
+  },
+  "fac_type": {
+    "0": "AIRPORT",
+    "1": "AIRPORT",
+    "2": "AIRPORT",
+    "3": "SEAPLANE BASE",
+    "4": "AIRPORT"
+  },
+  "fac_use": {
+    "0": "PU",
+    "1": "PU",
+    "2": "PU",
+    "3": "PU",
+    "4": "PU"
+  },
+  "faa_region": {
+    "0": "AAL",
+    "1": "AAL",
+    "2": "AAL",
+    "3": "AAL",
+    "4": "AAL"
+  },
+  "faa_dist": {
+    "0": "NONE",
+    "1": "NONE",
+    "2": "NONE",
+    "3": "NONE",
+    "4": "NONE"
+  },
+  "city": {
+    "0": "ADAK ISLAND",
+    "1": "AKHIOK",
+    "2": "AKIACHAK",
+    "3": "AKIACHAK",
+    "4": "AKIAK"
+  },
+  "county": {
+    "0": "ALEUTIAN ISLANDS",
+    "1": "KODIAK",
+    "2": "BETHEL",
+    "3": "BETHEL",
+    "4": "BETHEL"
+  },
+  "state": {
+    "0": "AK",
+    "1": "AK",
+    "2": "AK",
+    "3": "AK",
+    "4": "AK"
+  },
+  "full_name": {
+    "0": "ADAK",
+    "1": "AKHIOK",
+    "2": "AKIACHAK",
+    "3": "AKIACHAK",
+    "4": "AKIAK"
+  },
+  "own_type": {
+    "0": "MN",
+    "1": "PU",
+    "2": "PU",
+    "3": "PU",
+    "4": "PU"
+  },
+  "longitude": {
+    "0": -176.64,
+    "1": -154.18,
+    "2": -161.42,
+    "3": -161.43,
+    "4": -161.22
+  },
+  "latitude": {
+    "0": 51.87,
+    "1": 56.93,
+    "2": 60.9,
+    "3": 60.9,
+    "4": 60.9
+  },
+  "elevation": {
+    "0": 18,
+    "1": 44,
+    "2": 25,
+    "3": 18,
+    "4": 22
+  },
+  "aero_cht": {
+    "0": "W ALEUTIAN ISLS",
+    "1": "KODIAK",
+    "2": "MC GRATH",
+    "3": "MC GRATH",
+    "4": "MC GRATH"
+  },
+  "cbd_dist": {
+    "0": 0,
+    "1": 1,
+    "2": 0,
+    "3": 0,
+    "4": 0
+  },
+  "cbd_dir": {
+    "0": "W",
+    "1": "SW",
+    "2": "SE",
+    "3": "S",
+    "4": "SW"
+  },
+  "act_date": {
+    "0": null,
+    "1": null,
+    "2": null,
+    "3": null,
+    "4": null
+  },
+  "cert": {
+    "0": "BS 05/1973",
+    "1": null,
+    "2": null,
+    "3": null,
+    "4": null
+  },
+  "fed_agree": {
+    "0": null,
+    "1": "NGY",
+    "2": "N",
+    "3": null,
+    "4": "N1"
+  },
+  "cust_intl": {
+    "0": "N",
+    "1": "N",
+    "2": "N",
+    "3": "N",
+    "4": "N"
+  },
+  "c_ldg_rts": {
+    "0": "N",
+    "1": "N",
+    "2": "N",
+    "3": "N",
+    "4": "N"
+  },
+  "joint_use": {
+    "0": "N",
+    "1": null,
+    "2": "N",
+    "3": "N",
+    "4": "N"
+  },
+  "mil_rts": {
+    "0": "Y",
+    "1": "Y",
+    "2": "Y",
+    "3": "N",
+    "4": "Y"
+  },
+  "cntl_twr": {
+    "0": "N",
+    "1": "N",
+    "2": "N",
+    "3": "N",
+    "4": "N"
+  },
+  "major": {
+    "0": "Y",
+    "1": "N",
+    "2": "N",
+    "3": "N",
+    "4": "N"
+  }
+}
+""",
+                         dtype={
+                             "id": "Int64",
+                             "elevation": "Int64",
+                             "cbd_dist": "Int64",
+                             "act_date": "object"
+                         })
+}
