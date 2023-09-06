@@ -253,16 +253,16 @@ def test_maps_sql_block_types(field, expected):
   assert fields[0] is not None, (f"Database column not found: {field['name']}")
   assert fields[0] == expected
 
-def should_skip_real_bq_tests():
+def should_run_real_bq_tests():
   try:
     client = bigquery.Client()
-    client.getTable('malloy-data.faa.airports')
-    return False
-  finally:
+    client.get_table("malloy-data.faa.airports")
     return True
+  finally:
+    return False
 
-@pytest.mark.skipif(should_skip_real_bq_tests(),
-                    reason="Need project for real bq tests")
+@pytest.mark.skipif(should_run_real_bq_tests(),
+                    reason="BigQuery auth check failed")
 def test_runs_query():
   conn = BigQueryConnection()
 
