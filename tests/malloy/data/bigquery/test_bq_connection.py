@@ -23,7 +23,7 @@
 """Test bq_connection.py"""
 
 from collections import namedtuple
-# from google.cloud import bigquery
+from google.cloud import bigquery
 from pandas.testing import assert_frame_equal
 from malloy.data.connection import ConnectionInterface
 from malloy.data.bigquery import BigQueryConnection
@@ -253,9 +253,16 @@ def test_maps_sql_block_types(field, expected):
   assert fields[0] is not None, (f"Database column not found: {field['name']}")
   assert fields[0] == expected
 
+def should_skip_real_bq_tests():
+  try:
+    client = bigquery.Client()
+    client.getTable('malloy-data.faa.airports')
+    return False
+  finally:
+    return True
 
-# @pytest.mark.skipif(bigquery.Client().project is None,
-#                     reason="Need project for real bq tests")
+@pytest.mark.skipif(should_skip_real_bq_tests(),
+                    reason="Need project for real bq tests")
 def test_runs_query():
   conn = BigQueryConnection()
 
@@ -263,6 +270,7 @@ def test_runs_query():
   df_data = data.to_dataframe()
 
   assert_frame_equal(df_data, TEST_QUERY_1["dataframe"])
+
 
 
 TEST_QUERY_1 = {
