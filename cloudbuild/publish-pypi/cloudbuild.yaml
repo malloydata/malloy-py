@@ -95,7 +95,7 @@ steps:
         "--username",
         "__token__",
         "--password",
-        "$PYPI_TOKEN",
+        "$$PYPI_TOKEN",
         "dist/*",
       ]
 
