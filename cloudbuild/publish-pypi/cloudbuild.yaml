@@ -84,6 +84,11 @@ steps:
   - name: "docker.io/library/python:3.9"
     id: "Build packages"
     entrypoint: "python"
+    args: ["-m", "build"]
+
+  - name: "docker.io/library/python:3.9"
+    id: "Build packages"
+    entrypoint: "python"
     secretEnv: ["PYPI_TOKEN"]
     args:
       [
@@ -99,19 +104,11 @@ steps:
         "dist/*",
       ]
 
-  - name: "docker.io/library/python:3.9"
-    id: "Create pypi release"
-    entrypoint: "python"
-    args: ["scripts/do-github-release.py"]
-    secretEnv: ["GHAPI_PAT"]
-
 timeout: "1200s"
 options:
   logging: CLOUD_LOGGING_ONLY
 availableSecrets:
   secretManager:
-    - versionName: projects/malloy-303216/secrets/vscode-extension-gh-pat/versions/latest
-      env: "GHAPI_PAT"
     - versionName: projects/malloy-303216/secrets/github-malloy-py/versions/latest
       env: "GITHUB_SSH_KEY"
     - versionName: projects/malloy-303216/secrets/pypi-malloy-py/versions/latest
