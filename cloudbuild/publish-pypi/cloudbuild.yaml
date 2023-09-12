@@ -87,7 +87,7 @@ steps:
     args: ["-m", "build"]
 
   - name: "docker.io/library/python:3.9"
-    id: "Build packages"
+    id: "Publish packages"
     entrypoint: "python"
     secretEnv: ["PYPI_TOKEN"]
     args:
