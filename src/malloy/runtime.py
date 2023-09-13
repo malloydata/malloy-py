@@ -129,7 +129,8 @@ class Runtime():
     self._log.debug("Using compiler service: %s", service)
     self._init_compile_state(named_query=named_query, query=query)
 
-    async with grpc.aio.insecure_channel(service) as channel:
+    async with grpc.aio.insecure_channel(service,
+                                         options=self._grpc_options) as channel:
       stub = CompilerStub(channel)
       self._response_stream = stub.CompileStream(self)
       state = channel.get_state()
@@ -175,7 +176,8 @@ class Runtime():
     self._log.debug("Using compiler service: %s", service)
     self._init_compile_state()
 
-    async with grpc.aio.insecure_channel(service) as channel:
+    async with grpc.aio.insecure_channel(service,
+                                         options=self._grpc_options) as channel:
       stub = CompilerStub(channel)
       self._response_stream = stub.CompileStream(self)
       state = channel.get_state()
@@ -281,6 +283,8 @@ class Runtime():
     else:
       self._query_type = "compile"
     self._error = None
+    # Setting grpc max message size to 50mb.
+    self._grpc_options = [("grpc.max_receive_message_length", 1024 * 1024 * 50)]
 
   def _generate_initial_compile_request(self):
     self._log.debug("Generating initial compile request")
