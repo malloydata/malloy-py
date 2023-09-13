@@ -158,28 +158,20 @@ async def _malloy_query(line: str, cell: str):
   if model := IPython.get_ipython().user_ns.get(model_var):
     try:
       query = "\n" + cell
-      render_results = results_var is None
       job_result = None
       html_content = None
       sql = None
-      if render_results:
-        [job_result, html_content, sql] = await model.render(query=query)
-      else:
+      if results_var:
         [job_result, sql] = await model.get_sql_and_run(query=query)
-      if job_result is None:
-        print("No results")
-      elif results_var:
-        # Since renderer converts to dataframe internally
-        # we don't need to do it here
-        if render_results:
-          IPython.get_ipython().user_ns[results_var] = job_result
-        else:
-          IPython.get_ipython().user_ns[results_var] = job_result.to_dataframe()
-
+        IPython.get_ipython().user_ns[results_var] = job_result.to_dataframe()
         print("✅ Stored in", results_var)
-      elif html_content:
-        tabbed_html = render_results_tab(html_content, sql)
-        display.display(display.HTML(tabbed_html))
+      else:
+        [job_result, html_content, sql] = await model.render(query=query)
+        if html_content is None:
+          print("No results")
+        else:
+          tabbed_html = render_results_tab(html_content, sql)
+          display.display(display.HTML(tabbed_html))
     except MalloyRuntimeError as e:
       print(f"🚫 {e.args[0]}")
   else:
