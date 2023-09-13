@@ -66,6 +66,7 @@ class Runtime():
     self._service_manager = service_manager
     self._was_entered = False
     self._schema_cache = SchemaCache()
+    self._service_mode = CompileRequest.Mode.COMPILE_AND_RENDER
     self._log.debug("Runtime initialized")
 
   def __enter__(self):
