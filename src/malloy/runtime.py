@@ -66,6 +66,9 @@ class Runtime():
     self._service_manager = service_manager
     self._was_entered = False
     self._schema_cache = SchemaCache()
+    self._service_mode = CompileRequest.Mode.COMPILE_AND_RENDER
+    # Setting grpc max message size to 50mb.
+    self._grpc_options = [("grpc.max_receive_message_length", 1024 * 1024 * 50)]
     self._log.debug("Runtime initialized")
 
   def __enter__(self):
@@ -128,7 +131,8 @@ class Runtime():
     self._log.debug("Using compiler service: %s", service)
     self._init_compile_state(named_query=named_query, query=query)
 
-    async with grpc.aio.insecure_channel(service) as channel:
+    async with grpc.aio.insecure_channel(service,
+                                         options=self._grpc_options) as channel:
       stub = CompilerStub(channel)
       self._response_stream = stub.CompileStream(self)
       state = channel.get_state()
@@ -174,7 +178,8 @@ class Runtime():
     self._log.debug("Using compiler service: %s", service)
     self._init_compile_state()
 
-    async with grpc.aio.insecure_channel(service) as channel:
+    async with grpc.aio.insecure_channel(service,
+                                         options=self._grpc_options) as channel:
       stub = CompilerStub(channel)
       self._response_stream = stub.CompileStream(self)
       state = channel.get_state()
@@ -268,7 +273,6 @@ class Runtime():
     self._first_request_sent = False
     self._seen_responses = []
     self._last_response = None
-    self._service_mode = CompileRequest.Mode.COMPILE_AND_RENDER
     self._job_result = None
     self._html_content = None
     self._sql = None
