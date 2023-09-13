@@ -67,6 +67,8 @@ class Runtime():
     self._was_entered = False
     self._schema_cache = SchemaCache()
     self._service_mode = CompileRequest.Mode.COMPILE_AND_RENDER
+    # Setting grpc max message size to 50mb.
+    self._grpc_options = [("grpc.max_receive_message_length", 1024 * 1024 * 50)]
     self._log.debug("Runtime initialized")
 
   def __enter__(self):
@@ -283,8 +285,6 @@ class Runtime():
     else:
       self._query_type = "compile"
     self._error = None
-    # Setting grpc max message size to 50mb.
-    self._grpc_options = [("grpc.max_receive_message_length", 1024 * 1024 * 50)]
 
   def _generate_initial_compile_request(self):
     self._log.debug("Generating initial compile request")
