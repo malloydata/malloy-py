@@ -268,7 +268,6 @@ class Runtime():
     self._first_request_sent = False
     self._seen_responses = []
     self._last_response = None
-    self._service_mode = CompileRequest.Mode.COMPILE_AND_RENDER
     self._job_result = None
     self._html_content = None
     self._sql = None
