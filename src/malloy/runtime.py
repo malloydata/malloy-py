@@ -165,7 +165,9 @@ class Runtime():
   async def render(self, query: str = None, named_query: str = None):
     self._service_mode = CompileRequest.Mode.COMPILE_AND_RENDER
     await self.compile_and_maybe_execute(query=query, named_query=named_query)
-    return [self._job_result, self._html_content, self._job_result_json , self._sql]
+    return [
+        self._job_result, self._html_content, self._job_result_json, self._sql
+    ]
 
   async def compile_model(self):
     service = await self._service_manager.get_service()
