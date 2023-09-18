@@ -25,42 +25,74 @@ import random
 # CSS block.
 css = '''
 <style>
-/* Style the tab */
-.tab {
+div.result-outer {
+  display: flex;
+  flex-direction: column;
   overflow: auto;
-  background-color: inherit;
+  border: 1px solid rgb(65, 65, 65);
+  border-radius: 5px;
+  margin: 4px 0 12px;
+  position: relative;
 }
 
-/* Style the buttons inside the tab */
-.tab button {
-  color: inherit;
-  font-weight: lighter;
-  background-color: inherit;
-  float: right;
-  border: none;
-  outline: none;
+.result-controls-bar {
+  display: flex;
+  border-bottom: 1px solid rgb(120, 120, 120);;
+  justify-content: space-between;
+  align-items: center;
+  color: #b1b1b1;
+}
+
+.result-label {
+  font-weight: 500;
+  font-size: 12px;
+  padding: 0 8px;
+}
+
+.result-controls {
+  display: flex;
+  justify-content: end;
+  padding: 5px 5px 0 5px;
+  font-size: 12px;
+  gap: 3px;
+}
+
+.result-controls .result-control {
+  border: 0;
   cursor: pointer;
-  padding: 10px 10px;
-  transition: 0.1s;
+  background-color: inherit;
+  padding: 3px 5px;
+  color: #b1b1b1;
+  font-weight: lighter;
 }
 
-/* Change background color of buttons on hover */
-.tab button:hover {
+.result-controls .result-control:hover {
+  border-bottom: 1px solid #4285f4;
+  color: #4285f4;
+}
+
+.result-controls .result-control.active {
+  border-bottom: 1px solid #4285f4;
+  color: #4285f4;
   font-weight: 700;
 }
 
-/* Create an active/current tablink class */
-.tab button.active {
-  font-weight: 900;
+.result-inner td {
+  line-height: 16px;
 }
 
-/* Style the tab content */
-.tabcontent {
-  display: none;
-  padding: 6px 12px;
-  border: 1px solid #ccc;
-  overflow: auto;
+div.document .result-inner pre {
+  border: none;
+  background-color: transparent;
+  padding: 8px;
+  margin: 0;
 }
+
+div.document .result-middle[data-result-kind="sql"] pre,
+div.document .result-middle[data-result-kind="json"] pre {
+  background-color: #fbfbfb;
+}
+
 </style>
 '''
 
@@ -101,24 +133,37 @@ document.getElementById("defaultOpen-{rand}").click();
 # Tabbed result set.
 html_body = '''
 
-<div class="tab">
-  <button class="tablinks-{rand}" onclick="openTab_{rand}(event, 'SQL-{rand}')">SQL</button>
-  <button class="tablinks-{rand}" onclick="openTab_{rand}(event, 'HTML-{rand}')" id="defaultOpen-{rand}">HTML</button>
+<div class="result-outer">
+  <div class="result-controls-bar">
+    <span class="result-label">QUERY RESULTS</span>
+    <div class="result-controls">
+      <button class="result-control tablinks-{rand}" onclick="openTab_{rand}(event, 'HTML-{rand}')" data-result-kind="html" id="defaultOpen-{rand}">HTML</button>
+      <button class="result-control tablinks-{rand}" onclick="openTab_{rand}(event, 'JSON-{rand}')" data-result-kind="json">JSON</button>
+      <button class="result-control tablinks-{rand}" onclick="openTab_{rand}(event, 'SQL-{rand}')" data-result-kind="sql">SQL</button>
+    </div>
+  </div>
+  <div class="result-middle tabset-{rand}" data-result-kind="html" id="HTML-{rand}">
+    <div class="result-inner">
+      {html}
+    </div>
+  </div>
+  <div class="result-middle tabset-{rand}" data-result-kind="json" id="JSON-{rand}" >
+    <div class="result-inner">
+      <pre>{json}</pre>
+    </div>
+  </div>
+  <div class="result-middle tabset-{rand}" data-result-kind="sql" id="SQL-{rand}" >
+    <div class="result-inner">
+      <pre>{sql}</pre>
+    </div>
+  </div>
 </div>
-
-<div id="HTML-{rand}" class="tabcontent tabset-{rand}">
-  {html}
-</div>
-<div id="SQL-{rand}" class="tabcontent tabset-{rand}">
-  <pre>{sql}</pre>
-</div>
-
 '''
 
 
-def render_results_tab(html: str = '', sql: str = ''):
+def render_results_tab(html: str = '', json: str = '', sql: str = ''):
   # Separate each result set with a random id.
   random_id = str(random.randrange(100, 999))
-  return css + html_body.format(rand=random_id, html=html,
+  return css + html_body.format(rand=random_id, html=html, json=json,
                                 sql=sql) + js_script.replace(
                                     '{rand}', random_id)

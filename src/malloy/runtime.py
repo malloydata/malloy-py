@@ -165,7 +165,9 @@ class Runtime():
   async def render(self, query: str = None, named_query: str = None):
     self._service_mode = CompileRequest.Mode.COMPILE_AND_RENDER
     await self.compile_and_maybe_execute(query=query, named_query=named_query)
-    return [self._job_result, self._html_content, self._sql]
+    return [
+        self._job_result, self._html_content, self._job_result_json, self._sql
+    ]
 
   async def compile_model(self):
     service = await self._service_manager.get_service()
@@ -274,6 +276,7 @@ class Runtime():
     self._seen_responses = []
     self._last_response = None
     self._job_result = None
+    self._job_result_json = None
     self._html_content = None
     self._sql = None
     if query is not None:
@@ -371,10 +374,10 @@ class Runtime():
     sql = self._last_response.content
     query_result = self._run_sql(sql, connection_name)
     self._job_result = query_result.to_dataframe()
-    results_json = self._job_result.to_json(orient="records")
+    self._job_result_json = self._job_result.to_json(orient="records", indent=2)
     self._log.debug("Sending results to service.")
     return CompileRequest(type=CompileRequest.Type.RESULTS,
-                          query_result=QueryResult(data=results_json,
+                          query_result=QueryResult(data=self._job_result_json,
                                                    total_rows=len(
                                                        self._job_result.index)))
 
