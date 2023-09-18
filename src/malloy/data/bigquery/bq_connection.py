@@ -33,8 +33,7 @@ from collections.abc import Sequence
 from google.cloud import bigquery
 from google.api_core.gapic_v1 import client_info
 
-MALLOY_USER_AGENT = "malloy-{malloy_version}_{platform}".format(
-    malloy_version=malloy.__version__, platform=platform.python_version())
+MALLOY_USER_AGENT = f"malloy-{malloy.__version__}_{platform.python_version()}"
 
 
 class BigQueryConnection(ConnectionInterface):
