@@ -28,6 +28,8 @@ from pandas.testing import assert_frame_equal
 from malloy.data.connection import ConnectionInterface
 from malloy.data.bigquery import BigQueryConnection
 
+from io import StringIO
+
 import pytest
 import pandas
 
@@ -253,17 +255,20 @@ def test_maps_sql_block_types(field, expected):
   assert fields[0] is not None, (f"Database column not found: {field['name']}")
   assert fields[0] == expected
 
-def should_run_real_bq_tests():
+
+def bq_table(table):
   try:
     client = bigquery.Client()
-    client.get_table("malloy-data.faa.airports")
-    return True
-  finally:
-    return False
+    return client.get_table(table)
+  # pylint: disable-next=bare-except
+  except:
+    return None
 
-@pytest.mark.skipif(should_run_real_bq_tests(),
-                    reason="BigQuery auth check failed")
+
 def test_runs_query():
+  if bq_table("malloy-data.faa.airports") is None:
+    pytest.skip()
+
   conn = BigQueryConnection()
 
   data = conn.run_query(TEST_QUERY_1["sql"])
@@ -272,12 +277,11 @@ def test_runs_query():
   assert_frame_equal(df_data, TEST_QUERY_1["dataframe"])
 
 
-
 TEST_QUERY_1 = {
     "sql":
         "SELECT * FROM malloy-data.faa.airports ORDER BY id LIMIT 5;",
     "dataframe":
-        pandas.read_json("""
+        pandas.read_json(StringIO("""
   {
   "id": {
     "0": 1,
@@ -469,7 +473,7 @@ TEST_QUERY_1 = {
     "4": "N"
   }
 }
-""",
+"""),
                          dtype={
                              "id": "Int64",
                              "elevation": "Int64",
