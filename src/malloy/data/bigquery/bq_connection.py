@@ -25,10 +25,15 @@
 from __future__ import annotations
 
 import logging
+import malloy
+import platform
 
 from ..connection import ConnectionInterface
 from collections.abc import Sequence
 from google.cloud import bigquery
+from google.api_core.gapic_v1 import client_info
+
+MALLOY_USER_AGENT = f"malloy-{malloy.__version__}_{platform.python_version()}"
 
 
 class BigQueryConnection(ConnectionInterface):
@@ -37,30 +42,34 @@ class BigQueryConnection(ConnectionInterface):
   def __init__(self, name: str = "bigquery"):
     self._name = name
     self._log = logging.getLogger(__name__)
-    self._client_options = {}
+    self._client_options = {
+        "client_info": client_info.ClientInfo(user_agent=MALLOY_USER_AGENT)
+    }
 
   def get_name(self) -> str:
     return self._name
 
   def with_options(self, options) -> BigQueryConnection:
-    self._client_options = options
+    self._client_options = self._client_options | options
     return self
+
+  def get_client(self):
+    return bigquery.Client(**self._client_options)
 
   def get_schema_for_tables(self, tables: Sequence[(str, str)]):
     schema = {"schemas": {}}
     for (key, table) in tables:
       schema["schemas"][key] = self._to_struct_def(
           table,
-          bigquery.Client(**self._client_options).get_table(table).schema)
+          self.get_client().get_table(table).schema)
     return schema
 
   def run_query(self, sql: str):
-    return bigquery.Client(**self._client_options).query(sql)
+    return self.get_client().query(sql)
 
   def get_schema_for_sql_block(self, name, sql):
     job_config = bigquery.QueryJobConfig(dry_run=True, use_query_cache=False)
-    query_job = bigquery.Client(**self._client_options).query(
-        sql, job_config=job_config)
+    query_job = self.get_client().query(sql, job_config=job_config)
     return {
         "type":
             "struct",
