@@ -109,6 +109,7 @@ class Runtime():
     return self
 
   async def get_sql(self, named_query: str = None, query: str = None):
+    self._service_mode = CompileRequest.Mode.COMPILE_ONLY
     return await self.compile_and_maybe_execute(named_query=named_query,
                                                 query=query)
 
