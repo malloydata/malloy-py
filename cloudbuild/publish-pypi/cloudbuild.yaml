@@ -87,6 +87,12 @@ steps:
     args: ["-m", "build"]
 
   - name: "docker.io/library/python:3.9"
+    id: "Create github release"
+    entrypoint: "python"
+    args: ["scripts/do-github-release.py"]
+    secretEnv: ['GHAPI_PAT']
+
+  - name: "docker.io/library/python:3.9"
     id: "Publish packages"
     secretEnv: ["PYPI_TOKEN"]
     entrypoint: "bash"
@@ -104,3 +110,5 @@ availableSecrets:
       env: "GITHUB_SSH_KEY"
     - versionName: projects/malloy-303216/secrets/pypi-malloy-py/versions/latest
       env: "PYPI_TOKEN"
+    - versionName: projects/malloy-303216/secrets/vscode-extension-gh-pat/versions/latest
+      env: 'GHAPI_PAT'
