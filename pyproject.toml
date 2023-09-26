@@ -28,7 +28,10 @@ dev = ["db-dtypes", "grpcio-tools", "pylint", "pytest", "pip-tools", "pytest-asy
 ipython = ["ipykernel", "ipython", "pytest-notebook"]
 
 [project.urls]
-Github = "https://github.com/malloydata/malloy-py"
+Documentation: "https://malloydata.dev",
+Source: "https://github.com/malloydata/malloy-py",
+Issues: "https://github.com/malloydata/malloy-py/issues",
+Changelog: "https://github.com/malloydata/malloy-py/releases",
 
 [project.scripts]
 malloy = "malloy.__main__:main"
