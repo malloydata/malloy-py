@@ -18,14 +18,32 @@ classifiers = [
 ]
 keywords = ["malloy"]
 dependencies = [
+    "db_dtypes",
     "duckdb>=0.8.0, <1.0.0",
-    "google-cloud-bigquery"
+    "google-cloud-bigquery",
+    "grpcio",
+    "pandas",
 ]
 requires-python = ">3.7"
 
 [project.optional-dependencies]
-dev = ["db-dtypes", "grpcio-tools", "pylint", "pytest", "pip-tools", "pytest-asyncio", "pandas", "toml", "yapf", "twine", "bumpver"]
-ipython = ["ipykernel", "ipython", "pytest-notebook"]
+
+# Required for ipython notebooks, ex: jupyter notebooks
+ipython = ["ipython", "ipykernel", "nest-asyncio"]
+
+dev = [
+    "bumpver",
+    "grpcio-tools",
+    "pylint",
+    "pytest",
+    "pip-tools",
+    "pytest-asyncio",
+    "pytest-notebook",
+    "requests",
+    "tomli",
+    "twine",
+    "yapf",
+]
 
 [project.urls]
 Documentation = "https://malloydata.dev"
@@ -51,28 +69,18 @@ tag = true
 push = true
 
 [tool.bumpver.file_patterns]
-"pyproject.toml" = [
-    'current_version = "{version}"',
-    'version = "{version}"'
-]
+"pyproject.toml" = ['current_version = "{version}"', 'version = "{version}"']
 "src/malloy/__init__.py" = ["{version}"]
 
 [tool.yapfignore]
-ignore_patterns = [
-    "**/*_pb2_grpc.py",
-    "**/*_pb2.py",
-    "**/*_pb2.pyi",
-]
+ignore_patterns = ["**/*_pb2_grpc.py", "**/*_pb2.py", "**/*_pb2.pyi"]
 
 [tool.yapf]
 based_on_style = "google"
 indent_width = 2
 
 [tool.pytest.ini_options]
-nb_diff_ignore = [
-  "/metadata/language_info",
-  "/cells/*/execution_count"
-]
+nb_diff_ignore = ["/metadata/language_info", "/cells/*/execution_count"]
 # addopts = "--log-cli-level 10" #DEBUG
 # addopts = "--log-cli-level 20" #INFO
 # addopts = "--log-cli-level 30" #WARNING
