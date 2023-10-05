@@ -1,4 +1,3 @@
 # MANIFEST.in
 
 include src/malloy/service/*
-include src/malloy/utils/third_party.txt

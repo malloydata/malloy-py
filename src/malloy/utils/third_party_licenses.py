@@ -364,11 +364,12 @@ def gen_requirements_file(path=f'src/malloy/utils/{THIRD_PARTY_FILENAME}'):
 
 
 async def output_third_party_licenses(service_manager=None):
-  script_path = Path(abspath(getsourcefile(lambda: 0)))
-  license_file_path = Path(script_path.parent, THIRD_PARTY_FILENAME)
-  with open(license_file_path, 'r', encoding='utf-8') as file:
-    for line in file.readlines():
-      print(line)
+  # No python dependencies are packaged
+  # script_path = Path(abspath(getsourcefile(lambda: 0)))
+  # license_file_path = Path(script_path.parent, THIRD_PARTY_FILENAME)
+  # with open(license_file_path, 'r', encoding='utf-8') as file:
+  #   for line in file.readlines():
+  #     print(line)
 
   if service_manager is None:
     service_manager = ServiceManager()
