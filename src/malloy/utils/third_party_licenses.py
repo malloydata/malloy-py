@@ -26,8 +26,8 @@ import sys
 
 from importlib import metadata
 from pathlib import Path
-from inspect import getsourcefile
-from os.path import abspath
+# from inspect import getsourcefile
+# from os.path import abspath
 from malloy.service.service_manager import ServiceManager
 from malloy.services.v1.compiler_pb2_grpc import CompilerStub
 from malloy.services.v1.compiler_pb2 import ThirdPartyRequest
