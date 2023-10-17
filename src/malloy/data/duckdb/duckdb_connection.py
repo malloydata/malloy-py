@@ -143,7 +143,7 @@ class DuckDbConnection(ConnectionInterface):
     for column in columns:
       column_match = re.match(r"^([^\s]+) (.*)$", column)
       if column_match:
-        schema.append([column_match.group(1), column_match.group(2)])
+        schema.append([column_match.group(1).strip('"'), column_match.group(2)])
       else:
         raise DuckDbException(
             f"Badly form Structure definition ${schema_string}")
