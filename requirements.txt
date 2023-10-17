@@ -83,5 +83,5 @@ six==1.16.0
     #   google-auth
     #   grpcio
     #   python-dateutil
-urllib3==1.26.17
+urllib3==1.26.18
     # via requests
