@@ -202,6 +202,9 @@ class Runtime():
       return None
 
     return json.loads(self._sql)
+  
+  def get_problems(self):
+    return self._problems
 
   def _run_sql(self, sql: str, connection_name: str):
     if connection_name == self.default_connection:
@@ -280,6 +283,7 @@ class Runtime():
     self._job_result_json = None
     self._html_content = None
     self._sql = None
+    self._problems = []
     if query is not None:
       self._query_type = "query"
       self._query = query
@@ -412,6 +416,12 @@ class Runtime():
                                           file_path).read_text(encoding="utf8"))
     return CompileDocument(url=url, content=self._source)
 
+  def _parse_last_response_problems(self):
+    problems = []
+    for problem in self._last_response.problems:
+      problems.append(json.loads(problem))
+    return problems
+
   async def _parse_response(self):
     self._log.debug("Awaiting compiler response")
     self._last_response = await self._response_stream.read()
@@ -435,6 +445,7 @@ class Runtime():
       self._html_content = self._last_response.render_content
       self._sql = self._last_response.content
       self._connection = self._last_response.connection
+      self._problems = self._parse_last_response_problems()
       self._compile_completed.set()
       return
 

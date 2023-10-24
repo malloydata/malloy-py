@@ -56,7 +56,7 @@ class CompileResponse(_message.Message):
     def __init__(self, model: _Optional[str] = ..., sql: _Optional[str] = ...) -> None: ...
 
 class CompilerRequest(_message.Message):
-    __slots__ = ["connection", "content", "import_urls", "render_content", "sql_block", "table_schemas", "type"]
+    __slots__ = ["connection", "content", "import_urls", "problems", "render_content", "sql_block", "table_schemas", "type"]
     class Type(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
     COMPLETE: CompilerRequest.Type
@@ -65,6 +65,7 @@ class CompilerRequest(_message.Message):
     ERROR: CompilerRequest.Type
     IMPORT: CompilerRequest.Type
     IMPORT_URLS_FIELD_NUMBER: _ClassVar[int]
+    PROBLEMS_FIELD_NUMBER: _ClassVar[int]
     RENDER_CONTENT_FIELD_NUMBER: _ClassVar[int]
     RUN: CompilerRequest.Type
     SQL_BLOCK_FIELD_NUMBER: _ClassVar[int]
@@ -76,11 +77,12 @@ class CompilerRequest(_message.Message):
     connection: str
     content: str
     import_urls: _containers.RepeatedScalarFieldContainer[str]
+    problems: _containers.RepeatedScalarFieldContainer[str]
     render_content: str
     sql_block: SqlBlock
     table_schemas: _containers.RepeatedCompositeFieldContainer[TableSchema]
     type: CompilerRequest.Type
-    def __init__(self, type: _Optional[_Union[CompilerRequest.Type, str]] = ..., import_urls: _Optional[_Iterable[str]] = ..., table_schemas: _Optional[_Iterable[_Union[TableSchema, _Mapping]]] = ..., sql_block: _Optional[_Union[SqlBlock, _Mapping]] = ..., connection: _Optional[str] = ..., render_content: _Optional[str] = ..., content: _Optional[str] = ...) -> None: ...
+    def __init__(self, type: _Optional[_Union[CompilerRequest.Type, str]] = ..., import_urls: _Optional[_Iterable[str]] = ..., table_schemas: _Optional[_Iterable[_Union[TableSchema, _Mapping]]] = ..., sql_block: _Optional[_Union[SqlBlock, _Mapping]] = ..., connection: _Optional[str] = ..., render_content: _Optional[str] = ..., problems: _Optional[_Iterable[str]] = ..., content: _Optional[str] = ...) -> None: ...
 
 class QueryResult(_message.Message):
     __slots__ = ["data", "total_rows"]
