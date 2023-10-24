@@ -42,8 +42,10 @@ STYLES = """
 </style>
 """
 
+
 def render_warnings(warnings):
   html = "<div class=\"malloy_warnings\"><ul>"
   for warning in warnings:
-    html += f"<li>⚠️: {warning['message']} at line {warning['at']['range']['start']['line']+1}</li>"
+    line_num = warning["at"]["range"]["start"]["line"] + 1
+    html += f"<li>⚠️: {warning['message']} at line {line_num}</li>"
   return STYLES + html + "</ul></div>"

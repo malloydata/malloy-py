@@ -202,7 +202,7 @@ class Runtime():
       return None
 
     return json.loads(self._sql)
-  
+
   def get_problems(self):
     return self._problems
 
