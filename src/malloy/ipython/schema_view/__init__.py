@@ -160,14 +160,14 @@ def render_fields(explore, path=""):
   return html
 
 
-def render_schema(model):
+def render_schema(model_def):
   """
   Render a model into a schema tree.
   """
   html = schema_styles + schema_scripts
   html += """<div class="malloy_schema"><ul>\n"""
-  for schema_name in model["contents"]:
-    schema = model["contents"][schema_name]
+  for schema_name in model_def["contents"]:
+    schema = model_def["contents"][schema_name]
     if schema.get("type") == "struct":
       html += render_fields(schema)
   html += "</ul></div>\n"

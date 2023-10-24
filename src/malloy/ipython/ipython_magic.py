@@ -36,6 +36,7 @@ from malloy import Runtime
 from malloy.runtime import MalloyRuntimeError
 from .schema_view import render_schema
 from .tab_renderer import render_results_tab
+from .warnings import render_warnings
 
 nest_asyncio.apply()
 
@@ -118,7 +119,9 @@ async def _malloy_model(line, cell):
 
     IPython.get_ipython().user_ns[var_name] = runtime
     if model:
-      display.display(display.HTML(render_schema(model)))
+      warning_html = render_warnings(runtime.get_problems())
+      schema_html = render_schema(model)
+      display.display(display.HTML(warning_html + schema_html))
   except MalloyRuntimeError as e:
     print(f"🚫 {e.args[0]}")
     IPython.get_ipython().user_ns[var_name] = None
@@ -170,8 +173,9 @@ async def _malloy_query(line: str, cell: str):
         if html_content is None:
           print("No results")
         else:
+          warning_html = render_warnings(runtime.get_problems())
           tabbed_html = render_results_tab(html_content, json, sql)
-          display.display(display.HTML(tabbed_html))
+          display.display(display.HTML(warning_html + tabbed_html))
     except MalloyRuntimeError as e:
       print(f"🚫 {e.args[0]}")
   else:
