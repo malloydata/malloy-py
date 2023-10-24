@@ -34,9 +34,9 @@ STYLES = """
   }
 
   .malloy_warnings li {
-  	background-color: var(--vscode-inputValidation-warningBackground, inherit);
-	  border-color: var(--vscode-inputValidation-warningBorder, inherit);
-	  color: var(--vscode-list-warningForeground, inherit);
+    background-color: var(--vscode-inputValidation-warningBackground, inherit);
+    border-color: var(--vscode-inputValidation-warningBorder, inherit);
+    color: var(--vscode-list-warningForeground, inherit);
     list-style: none;
   }
 </style>
