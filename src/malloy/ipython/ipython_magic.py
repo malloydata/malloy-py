@@ -113,7 +113,7 @@ async def _malloy_model(line, cell):
     return
 
   var_name = args.modelname
-  home_dir = args.data_dir
+  home_dir = args.home_dir
 
   if args.import_file:
     runtime.load_file(args.import_file)
