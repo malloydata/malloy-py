@@ -21,23 +21,23 @@
 
 // test_file_01.malloy
 
-source: airports is table('duckdb:data/airports.parquet') {
+source: airports is duckdb.table('data/airports.parquet') extend {
   measure: airport_count is count()
 
-  query: by_state is {
+  view: by_state is {
     where: state != null
     group_by: state
     aggregate: airport_count
   }
 
-  query: by_facility_type is {
+  view: by_facility_type is {
     group_by: fac_type
     aggregate:
       airport_count
       avg_elevation is elevation.avg()
   }
 
-  query: airports_by_region_dashboard is {
+  view: airports_by_region_dashboard is {
     group_by: faa_region
     aggregate: airport_count
     nest:
@@ -45,7 +45,7 @@ source: airports is table('duckdb:data/airports.parquet') {
       by_facility_type
   }
 
-  query: select_star is {
-    project: *
+  view: select_star is {
+    select: *
   }
 }

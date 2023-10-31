@@ -79,10 +79,10 @@ class DuckDbConnection(ConnectionInterface):
       self._con = duckdb.connect(database=":memory:",
                                  read_only=False,
                                  config=self._client_options)
-      if self._home_directory:
-        sql = f"SET FILE_SEARCH_PATH=\"{self._home_directory}\""
-        self._log.debug(sql)
-        self._con.execute(sql)
+    if self._home_directory:
+      sql = f"SET FILE_SEARCH_PATH=\"{self._home_directory}\""
+      self._log.debug(sql)
+      self._con.execute(sql)
     return self._con
 
   def get_schema_for_tables(self, tables: Sequence[(str, str)]):
