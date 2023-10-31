@@ -45,7 +45,7 @@ home_dir = f"{Path(__file__).parent}/test_data"
 test_file_01 = f"{home_dir}/test_file_01.malloy"
 fake_file = f"{home_dir}/not_a_real_file.malloy"
 query_by_state = """
-query: airports -> {
+run: airports -> {
                 where: state != null
                 group_by: state
                 aggregate: airport_count
