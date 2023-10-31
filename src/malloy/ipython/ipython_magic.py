@@ -73,6 +73,11 @@ model_arg_parser.add_argument("-i",
                               required=False,
                               dest="import_file")
 
+model_arg_parser.add_argument("-d",
+                              "--home_dir",
+                              required=False,
+                              dest="home_dir")
+
 # Argument parser for the %%malloy_query magic
 query_arg_parser = MalloyMagicArgumentParser(
     prog="%%malloy_query",
@@ -108,11 +113,12 @@ async def _malloy_model(line, cell):
     return
 
   var_name = args.modelname
+  home_dir = args.home_dir
 
   if args.import_file:
     runtime.load_file(args.import_file)
   else:
-    runtime.load_source("\n" + cell)
+    runtime.load_source("\n" + cell, import_path=home_dir)
 
   try:
     model = await runtime.compile_model()
