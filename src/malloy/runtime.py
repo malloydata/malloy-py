@@ -351,6 +351,11 @@ class Runtime():
         self._log.debug("  default connection: %s", connection_name)
 
       connection = self._connection_manager.get_connection(connection_name)
+
+      set_home_dir = getattr(connection, "set_home_dir", None)
+      if callable(set_home_dir):
+        set_home_dir(self._file_dir)
+
       if connection:
         # tables = tables_per_connection_to_fetch.get(connection)
         self._log.debug("  tables: %s", tables)

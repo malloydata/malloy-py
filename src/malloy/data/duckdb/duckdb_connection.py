@@ -68,8 +68,11 @@ class DuckDbConnection(ConnectionInterface):
     return self
 
   def with_home_dir(self, path) -> DuckDbConnection:
-    self._home_directory = path
+    self.set_home_dir(path)
     return self
+
+  def set_home_dir(self, path):
+    self._home_directory = path
 
   def get_connection(self):
     if self._con is None:
