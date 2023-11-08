@@ -24,11 +24,12 @@
 
 from __future__ import annotations
 
-import logging
+from ..connection import ConnectionInterface
+
 import malloy
 import platform
 
-from ..connection import ConnectionInterface
+from absl import logging
 from collections.abc import Sequence
 from google.cloud import bigquery
 from google.api_core.gapic_v1 import client_info
@@ -41,7 +42,7 @@ class BigQueryConnection(ConnectionInterface):
 
   def __init__(self, name: str = "bigquery"):
     self._name = name
-    self._log = logging.getLogger(__name__)
+    self._log = logging
     self._client_options = {
         "client_info": client_info.ClientInfo(user_agent=MALLOY_USER_AGENT)
     }

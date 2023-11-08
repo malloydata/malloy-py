@@ -22,7 +22,8 @@
 # connection_manager.py
 """Manages a collection of connections required for compiling a malloy model."""
 import abc
-import logging
+
+from absl import logging
 from malloy.data.connection import ConnectionInterface
 
 
@@ -56,7 +57,7 @@ class DefaultConnectionManager(ConnectionManagerInterface):
       connections to connection name."""
 
   def __init__(self):
-    self._log = logging.getLogger(__name__)
+    self._log = logging
     self._connections = {}
 
   def get_connection(self, name: str) -> ConnectionInterface:

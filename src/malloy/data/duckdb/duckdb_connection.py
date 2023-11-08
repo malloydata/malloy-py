@@ -25,10 +25,11 @@
 from __future__ import annotations
 
 from ..connection import ConnectionInterface
+
+from absl import logging
 from collections.abc import Sequence
 from pathlib import Path
 import duckdb
-import logging
 import re
 
 
@@ -50,7 +51,7 @@ class DuckDbConnection(ConnectionInterface):
   _table_regex = re.compile("^duckdb:(.+)$")
 
   def __init__(self, home_dir=None, name="duckdb"):
-    self._log = logging.getLogger(f"{__name__}({name})")
+    self._log = logging
     self._name = name
     self._client_options = {}
     if home_dir is None:
