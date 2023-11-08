@@ -28,7 +28,9 @@ import grpc
 import hashlib
 import json
 import os
+import sys
 
+from absl import flags
 from absl import logging
 from pathlib import Path
 
@@ -61,6 +63,9 @@ class Runtime():
       connection_manager: ConnectionManagerInterface = DefaultConnectionManager(
       ),
       service_manager=ServiceManager()):
+    if not flags.FLAGS.is_parsed():
+      logging.use_absl_handler()
+      flags.FLAGS(sys.argv)
     self._log = logging
     self._connection_manager = connection_manager
     self._service_manager = service_manager
