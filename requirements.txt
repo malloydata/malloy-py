@@ -60,7 +60,7 @@ protobuf==4.23.3
     #   googleapis-common-protos
     #   grpcio-status
     #   proto-plus
-pyarrow==9.0.0
+pyarrow==14.0.1
     # via google-cloud-bigquery
 pyasn1==0.5.0
     # via
