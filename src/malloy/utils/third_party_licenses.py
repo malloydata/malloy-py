@@ -102,7 +102,16 @@ SPECIAL_CASES = {
     'jupyter-server-terminals': {
         METADATA_NAME: 'jupyter_server_terminals'
     },
+    'markdown-it-py': {
+        METADATA_LICENSE_FILE: 'LICENSE'
+    },
     'more-itertools': {
+        METADATA_LICENSE_FILE: 'LICENSE'
+    },
+    'nh3': {
+        METADATA_LICENSE_FILE: 'LICENSE'
+    },
+    'pandas': {
         METADATA_LICENSE_FILE: 'LICENSE'
     },
     'pep517': {
@@ -113,6 +122,9 @@ SPECIAL_CASES = {
     },
     'pickleshare': {
         METADATA_LICENSE_FILE: 'LICENSE'
+    },
+    'pyproject-hooks': {
+        METADATA_NAME: 'pyproject_hooks'
     },
     'pytest-notebook': {
         METADATA_NAME: 'pytest_notebook'
@@ -131,6 +143,9 @@ SPECIAL_CASES = {
         METADATA_LICENSE_FILE: 'LICENSE'
     },
     'tinycss2': {
+        METADATA_LICENSE_FILE: 'LICENSE'
+    },
+    'types-python-dateutil': {
         METADATA_LICENSE_FILE: 'LICENSE'
     },
     'typing-extensions': {

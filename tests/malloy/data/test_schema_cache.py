@@ -22,13 +22,12 @@
 # test_schema_cache.py
 """Test schema_cache.py"""
 
-import logging
-
+from absl import logging
 from pathlib import Path
 from malloy.data.duckdb import DuckDbConnection
 from malloy.data.schema_cache import SchemaCache
 
-logging.basicConfig(level=logging.ERROR)
+logging.set_verbosity(logging.ERROR)
 
 home_dir = f"{Path(__file__).parent.parent}/test_data"
 test_file_01 = f"{home_dir}/test_file_01.malloy"

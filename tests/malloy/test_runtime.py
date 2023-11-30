@@ -25,10 +25,10 @@
 import asyncio
 import pytest
 import pytest_asyncio
-import logging
 import json
 import re
 
+from absl import logging
 from pathlib import Path
 from malloy import Runtime
 from malloy.service import ServiceManager
@@ -39,7 +39,7 @@ pytestmark = pytest.mark.skipif(
     reason=f"Could not find: {ServiceManager.service_path()}",
     allow_module_level=True)
 
-logging.basicConfig(level=logging.ERROR)
+logging.set_verbosity(logging.ERROR)
 
 home_dir = f"{Path(__file__).parent}/test_data"
 test_file_01 = f"{home_dir}/test_file_01.malloy"

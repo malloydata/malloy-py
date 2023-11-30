@@ -24,12 +24,16 @@
 # Version of the python malloy package
 __version__ = "2023.1064"
 
+import importlib
+
 from malloy.runtime import (Runtime)
 from malloy.utils.third_party_licenses import (gen_requirements_file,
                                                output_third_party_licenses)
 try:
-  from malloy.ipython.ipython_magic import (load_ipython_extension,
-                                            unload_ipython_extension)
+  mod = importlib.import_module("malloy.ipython.ipython_magic")
+  load_ipython_extension = getattr(mod, "load_ipython_extension")
+  unload_ipython_extension = getattr(mod, "unload_ipython_extension")
+
 except ModuleNotFoundError:
   pass
 

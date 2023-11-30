@@ -19,14 +19,15 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import logging
 import os
 import requests
 
+from absl import logging
 from pathlib import Path
 
-logging.basicConfig(level=logging.INFO)
-log = logging.getLogger('gen-github-release')
+log = logging
+logging.use_absl_handler()
+logging.set_verbosity(logging.INFO)
 
 GITHUB_API_URL = 'https://api.github.com/repos'
 GITHUB_API_MIME_TYPE = 'application/vnd.github+json'

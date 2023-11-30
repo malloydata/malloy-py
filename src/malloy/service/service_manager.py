@@ -22,9 +22,10 @@
 # service_manager.py
 """Module manages the service(s) needed by the Malloy runtime. """
 import asyncio
-import logging
 import platform
 import re
+
+from absl import logging
 from pathlib import Path
 
 
@@ -56,7 +57,7 @@ class ServiceManager:
     return service_path
 
   def __init__(self, external_service: str = None):
-    self._log = logging.getLogger(__name__)
+    self._log = logging
     self._is_ready = asyncio.Event()
     self._external_service = external_service
     self._proc = None

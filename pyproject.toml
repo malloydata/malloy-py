@@ -19,7 +19,8 @@ classifiers = [
 keywords = ["malloy"]
 dependencies = [
     "duckdb>=0.8.0, <1.0.0",
-    "google-cloud-bigquery"
+    "google-cloud-bigquery",
+    "absl-py",
 ]
 requires-python = ">3.7"
 

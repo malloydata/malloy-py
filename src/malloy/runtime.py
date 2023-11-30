@@ -27,9 +27,9 @@ import asyncio
 import grpc
 import hashlib
 import json
-import logging
 import os
 
+from absl import logging
 from pathlib import Path
 
 from malloy.data.connection import ConnectionInterface
@@ -61,7 +61,7 @@ class Runtime():
       connection_manager: ConnectionManagerInterface = DefaultConnectionManager(
       ),
       service_manager=ServiceManager()):
-    self._log = logging.getLogger(__name__)
+    self._log = logging
     self._connection_manager = connection_manager
     self._service_manager = service_manager
     self._was_entered = False
