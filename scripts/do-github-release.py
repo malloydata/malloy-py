@@ -25,8 +25,9 @@ import requests
 from absl import logging
 from pathlib import Path
 
-logging.basicConfig(level=logging.INFO)
 log = logging
+logging.use_absl_handler()
+logging.set_verbosity(logging.INFO)
 
 GITHUB_API_URL = 'https://api.github.com/repos'
 GITHUB_API_MIME_TYPE = 'application/vnd.github+json'

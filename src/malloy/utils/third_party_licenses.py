@@ -111,6 +111,9 @@ SPECIAL_CASES = {
     'nh3': {
         METADATA_LICENSE_FILE: 'LICENSE'
     },
+    'pandas': {
+        METADATA_LICENSE_FILE: 'LICENSE'
+    },
     'pep517': {
         METADATA_LICENSE_FILE: 'LICENSE'
     },
