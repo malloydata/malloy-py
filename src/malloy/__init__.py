@@ -22,7 +22,7 @@
 # __init__.py
 """Base module of the Malloy python runtime."""
 # Version of the python malloy package
-__version__ = "2023.1064"
+__version__ = "2023.1065-dev"
 
 import importlib
 
