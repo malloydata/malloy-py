@@ -24,9 +24,18 @@
 import asyncio
 import platform
 import re
+import sys
 
+from absl import flags
 from absl import logging
+from datetime import datetime, timedelta
 from pathlib import Path
+
+_MALLOY_DIALECTS = flags.DEFINE_list(
+    "malloy_dialects", "",
+    "List of dialects to initialize by default in ipython runtime")
+
+_TIMEOUT_SECONDS = 30
 
 
 class ServiceManager:
@@ -86,23 +95,61 @@ class ServiceManager:
     service_path = ServiceManager.service_path()
     self._log.debug("Starting compiler service: %s", service_path)
 
+    args = ["-p", "0"]
+    if not flags.FLAGS.is_parsed():
+      logging.debug("absl flags not yet parsed, attempting to parse sys.argv")
+      flags.FLAGS(sys.argv, True)
+
+    if _MALLOY_DIALECTS.value and len(_MALLOY_DIALECTS.value):
+      args.append("--dialect")
+      args.extend(_MALLOY_DIALECTS.value)
+
+    self._log.debug("Running with args: %s", args)
     self._proc = await asyncio.create_subprocess_exec(
         service_path,
+        *args,
         stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.STDOUT,
-        env={"PORT": "0"})
+        stderr=asyncio.subprocess.STDOUT)
 
     service_listening = re.compile(r"^Server listening on (\d+)$")
-    line = await self._proc.stdout.readline()
-    if line is not None:
-      sline = line.decode().rstrip()
-      match = service_listening.match(sline)
-      if match:
-        self._log.debug("Compiler service is running: %s", sline)
-        self._internal_service = "localhost:" + match.group(1)
-        self._is_ready.set()
-      else:
-        self._log.debug("Compiler service NOT running: %s", sline)
+    service_errored = re.compile(r"^Error:.+$")
+    errored = False
+    empty_line_count = 0
+    timeout = datetime.now() + timedelta(0, _TIMEOUT_SECONDS)
+    while datetime.now() < timeout:
+      line = await self._proc.stdout.readline()
+      if line is not None:
+        sline = line.decode().rstrip()
+        match = service_listening.match(sline)
+        if match:
+          self._log.debug("Compiler service is running: %s", sline)
+          self._internal_service = "localhost:" + match.group(1)
+          self._is_ready.set()
+          break
+
+        if service_errored.match(sline):
+          errored = True
+
+        if errored:
+          self._log.error("Message from compiler process: %s", sline)
+        else:
+          self._log.debug("Message from compiler process: %s", sline)
+
+        if sline == "":
+          empty_line_count += 1
+        else:
+          empty_line_count = 0
+
+        if empty_line_count > 1:
+          break
+
+      elif errored:
+        break
+
+    if self._is_ready.is_set() is not True and errored is False:
+      self._log.error(
+          "Timeout or something unexpected happened starting the compiler.\n" +
+          "  Compiler service NOT running: %s", sline)
 
   def _kill_service(self):
     if self._proc is None:
