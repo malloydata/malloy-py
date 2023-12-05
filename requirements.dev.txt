@@ -170,7 +170,7 @@ jupyter-core==5.5.0
     #   nbformat
 jupyter-events==0.9.0
     # via jupyter-server
-jupyter-server==2.10.0
+jupyter-server==2.11.2
     # via
     #   jupyter-server-mathjax
     #   nbdime
