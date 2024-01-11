@@ -80,7 +80,7 @@ fqdn==1.5.1
     # via jsonschema
 gitdb==4.0.11
     # via gitpython
-gitpython==3.1.40
+gitpython==3.1.41
     # via nbdime
 google-api-core[grpc]==2.13.0
     # via
