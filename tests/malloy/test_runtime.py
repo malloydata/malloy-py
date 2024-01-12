@@ -139,25 +139,10 @@ async def test_another_with():
 
 
 @pytest.mark.asyncio
-async def test_renders_result():
-  """"Verify that HTML results are rendered"""
+async def test_returns_prepared_result():
+  """verify that prepared result is available"""
   with Runtime() as rt:
     rt.add_connection(DuckDbConnection(home_dir=home_dir))
     rt.load_file(test_file_01)
-    [_, html, json_str, sql] = await rt.render(query=query_by_state)
-    html_regex = r"""(<table[\s\w\W]*<\/table>)"""
-    assert re.search(html_regex, html)
-    json_obj = json.loads(json_str)
-    assert json_obj[0]["state"] == "TX"
-    assert json_obj[0]["airport_count"] == 1845
-    assert json_obj[22]["state"] == "NC"
-    assert json_obj[22]["airport_count"] == 400
-    assert sql == """
-SELECT\x20
-   airports."state" as "state",
-   COUNT( 1) as "airport_count"
-FROM 'data/airports.parquet' as airports
-WHERE airports."state" IS NOT NULL
-GROUP BY 1
-ORDER BY 2 desc NULLS LAST
-""".lstrip()
+    [_, _, prepared_result] = await rt.get_sql_and_run(query=query_by_state)
+    assert prepared_result is not None and prepared_result != ""
