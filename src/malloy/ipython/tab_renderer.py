@@ -161,7 +161,7 @@ html_body = '''
     </div>
   </div>
   <div class="result-middle tabset-{rand}" data-result-kind="html" id="HTML-{rand}">
-    <div class="result-inner" id="HTML-{rand}-inner">
+    <div class="result-inner" id="{result_div}">
     </div>
   </div>
   <div class="result-middle tabset-{rand}" data-result-kind="json" id="JSON-{rand}" >
@@ -183,7 +183,10 @@ def render_results_tab(result_json: str, total_rows: int, prepared_result: str,
   # Separate each result set with a random id.
   random_id = str(random.randrange(100, 999))
   result_div = "HTML-" + random_id + "-inner"
-  tabbed_html = html_body.format(rand=random_id, json=result_json, sql=sql)
+  tabbed_html = html_body.format(rand=random_id,
+                                 json=result_json,
+                                 sql=sql,
+                                 result_div=result_div)
   return css + tabbed_html + tabbed_html_js.replace(
       "{rand}", random_id) + bundled_renderer_js.format(
           result=result_json,
