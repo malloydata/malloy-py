@@ -185,7 +185,7 @@ def render_results_tab(result_json: str, total_rows: int, prepared_result: str,
   result_div = "HTML-" + random_id + "-inner"
   tabbed_html = html_body.format(rand=random_id, json=result_json, sql=sql)
   return css + tabbed_html + tabbed_html_js.replace(
-      '{rand}', random_id) + bundled_renderer_js.format(
+      "{rand}", random_id) + bundled_renderer_js.format(
           result=result_json,
           prepared_result=prepared_result,
           result_div=result_div,
