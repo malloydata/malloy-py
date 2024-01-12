@@ -97,7 +97,7 @@ div.document .result-middle[data-result-kind="json"] pre {
 '''
 
 # JS block.
-js_script = '''
+tabbed_html_js = '''
 <script>
 function openTab_{rand}(evt, tabName) {
   var i, tabcontent, tablinks, cur_tabset, cur_tablinks;
@@ -130,6 +130,24 @@ document.getElementById("defaultOpen-{rand}").click();
 </script>
 '''
 
+# bundled renderer.
+bundled_renderer_js = '''<script>
+if (!window.renderMalloyResults) {{
+  var script = document.createElement('script');
+  script.src = 'assets/js/bundled_renderer.js';
+  document.head.appendChild(script);
+}}
+var result = JSON.parse(`{result}`);
+var preparedResult = JSON.parse({prepared_result});
+var resultElementId = `{result_div}`
+var resultEle = document.getElementById(resultElementId);
+renderMalloyResults(result, {total_rows}, preparedResult).then(
+  function(malloyResEle) {{
+    resultEle.appendChild(malloyResEle);
+    }});
+</script>
+'''
+
 # Tabbed result set.
 html_body = '''
 
@@ -143,8 +161,7 @@ html_body = '''
     </div>
   </div>
   <div class="result-middle tabset-{rand}" data-result-kind="html" id="HTML-{rand}">
-    <div class="result-inner">
-      {html}
+    <div class="result-inner" id="HTML-{rand}-inner">
     </div>
   </div>
   <div class="result-middle tabset-{rand}" data-result-kind="json" id="JSON-{rand}" >
@@ -161,9 +178,15 @@ html_body = '''
 '''
 
 
-def render_results_tab(html: str = '', json: str = '', sql: str = ''):
+def render_results_tab(result_json: str, total_rows: int, prepared_result: str,
+                       sql: str):
   # Separate each result set with a random id.
   random_id = str(random.randrange(100, 999))
-  return css + html_body.format(rand=random_id, html=html, json=json,
-                                sql=sql) + js_script.replace(
-                                    '{rand}', random_id)
+  result_div = "HTML-" + random_id + "-inner"
+  tabbed_html = html_body.format(rand=random_id, json=result_json, sql=sql)
+  return css + tabbed_html + tabbed_html_js.replace(
+      '{rand}', random_id) + bundled_renderer_js.format(
+          result=result_json,
+          prepared_result=prepared_result,
+          result_div=result_div,
+          total_rows=total_rows)

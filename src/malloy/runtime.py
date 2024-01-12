@@ -37,7 +37,7 @@ from malloy.data.connection_manager import ConnectionManagerInterface, DefaultCo
 from malloy.data.schema_cache import SchemaCache
 from malloy.service import ServiceManager
 from malloy.services.v1.compiler_pb2_grpc import CompilerStub
-from malloy.services.v1.compiler_pb2 import CompileRequest, CompileDocument, CompilerRequest, SqlBlockSchema, QueryResult
+from malloy.services.v1.compiler_pb2 import CompileRequest, CompileDocument, CompilerRequest, SqlBlockSchema
 
 
 class MalloyRuntimeError(Exception):
@@ -66,7 +66,6 @@ class Runtime():
     self._service_manager = service_manager
     self._was_entered = False
     self._schema_cache = SchemaCache()
-    self._service_mode = CompileRequest.Mode.COMPILE_AND_RENDER
     # Setting grpc max message size to 50mb.
     self._grpc_options = [("grpc.max_receive_message_length", 1024 * 1024 * 50)]
     self._log.debug("Runtime initialized")
@@ -109,13 +108,9 @@ class Runtime():
     return self
 
   async def get_sql(self, named_query: str = None, query: str = None):
-    self._service_mode = CompileRequest.Mode.COMPILE_ONLY
-    return await self.compile_and_maybe_execute(named_query=named_query,
-                                                query=query)
+    return await self.compile_malloy(named_query=named_query, query=query)
 
-  async def compile_and_maybe_execute(self,
-                                      named_query: str = None,
-                                      query: str = None):
+  async def compile_malloy(self, named_query: str = None, query: str = None):
     self._sql = None
     self._connection = None
     if named_query is None and query is None:
@@ -152,23 +147,14 @@ class Runtime():
     return [self._sql, self._connection]
 
   async def run(self, query: str = None, named_query: str = None):
-    self._service_mode = CompileRequest.Mode.COMPILE_ONLY
     [sql, connection_name] = await self.get_sql(query=query,
                                                 named_query=named_query)
     return self._run_sql(sql, connection_name)
 
   async def get_sql_and_run(self, query: str = None, named_query: str = None):
-    self._service_mode = CompileRequest.Mode.COMPILE_ONLY
     [sql, connection_name] = await self.get_sql(query=query,
                                                 named_query=named_query)
-    return [self._run_sql(sql, connection_name), sql]
-
-  async def render(self, query: str = None, named_query: str = None):
-    self._service_mode = CompileRequest.Mode.COMPILE_AND_RENDER
-    await self.compile_and_maybe_execute(query=query, named_query=named_query)
-    return [
-        self._job_result, self._html_content, self._job_result_json, self._sql
-    ]
+    return [self._run_sql(sql, connection_name), sql, self._prepared_result]
 
   async def compile_model(self):
     service = await self._service_manager.get_service()
@@ -259,12 +245,6 @@ class Runtime():
         self._last_response = None
         return request
 
-      if self._last_response.type == CompilerRequest.Type.RUN:
-        self._log.debug("  generating run sql request")
-        request = self._generate_results_request()
-        self._last_response = None
-        return request
-
     except Exception as ex:
       self._log.error(ex)
       self._compile_completed.set()
@@ -279,9 +259,7 @@ class Runtime():
     self._first_request_sent = False
     self._seen_responses = []
     self._last_response = None
-    self._job_result = None
-    self._job_result_json = None
-    self._html_content = None
+    self._prepared_result = None
     self._sql = None
     self._problems = []
     if query is not None:
@@ -298,12 +276,10 @@ class Runtime():
     self._log.debug("Generating initial compile request")
     if self._is_file:
       compile_request = CompileRequest(type=CompileRequest.Type.COMPILE,
-                                       mode=self._service_mode,
                                        document=self._create_document(
                                            self._file_name))
     else:
       compile_request = CompileRequest(type=CompileRequest.Type.COMPILE,
-                                       mode=self._service_mode,
                                        document=self._create_document(
                                            self._file_name, internal=True))
     if self._query_type == "query":
@@ -378,19 +354,6 @@ class Runtime():
     self._log.debug(request)
     return request
 
-  def _generate_results_request(self):
-    self._log.debug(self._last_response.sql_block.sql)
-    connection_name = self._last_response.connection
-    sql = self._last_response.content
-    query_result = self._run_sql(sql, connection_name)
-    self._job_result = query_result.to_dataframe()
-    self._job_result_json = self._job_result.to_json(orient="records", indent=2)
-    self._log.debug("Sending results to service.")
-    return CompileRequest(type=CompileRequest.Type.RESULTS,
-                          query_result=QueryResult(data=self._job_result_json,
-                                                   total_rows=len(
-                                                       self._job_result.index)))
-
   def _generate_sql_block_schemas_request(self):
     # Compiler should really be telling us which connection to use per table...
     self._log.debug(self._last_response.sql_block.sql)
@@ -447,7 +410,7 @@ class Runtime():
 
     if self._last_response.type == CompilerRequest.Type.COMPLETE:
       self._log.debug("Received compile COMPLETE, ending session")
-      self._html_content = self._last_response.render_content
+      self._prepared_result = self._last_response.prepared_result
       self._sql = self._last_response.content
       self._connection = self._last_response.connection
       self._problems = self._parse_last_response_problems()
