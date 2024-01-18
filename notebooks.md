@@ -41,6 +41,17 @@ run: titles -> {
 }
 ```
 
+Here, the query cell is referring to a model that is declared as `imdb` in the model cell above.
+If you would like to save the query results to a variable (for ex: `result_var`), mention the variable name next to the model name:
+
+```sh
+%%malloy_query imdb result_var
+run: titles -> {
+  # link
+  group_by: movie_url
+  limit: 2
+}
+```
 
 ## Malloy Service path
 
