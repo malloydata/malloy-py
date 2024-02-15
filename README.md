@@ -29,7 +29,7 @@ python3 -m pip install malloy
 
 ## Syntax Examples
 
-Run named query from malloy file:
+### Run a named query from a Malloy file
 
 ```python
 import asyncio
@@ -42,27 +42,23 @@ async def main():
   with malloy.Runtime() as runtime:
     runtime.add_connection(DuckDbConnection(home_dir=home_dir))
 
-    data = await runtime.load_file(home_dir + "/5_movie_complex.malloy").run(
-        named_query="horror_combo")
+    data = await runtime.load_file(home_dir + "/imdb.malloy").run(
+        named_query="genre_movie_map")
 
-    dataframe = data.df()
+    dataframe = data.to_dataframe()
     print(dataframe)
-
 
 if __name__ == "__main__":
   asyncio.run(main())
-
-
 ```
 
-Get SQL from inline query using malloy file as source:
+### Get SQL from an in-line query, using a Malloy file as a source
 
 ```python
 import asyncio
 
 import malloy
 from malloy.data.duckdb import DuckDbConnection
-
 
 async def main():
   home_dir = "/path/to/samples/duckdb/faa"
@@ -71,7 +67,7 @@ async def main():
 
     [sql, connection
     ] = await runtime.load_file(home_dir + "/flights.malloy").get_sql(query="""
-                  query: flights -> {
+                  run: flights -> {
                     where: carrier ? 'WN' | 'DL', dep_time ? @2002-03-03
                     group_by:
                       flight_date is dep_time.day
@@ -80,7 +76,7 @@ async def main():
                       daily_flight_count is flight_count
                       aircraft.aircraft_count
                     nest: per_plane_data is {
-                      top: 20
+                      limit: 20
                       group_by: tail_num
                       aggregate: plane_flight_count is flight_count
                       nest: flight_legs is {
@@ -99,14 +95,11 @@ async def main():
 
     print(sql)
 
-
 if __name__ == "__main__":
   asyncio.run(main())
-
-
 ```
 
-Write inline malloy model source and run query:
+### Write an in-line Malloy model, and run a query
 
 ```python
 import asyncio
@@ -116,28 +109,67 @@ from malloy.data.duckdb import DuckDbConnection
 
 
 async def main():
-  home_dir = "/path/to/samples/duckdb/auto_recalls"
+  home_dir = "/path/to/samples/duckdb/imdb/data"
   with malloy.Runtime() as runtime:
     runtime.add_connection(DuckDbConnection(home_dir=home_dir))
 
     data = await runtime.load_source("""
-        source: auto_recalls is table('duckdb:auto_recalls.csv') {
-          declare:
-            recall_count is count()
-            percent_of_recalls is recall_count/all(recall_count)*100
+        source:titles is duckdb.table('titles.parquet') extend {
+          primary_key: tconst
+          dimension:
+            movie_url is concat('https://www.imdb.com/title/',tconst)
         }
         """).run(query="""
-        query: auto_recalls -> {
-          group_by: Manufacturer
-          aggregate:
-            recall_count
-            percent_of_recalls
+        run: titles -> {
+          group_by: movie_url
+          limit: 5
         }
         """)
 
-    dataframe = data.df()
+    dataframe = data.to_dataframe()
     print(dataframe)
 
+
+if __name__ == "__main__":
+  asyncio.run(main())
+  
+```
+
+### Querying BigQuary tables
+
+BigQuery auth via OAuth using gcloud.
+```
+gcloud auth login --update-adc
+gcloud config set project {my_project_id} --installation
+```
+
+Actual usage is similar to DuckDB.
+
+```python
+import asyncio
+import malloy
+from malloy.data.bigquery import BigQueryConnection
+
+async def main():
+  with malloy.Runtime() as runtime:
+    runtime.add_connection(BigQueryConnection())
+
+    data = await runtime.load_source("""
+        source:ga_sessions is bigquery.table('bigquery-public-data.google_analytics_sample.ga_sessions_20170801') extend {
+          measure:
+            hits_count is hits.count()
+        }
+        """).run(query="""
+        run: ga_sessions -> {
+            where: trafficSource.`source` != '(direct)'
+            group_by: trafficSource.`source`
+            aggregate: hits_count
+            limit: 10
+          }
+        """)
+
+    dataframe = data.to_dataframe()
+    print(dataframe)
 
 if __name__ == "__main__":
   asyncio.run(main())
