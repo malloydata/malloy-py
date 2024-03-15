@@ -38,7 +38,7 @@ PROJECT_URLS = [
      "https://github.com/googleapis/python-api-common-protos"),
     ("https://github.com/googleapis/proto-plus-python.git",
      "https://github.com/googleapis/proto-plus-python"),
-    ("http://github.com/minrk/appnope", "https://github.com/minrk/appnope")
+    ("http://github.com/minrk/appnope", "https://github.com/minrk/appnope"),
 ]
 
 
