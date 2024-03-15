@@ -24,7 +24,7 @@ python3 -m pip install malloy
 
 ## Join The Community
 
-- Join our [Malloy Slack Community!](https://join.slack.com/t/malloy-community/shared_invite/zt-upi18gic-W2saeFu~VfaVM1~HIerJ7w) Use this community to ask questions, meet other Malloy users, and share ideas with one another.
+- Join our [Malloy Slack Community!](https://malloydata.github.io/slack) Use this community to ask questions, meet other Malloy users, and share ideas with one another.
 - Use [GitHub issues](https://github.com/looker-open-source/malloy/issues) to provide feedback, suggest improvements, report bugs, and start new discussions.
 
 ## Syntax Examples
