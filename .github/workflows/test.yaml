@@ -1,0 +1,40 @@
+name: Test
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+      - name: Use Python ${{ matrix.node-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Install and test
+        run: |
+          python3 -m pip install --upgrade pip --user
+          python3 -m pip install pip-tools --user
+          python3 -m pip install -r requirements.dev.txt --user
+          python3 -m pip install -e . --user
+          python3 -m pylint src tests
+          python3 -m yapf --diff --recursive src tests
+          ./scripts/gen-services.sh
+          mkdir .snowflake
+          echo [default]\\naccount = "$SNOWFLAKE_ACCOUNT"\\nuser = "$SNOWFLAKE_USER"\\npassword = "$SNOWFLAKE_PASSWORD"\\nwarehouse="$SNOWFLAKE_WAREHOUSE"\\ndatabase="$SNOWFLAKE_DATABASE"\\nschema="$SNOWFLAKE_SCHEMA"
+          python3 -m pytest --junitxml=junit/test-results.xml -rxXs
+        env:
+          CI: true
+          SNOWFLAKE_ACCOUNT: pt58362-rx92781
+          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+          SNOWFLAKE_WAREHOUSE: LOOKER_WH
+          SNOWFLAKE_DATABASE: MALLOYTEST
+          SNOWFLAKE_SCHEMA: PUBLIC
