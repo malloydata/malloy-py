@@ -27,8 +27,7 @@ jobs:
           python3 -m pylint src tests
           python3 -m yapf --diff --recursive src tests
           ./scripts/gen-services.sh
-          mkdir .snowflake
-          echo [default]\\naccount = "$SNOWFLAKE_ACCOUNT"\\nuser = "$SNOWFLAKE_USER"\\npassword = "$SNOWFLAKE_PASSWORD"\\nwarehouse="$SNOWFLAKE_WAREHOUSE"\\ndatabase="$SNOWFLAKE_DATABASE"\\nschema="$SNOWFLAKE_SCHEMA"
+          ./scripts/gen-snowflake-auth.sh
           python3 -m pytest --junitxml=junit/test-results.xml -rxXs
         env:
           CI: true
