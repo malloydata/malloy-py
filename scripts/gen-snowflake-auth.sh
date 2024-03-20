@@ -11,3 +11,4 @@ database="$SNOWFLAKE_DATABASE"
 schema="$SNOWFLAKE_SCHEMA"
 SNOWFLAKE
 ) > $HOME/.snowflake/connections.toml
+chmod 0600 $HOME/.snowflake/connections.toml
