@@ -23,6 +23,8 @@
 """Test runtime.py"""
 
 import asyncio
+import json
+import re
 import pytest
 import pytest_asyncio
 
@@ -31,11 +33,13 @@ from pathlib import Path
 from malloy import Runtime
 from malloy.service import ServiceManager
 from malloy.data.duckdb import DuckDbConnection
+from malloy.data.snowflake import SnowflakeConnection
+from snowflake.connector import Error as SnowflakeError
 
 pytestmark = pytest.mark.skipif(
     not Path(ServiceManager.service_path()).exists(),
     reason=f"Could not find: {ServiceManager.service_path()}",
-    allow_module_level=True)
+)
 
 logging.set_verbosity(logging.ERROR)
 
@@ -84,7 +88,7 @@ async def test_returns_sql(service_manager):
   rt.add_connection(DuckDbConnection(home_dir=home_dir))
   rt.load_file(test_file_01)
   [sql, connection] = await rt.get_sql(query=query_by_state)
-  assert sql == """
+  assert (sql == """
 SELECT\x20
    airports."state" as "state",
    COUNT(1) as "airport_count"
@@ -92,7 +96,7 @@ FROM 'data/airports.parquet' as airports
 WHERE airports."state" IS NOT NULL
 GROUP BY 1
 ORDER BY 2 desc NULLS LAST
-""".lstrip()
+""".lstrip())
   assert connection == "duckdb"
 
 
@@ -144,3 +148,58 @@ async def test_returns_prepared_result():
     rt.load_file(test_file_01)
     [_, _, prepared_result] = await rt.get_sql_and_run(query=query_by_state)
     assert prepared_result is not None and prepared_result != ""
+
+
+def ensure_snowflake_connectable(conn: SnowflakeConnection):
+  try:
+    _ = conn.get_connection()
+  except SnowflakeError:
+    return False
+  return True
+
+
+@pytest.mark.asyncio
+async def test_basic_snowflake_malloy_source():
+  conn = SnowflakeConnection()
+  if not ensure_snowflake_connectable(conn):
+    return
+
+  query_by_faa_region = """
+run: airports -> {
+    where: faa_region != null
+    group_by: faa_region
+    aggregate: airport_count
+}"""
+  with Runtime() as rt:
+    rt.add_connection(conn)
+    test_file_snowflake = f"{home_dir}/test_file_snowflake.malloy"
+    rt.load_file(test_file_snowflake)
+    data = await rt.run(query=query_by_faa_region)
+    df_data = data.to_dataframe()
+    assert len(df_data) == 9
+    assert df_data["faa_region"][0] == "AGL"
+    assert df_data["airport_count"][0] == 4437
+
+
+@pytest.mark.asyncio
+async def test_basic_snowflake_sql_source():
+  conn = SnowflakeConnection()
+  if not ensure_snowflake_connectable(conn):
+    return
+
+  query_by_faa_region = """
+run: airports -> {
+    where: faa_region != null
+    aggregate: airport_count is count()
+    group_by: faa_region
+}"""
+  with Runtime() as rt:
+    rt.add_connection(conn)
+    rt.load_source(
+        "source: airports is snowflake.sql('select * from malloytest.airports')"
+    )
+    data = await rt.run(query=query_by_faa_region)
+    df_data = data.to_dataframe()
+    assert len(df_data) == 9
+    assert df_data["faa_region"][0] == "AGL"
+    assert df_data["airport_count"][0] == 4437

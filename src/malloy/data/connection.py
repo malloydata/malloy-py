@@ -23,11 +23,12 @@
 """An object capable of returning data needed for compiling a malloy source."""
 import abc
 from collections.abc import Sequence
+from typing import Tuple
 from malloy.data.query_results import QueryResultsInterface
 
 
 class ConnectionInterface(metaclass=abc.ABCMeta):
-  """Basic definition of a Malloy connection interface. """
+  """Basic definition of a Malloy connection interface."""
 
   @classmethod
   def __subclasshook__(cls, subclass):
@@ -39,11 +40,11 @@ class ConnectionInterface(metaclass=abc.ABCMeta):
             callable(subclass.get_schema_for_sql_block))
 
   @abc.abstractmethod
-  def get_name(self, sql: str):
+  def get_name(self):
     raise NotImplementedError
 
   @abc.abstractmethod
-  def get_schema_for_tables(self, tables: Sequence[(str, str)]):
+  def get_schema_for_tables(self, tables: Sequence[Tuple[str, str]]):
     raise NotImplementedError
 
   @abc.abstractmethod

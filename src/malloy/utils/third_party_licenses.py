@@ -61,6 +61,16 @@ SPECIAL_CASES = {
     'idna': {
         METADATA_LICENSE_FILE: 'LICENSE'
     },
+    'jupyterlab-pygments': {
+        METADATA_NAME: 'jupyterlab_pygments',
+        METADATA_URL: 'https://github.com/jupyterlab/jupyterlab_pygments',
+        METADATA_LICENSE_FILE: 'LICENSE'
+    },
+    'prometheus-client': {
+        METADATA_NAME: 'prometheus_client',
+        METADATA_URL: 'https://github.com/prometheus/client_python',
+        METADATA_LICENSE_FILE: 'LICENSE'
+    },
     'pyparsing': {
         METADATA_LICENSE_FILE: 'LICENSE'
     },
@@ -128,6 +138,11 @@ SPECIAL_CASES = {
     },
     'pytest-notebook': {
         METADATA_NAME: 'pytest_notebook'
+    },
+    'readme-renderer': {
+        METADATA_NAME: 'readme_renderer',
+        METADATA_URL: 'https://github.com/pypa/readme_renderer',
+        METADATA_LICENSE_FILE: 'LICENSE',
     },
     'requests-toolbelt': {
         METADATA_LICENSE_FILE: 'LICENSE',
