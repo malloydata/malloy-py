@@ -18,6 +18,10 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.9'
+      - name: GCloud auth
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.BIGQUERY_KEY }}'
       - name: Install and test
         run: |
           python3 -m pip install --upgrade pip --user
