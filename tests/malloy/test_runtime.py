@@ -87,7 +87,7 @@ async def test_returns_sql(service_manager):
   assert sql == """
 SELECT\x20
    airports."state" as "state",
-   COUNT( 1) as "airport_count"
+   COUNT(1) as "airport_count"
 FROM 'data/airports.parquet' as airports
 WHERE airports."state" IS NOT NULL
 GROUP BY 1
