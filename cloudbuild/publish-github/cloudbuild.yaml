@@ -65,12 +65,7 @@ steps:
 
   - name: "ubuntu"
     id: "Snowflake Secrets"
-    env:
-    - 'SNOWFLAKE_ACCOUNT=pt58362-rx92781'
-    - 'SNOWFLAKE_WAREHOUSE=LOOKER_WH'
-    - 'SNOWFLAKE_DATABASE=MALLOYTEST'
-    - 'SNOWFLAKE_SCHEMA=PUBLIC'
-    secretEnv: ['SNOWFLAKE_USER', 'SNOWFLAKE_PASSWORD']
+    secretEnv: ['SNOWFLAKE_CONNECTION']
     entrypoint: "bash"
     args: ["./scripts/gen-snowflake-auth.sh"]
 
@@ -112,7 +107,5 @@ availableSecrets:
       env: 'GHAPI_PAT'
     - versionName: projects/malloy-303216/secrets/github-malloy-py/versions/latest
       env: 'GITHUB_SSH_KEY'
-    - versionName: projects/malloy-303216/secrets/snowflake-user/versions/latest
-      env: 'SNOWFLAKE_USER'
-    - versionName: projects/malloy-303216/secrets/snowflake-password/versions/latest
-      env: 'SNOWFLAKE_PASSWORD'
+    - versionName: projects/malloy-303216/secrets/snowflake-connection/versions/latest
+      env: 'SNOWFLAKE_CONNECTION'
