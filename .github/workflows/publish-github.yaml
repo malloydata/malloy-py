@@ -1,0 +1,50 @@
+name: Publish GitHub
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    uses: "./.github/workflows/test.yaml"
+    secrets:
+      SNOWFLAKE_CONNECTION: ${{ secrets.SNOWFLAKE_CONNECTION }}
+      BIGQUERY_KEY: ${{ secrets.BIGQUERY_KEY }}
+
+  publish-github:
+    needs:
+      - test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: "true"
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18.x"
+      - name: Use Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+      - name: Install
+        run: |
+          python3 -m pip install --upgrade pip --user
+          python3 -m pip install pip-tools --user
+          python3 -m pip install -r requirements.dev.txt --user
+          python3 -m pip install -e . --user
+      - name: Build
+        run: |
+          git config --global user.email "malloy-ci-bot@malloydata.org"
+          git config --global user.name "Malloy CI Bot"
+          python3 -m bumpver update --tag dev --allow-dirty
+          python3 -c 'import malloy; malloy.gen_requirements_file()'
+          python3 -m build
+      - name: Publish
+        run: |
+          python3 scripts/do-github-release.py
+    env:
+      CI: true
+      GHAPI_PAT: ${{ secrets.GHAPI_PAT }}

@@ -1,6 +1,13 @@
 name: Test
 
-on: [push]
+on:
+  pull_request:
+  workflow_call:
+    secrets:
+      BIGQUERY_KEY:
+        required: true
+      SNOWFLAKE_CONNECTION:
+        required: true
 
 jobs:
   test:
@@ -9,19 +16,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          submodules: 'true'
-      - name: Use Node.js ${{ matrix.node-version }}
+          submodules: "true"
+      - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
-      - name: Use Python ${{ matrix.node-version }}
+          node-version: "18.x"
+      - name: Use Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.9'
+          python-version: "3.9"
       - name: GCloud auth
-        uses: 'google-github-actions/auth@v2'
+        uses: "google-github-actions/auth@v2"
         with:
-          credentials_json: '${{ secrets.BIGQUERY_KEY }}'
+          credentials_json: "${{ secrets.BIGQUERY_KEY }}"
       - name: Install and test
         run: |
           python3 -m pip install --upgrade pip --user
