@@ -1,0 +1,52 @@
+name: Publish PyPI
+
+on: [workflow_dispatch]
+
+jobs:
+  test:
+    uses: "./.github/workflows/test.yaml"
+    secrets:
+      SNOWFLAKE_CONNECTION: ${{ secrets.SNOWFLAKE_CONNECTION }}
+      BIGQUERY_KEY: ${{ secrets.BIGQUERY_KEY }}
+
+  publish-pypi:
+    needs:
+      - test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: "true"
+          token: ${{ secrets.GHAPI_PAT }}
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18.x"
+      - name: Use Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+      - name: Install
+        run: |
+          python3 -m pip install --upgrade pip --user
+          python3 -m pip install pip-tools --user
+          python3 -m pip install -r requirements.dev.txt --user
+          python3 -m pip install -e . --user
+      - name: Build
+        run: |
+          git config --global user.email "malloy-ci-bot@malloydata.org"
+          git config --global user.name "Malloy CI Bot"
+          python3 -m bumpver update --tag final --allow-dirty
+          python3 -c 'import malloy; malloy.gen_requirements_file()'
+          python3 -m build
+      - name: Publish GitHub
+        run: |
+          python3 scripts/do-github-release.py
+      - name: Publish PyPI
+        run: |
+          python3 -m twine upload -r pypi -u __token__ -p $PYPI_TOKEN --verbose --disable-progress-bar dist/*
+    env:
+      CI: true
+      GHAPI_PAT: ${{ secrets.GHAPI_PAT }}
+      PYPY_TOKEN: ${{ secrets.PYPI_TOKEN }}
