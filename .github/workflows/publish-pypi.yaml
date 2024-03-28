@@ -1,4 +1,4 @@
-name: Publish GitHub
+name: Publish PyPI
 
 on: [workflow_dispatch]
 
@@ -9,7 +9,7 @@ jobs:
       SNOWFLAKE_CONNECTION: ${{ secrets.SNOWFLAKE_CONNECTION }}
       BIGQUERY_KEY: ${{ secrets.BIGQUERY_KEY }}
 
-  publish-github:
+  publish-pypi:
     needs:
       - test
     runs-on: ubuntu-latest
