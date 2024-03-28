@@ -4,7 +4,9 @@ on:
   push:
     branches:
       - main
-
+    paths-ignore:
+      - "**/pyproject.toml"
+      - "**/src/malloy/__init__.py"
 jobs:
   test:
     uses: "./.github/workflows/test.yaml"
