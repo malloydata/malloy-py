@@ -49,4 +49,4 @@ jobs:
     env:
       CI: true
       GHAPI_PAT: ${{ secrets.GHAPI_PAT }}
-      PYPY_TOKEN: ${{ secrets.PYPI_TOKEN }}
+      PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
