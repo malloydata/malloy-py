@@ -89,7 +89,7 @@ python-dateutil==2.9.0.post0
     # via google-cloud-bigquery
 pytz==2024.1
     # via snowflake-connector-python
-requests==2.31.0
+requests==2.32.0
     # via
     #   google-api-core
     #   google-cloud-bigquery
