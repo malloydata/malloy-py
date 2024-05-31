@@ -359,7 +359,7 @@ referencing==0.34.0
     #   jsonschema
     #   jsonschema-specifications
     #   jupyter-events
-requests==2.31.0
+requests==2.32.2
     # via
     #   google-api-core
     #   google-cloud-bigquery
