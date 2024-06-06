@@ -429,7 +429,7 @@ tomlkit==0.12.4
     # via
     #   pylint
     #   snowflake-connector-python
-tornado==6.4
+tornado==6.4.1
     # via
     #   ipykernel
     #   jupyter-client
