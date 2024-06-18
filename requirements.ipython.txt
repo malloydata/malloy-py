@@ -355,7 +355,7 @@ typing-extensions==4.10.0
     #   snowflake-connector-python
 uri-template==1.3.0
     # via jsonschema
-urllib3==1.26.18
+urllib3==1.26.19
     # via
     #   requests
     #   snowflake-connector-python
