@@ -10,7 +10,7 @@ asn1crypto==1.5.1
     # via snowflake-connector-python
 cachetools==5.3.3
     # via google-auth
-certifi==2024.2.2
+certifi==2024.7.4
     # via
     #   requests
     #   snowflake-connector-python

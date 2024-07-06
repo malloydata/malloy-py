@@ -37,7 +37,7 @@ bumpver==2023.1129
     # via malloy (pyproject.toml)
 cachetools==5.3.3
     # via google-auth
-certifi==2024.2.2
+certifi==2024.7.4
     # via
     #   requests
     #   snowflake-connector-python
