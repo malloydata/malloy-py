@@ -84,6 +84,9 @@ SPECIAL_CASES = {
     'grpcio-tools': {
         METADATA_LICENSE_FILE: 'LICENSE'
     },
+    'jinja2': {
+        METADATA_LICENSE_FILE: 'LICENSE.txt'
+    },
     'jaraco-classes': {
         METADATA_NAME: 'jaraco.classes'
     },
@@ -114,6 +117,9 @@ SPECIAL_CASES = {
     },
     'markdown-it-py': {
         METADATA_LICENSE_FILE: 'LICENSE'
+    },
+    'markupsafe': {
+        METADATA_LICENSE_FILE: 'LICENSE.txt'
     },
     'more-itertools': {
         METADATA_LICENSE_FILE: 'LICENSE'
