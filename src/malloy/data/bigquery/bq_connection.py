@@ -143,7 +143,7 @@ class BigQueryConnection(ConnectionInterface):
         },
         "structRelationship": {
             "type": "nested",
-            "field": name,
+            "fieldName": name,
             "isArray": False
         } if mode == "REPEATED" else {
             "type": "inline"
@@ -167,7 +167,7 @@ class BigQueryConnection(ConnectionInterface):
       elif metadata.field_type in self.TYPE_MAP:
         field |= self.TYPE_MAP[metadata.field_type]
       else:
-        field["type"] = "unsupported"
+        field["type"] = "sql native"
         field["rawType"] = metadata.field_type.lower()
       fields.append(field)
 
@@ -191,7 +191,7 @@ class BigQueryConnection(ConnectionInterface):
       elif schema_field["type"] in self.TYPE_MAP:
         field |= self.TYPE_MAP[schema_field["type"]]
       else:
-        field["type"] = "unsupported"
+        field["type"] = "sql native"
         field["rawType"] = schema_field["type"].lower()
       fields.append(field)
 
