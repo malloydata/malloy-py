@@ -173,10 +173,8 @@ SPECIAL_CASES = {
         METADATA_NAME: 'typing_extensions'
     },
     'uri-template': {
-        METADATA_URL:
-            'https://github.com/plinss/uri-template',
-        METADATA_LICENSE_FILE:
-            'LICENSE'
+        METADATA_URL: 'https://github.com/plinss/uri-template',
+        METADATA_LICENSE_FILE: 'LICENSE'
     },
     'webencodings': {
         METADATA_LICENSE_FILE: 'LICENSE'
