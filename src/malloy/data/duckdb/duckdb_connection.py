@@ -184,7 +184,7 @@ class DuckDbConnection(ConnectionInterface):
             },
             "structRelationship": {
                 "type": "nested" if is_array else "inline",
-                "field": name,
+                "fieldName": name,
                 "isArray": False,
             },
             "fields": self._map_fields(sub_schema),
@@ -205,7 +205,7 @@ class DuckDbConnection(ConnectionInterface):
               },
               "structRelationship": {
                   "type": "nested",
-                  "field": name,
+                  "fieldName": name,
                   "isArray": True,
               },
               "fields": [{

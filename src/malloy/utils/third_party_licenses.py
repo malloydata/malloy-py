@@ -84,6 +84,9 @@ SPECIAL_CASES = {
     'grpcio-tools': {
         METADATA_LICENSE_FILE: 'LICENSE'
     },
+    'jinja2': {
+        METADATA_LICENSE_FILE: 'LICENSE.txt'
+    },
     'jaraco-classes': {
         METADATA_NAME: 'jaraco.classes'
     },
@@ -114,6 +117,9 @@ SPECIAL_CASES = {
     },
     'markdown-it-py': {
         METADATA_LICENSE_FILE: 'LICENSE'
+    },
+    'markupsafe': {
+        METADATA_LICENSE_FILE: 'LICENSE.txt'
     },
     'more-itertools': {
         METADATA_LICENSE_FILE: 'LICENSE'
@@ -167,10 +173,8 @@ SPECIAL_CASES = {
         METADATA_NAME: 'typing_extensions'
     },
     'uri-template': {
-        METADATA_URL:
-            'https://gitlab.linss.com/open-source/python/uri-template/-',
-        METADATA_LICENSE_FILE:
-            'LICENSE'
+        METADATA_URL: 'https://github.com/plinss/uri-template',
+        METADATA_LICENSE_FILE: 'LICENSE'
     },
     'webencodings': {
         METADATA_LICENSE_FILE: 'LICENSE'

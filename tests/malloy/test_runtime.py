@@ -90,10 +90,10 @@ async def test_returns_sql(service_manager):
   [sql, connection] = await rt.get_sql(query=query_by_state)
   assert (sql == """
 SELECT\x20
-   airports."state" as "state",
+   base."state" as "state",
    COUNT(1) as "airport_count"
-FROM 'data/airports.parquet' as airports
-WHERE airports."state" IS NOT NULL
+FROM 'data/airports.parquet' as base
+WHERE base."state" IS NOT NULL
 GROUP BY 1
 ORDER BY 2 desc NULLS LAST
 """.lstrip())
