@@ -174,7 +174,7 @@ SPECIAL_CASES = {
     },
     'uri-template': {
         METADATA_URL:
-            'https://gitlab.linss.com/open-source/python/uri-template/-',
+            'https://github.com/plinss/uri-template',
         METADATA_LICENSE_FILE:
             'LICENSE'
     },
