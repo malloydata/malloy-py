@@ -196,7 +196,7 @@ def render_results_tab(result_json: str, total_rows: int, prepared_result: str,
   random_id = str(random.randrange(100, 999))
 
   # Set static id when running under tests
-  if os.environ.get('PYTEST_VERSION') is not None:
+  if os.environ.get("PYTEST_VERSION") is not None:
     random_id = "423"
 
   result_div = "HTML-" + random_id + "-inner"

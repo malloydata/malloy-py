@@ -374,9 +374,11 @@ def validate_data(requirements):
           f'ERROR: Licence type not classified for {key}\n  {requirements[key]}'
       )
 
-  # Python dependencies are not packaged/distributed by us, re-add check if this changes
-  # if issue_found:
-  #   raise AssertionError('ERROR: License data validation failed')
+  if issue_found:
+    # Python dependencies are not packaged/distributed by us
+    # re-add failure if this changes
+    #   raise AssertionError('ERROR: License data validation failed')
+    print('WARNING: issue(s) found with python license information')
 
 
 def gen_requirements_file(path=f'src/malloy/utils/{THIRD_PARTY_FILENAME}'):
