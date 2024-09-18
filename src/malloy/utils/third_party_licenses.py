@@ -393,8 +393,7 @@ def validate_data(requirements):
     if license_types is None or len(license_types) < 1:
       issue_found = True
       print(
-          f'WARN: Licence type not classified for {key}\n  {requirements[key]}'
-      )
+          f'WARN: Licence type not classified for {key}\n  {requirements[key]}')
 
   if issue_found:
     # Python dependencies are not packaged/distributed by us
