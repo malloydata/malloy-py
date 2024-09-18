@@ -21,6 +21,7 @@
 """Malloy IPython magics tabbed renderer."""
 
 import random
+import os
 
 # CSS block.
 css = '''
@@ -132,19 +133,30 @@ document.getElementById("defaultOpen-{rand}").click();
 
 # bundled renderer.
 bundled_renderer_js = '''<script>
-if (!window.renderMalloyResults) {{
-  var script = document.createElement('script');
-  script.src = 'assets/js/bundled_renderer.js';
+function renderResults() {{
+  var result = JSON.parse(`{result}`);
+  var preparedResult = JSON.parse({prepared_result});
+  var resultElementId = `{result_div}`
+  var resultEle = document.getElementById(resultElementId);
+  renderMalloyResults(result, {total_rows}, preparedResult).then(
+    function(malloyResEle) {{
+      resultEle.appendChild(malloyResEle);
+    }}
+  );
+}};
+
+var script = document.querySelector('#malloy-renderer-js');
+if (!script) {{
+  script = document.createElement('script');
+  script.id = 'malloy-renderer-js';
+  script.src = 'https://cdn.jsdelivr.net/npm/@malloydata/render@0.0.118/dist/bundle/bundled_renderer.min.js';
+  script.async = false;
+  script.addEventListener('load', renderResults);
   document.head.appendChild(script);
+}} else {{
+  renderResults();
 }}
-var result = JSON.parse(`{result}`);
-var preparedResult = JSON.parse({prepared_result});
-var resultElementId = `{result_div}`
-var resultEle = document.getElementById(resultElementId);
-renderMalloyResults(result, {total_rows}, preparedResult).then(
-  function(malloyResEle) {{
-    resultEle.appendChild(malloyResEle);
-    }});
+
 </script>
 '''
 
@@ -182,6 +194,11 @@ def render_results_tab(result_json: str, total_rows: int, prepared_result: str,
                        sql: str):
   # Separate each result set with a random id.
   random_id = str(random.randrange(100, 999))
+
+  # Set static id when running under tests
+  if os.environ.get("PYTEST_VERSION") is not None:
+    random_id = "382"
+
   result_div = "HTML-" + random_id + "-inner"
   tabbed_html = html_body.format(rand=random_id,
                                  json=result_json,

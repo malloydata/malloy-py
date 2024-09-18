@@ -6,7 +6,7 @@
 #
 absl-py==2.1.0
     # via malloy (pyproject.toml)
-anyio==4.3.0
+anyio==4.4.0
     # via jupyter-server
 appnope==0.1.4
     # via ipykernel
@@ -18,7 +18,7 @@ arrow==1.3.0
     # via isoduration
 asn1crypto==1.5.1
     # via snowflake-connector-python
-astroid==3.1.0
+astroid==3.2.4
     # via pylint
 asttokens==2.4.1
     # via stack-data
@@ -27,21 +27,23 @@ attrs==22.2.0
     #   jsonschema
     #   pytest-notebook
     #   referencing
+backports-tarfile==1.2.0
+    # via jaraco-context
 beautifulsoup4==4.12.3
     # via nbconvert
 bleach==6.1.0
     # via nbconvert
-build==1.1.1
+build==1.2.2
     # via pip-tools
 bumpver==2023.1129
     # via malloy (pyproject.toml)
-cachetools==5.3.3
+cachetools==5.5.0
     # via google-auth
-certifi==2024.2.2
+certifi==2024.8.30
     # via
     #   requests
     #   snowflake-connector-python
-cffi==1.16.0
+cffi==1.17.1
     # via
     #   argon2-cffi-bindings
     #   cryptography
@@ -60,13 +62,13 @@ colorama==0.4.6
     #   nbdime
 comm==0.2.2
     # via ipykernel
-cryptography==42.0.5
+cryptography==43.0.1
     # via
     #   pyopenssl
     #   snowflake-connector-python
-db-dtypes==1.2.0
+db-dtypes==1.3.0
     # via malloy (pyproject.toml)
-debugpy==1.8.1
+debugpy==1.8.5
     # via ipykernel
 decorator==5.1.1
     # via ipython
@@ -74,59 +76,58 @@ defusedxml==0.7.1
     # via nbconvert
 dill==0.3.8
     # via pylint
-docutils==0.20.1
+docutils==0.21.2
     # via readme-renderer
-duckdb==0.10.1
+duckdb==1.1.0
     # via malloy (pyproject.toml)
-exceptiongroup==1.2.0
+exceptiongroup==1.2.2
     # via
     #   anyio
     #   ipython
     #   pytest
-executing==2.0.1
+executing==2.1.0
     # via stack-data
-fastjsonschema==2.19.1
+fastjsonschema==2.20.0
     # via nbformat
-filelock==3.13.1
+filelock==3.16.1
     # via snowflake-connector-python
 fqdn==1.5.1
     # via jsonschema
 gitdb==4.0.11
     # via gitpython
-gitpython==3.1.42
+gitpython==3.1.43
     # via nbdime
-google-api-core[grpc]==2.17.1
+google-api-core[grpc]==2.19.2
+    # via
+    #   google-cloud-bigquery
+    #   google-cloud-core
+google-auth==2.34.0
     # via
     #   google-api-core
     #   google-cloud-bigquery
     #   google-cloud-core
-google-auth==2.28.2
-    # via
-    #   google-api-core
-    #   google-cloud-bigquery
-    #   google-cloud-core
-google-cloud-bigquery==3.19.0
+google-cloud-bigquery==3.25.0
     # via malloy (pyproject.toml)
 google-cloud-core==2.4.1
     # via google-cloud-bigquery
-google-crc32c==1.5.0
+google-crc32c==1.6.0
     # via google-resumable-media
-google-resumable-media==2.7.0
+google-resumable-media==2.7.2
     # via google-cloud-bigquery
-googleapis-common-protos==1.63.0
+googleapis-common-protos==1.65.0
     # via
     #   google-api-core
     #   grpcio-status
-grpcio==1.62.1
+grpcio==1.66.1
     # via
     #   google-api-core
     #   grpcio-status
     #   grpcio-tools
-grpcio-status==1.62.1
+grpcio-status==1.66.1
     # via google-api-core
-grpcio-tools==1.62.1
+grpcio-tools==1.66.1
     # via malloy (pyproject.toml)
-idna==3.6
+idna==3.10
     # via
     #   anyio
     #   jsonschema
@@ -143,7 +144,7 @@ importlib-metadata==6.11.0
     #   yapf
 iniconfig==2.0.0
     # via pytest
-ipykernel==6.29.3
+ipykernel==6.29.5
     # via malloy (pyproject.toml)
 ipython==8.18.1
     # via
@@ -153,25 +154,29 @@ isoduration==20.11.0
     # via jsonschema
 isort==5.13.2
     # via pylint
-jaraco-classes==3.3.1
+jaraco-classes==3.4.0
+    # via keyring
+jaraco-context==6.0.1
+    # via keyring
+jaraco-functools==4.0.2
     # via keyring
 jedi==0.19.1
     # via ipython
-jinja2==3.1.3
+jinja2==3.1.4
     # via
     #   jupyter-server
     #   nbconvert
     #   nbdime
-jsonpointer==2.4
+jsonpointer==3.0.0
     # via jsonschema
-jsonschema[format-nongpl]==4.21.1
+jsonschema[format-nongpl]==4.23.0
     # via
     #   jupyter-events
     #   nbformat
     #   pytest-notebook
 jsonschema-specifications==2023.12.1
     # via jsonschema
-jupyter-client==8.6.1
+jupyter-client==8.6.3
     # via
     #   ipykernel
     #   jupyter-server
@@ -185,7 +190,7 @@ jupyter-core==5.7.2
     #   nbformat
 jupyter-events==0.10.0
     # via jupyter-server
-jupyter-server==2.13.0
+jupyter-server==2.14.2
     # via
     #   jupyter-server-mathjax
     #   nbdime
@@ -195,7 +200,7 @@ jupyter-server-terminals==0.5.3
     # via jupyter-server
 jupyterlab-pygments==0.3.0
     # via nbconvert
-keyring==24.3.1
+keyring==25.4.0
     # via twine
 lexid==2021.1006
     # via bumpver
@@ -207,7 +212,7 @@ markupsafe==2.1.5
     # via
     #   jinja2
     #   nbconvert
-matplotlib-inline==0.1.6
+matplotlib-inline==0.1.7
     # via
     #   ipykernel
     #   ipython
@@ -217,17 +222,19 @@ mdurl==0.1.2
     # via markdown-it-py
 mistune==3.0.2
     # via nbconvert
-more-itertools==10.2.0
-    # via jaraco-classes
+more-itertools==10.5.0
+    # via
+    #   jaraco-classes
+    #   jaraco-functools
 nbclient==0.5.13
     # via
     #   nbconvert
     #   pytest-notebook
-nbconvert==7.16.2
+nbconvert==7.16.4
     # via jupyter-server
-nbdime==4.0.1
+nbdime==4.0.2
     # via pytest-notebook
-nbformat==5.10.3
+nbformat==5.10.4
     # via
     #   jupyter-server
     #   nbclient
@@ -238,16 +245,16 @@ nest-asyncio==1.6.0
     # via
     #   ipykernel
     #   nbclient
-nh3==0.2.15
+nh3==0.2.18
     # via readme-renderer
-numpy==1.26.4
+numpy==2.0.2
     # via
     #   db-dtypes
     #   pandas
     #   pyarrow
 overrides==7.7.0
     # via jupyter-server
-packaging==24.0
+packaging==24.1
     # via
     #   build
     #   db-dtypes
@@ -257,13 +264,13 @@ packaging==24.0
     #   nbconvert
     #   pytest
     #   snowflake-connector-python
-pandas==2.2.1
+pandas==2.2.2
     # via
     #   db-dtypes
     #   malloy (pyproject.toml)
 pandocfilters==1.5.1
     # via nbconvert
-parso==0.8.3
+parso==0.8.4
     # via jedi
 pexpect==4.9.0
     # via ipython
@@ -271,65 +278,68 @@ pip-tools==7.4.1
     # via malloy (pyproject.toml)
 pkginfo==1.10.0
     # via twine
-platformdirs==3.11.0
+platformdirs==4.3.6
     # via
     #   jupyter-core
     #   pylint
     #   snowflake-connector-python
     #   yapf
-pluggy==1.4.0
+pluggy==1.5.0
     # via pytest
 prometheus-client==0.20.0
     # via jupyter-server
-prompt-toolkit==3.0.43
+prompt-toolkit==3.0.47
     # via ipython
-protobuf==4.25.3
+proto-plus==1.24.0
+    # via google-api-core
+protobuf==5.28.1
     # via
     #   google-api-core
     #   googleapis-common-protos
     #   grpcio-status
     #   grpcio-tools
-psutil==5.9.8
+    #   proto-plus
+psutil==6.0.0
     # via ipykernel
 ptyprocess==0.7.0
     # via
     #   pexpect
     #   terminado
-pure-eval==0.2.2
+pure-eval==0.2.3
     # via stack-data
-pyarrow==15.0.2
+pyarrow==17.0.0
     # via db-dtypes
-pyasn1==0.5.1
+pyasn1==0.6.1
     # via
     #   pyasn1-modules
     #   rsa
-pyasn1-modules==0.3.0
+pyasn1-modules==0.4.1
     # via google-auth
-pycparser==2.21
+pycparser==2.22
     # via cffi
-pygments==2.17.2
+pygments==2.18.0
     # via
     #   ipython
     #   nbconvert
     #   nbdime
     #   readme-renderer
     #   rich
-pyjwt==2.8.0
+pyjwt==2.9.0
     # via snowflake-connector-python
-pylint==3.1.0
+pylint==3.2.7
     # via malloy (pyproject.toml)
-pyopenssl==24.1.0
+pyopenssl==24.2.1
     # via snowflake-connector-python
-pyproject-hooks==1.0.0
+pyproject-hooks==1.1.0
     # via
     #   build
     #   pip-tools
-pytest==8.1.1
+pytest==8.3.3
     # via
     #   malloy (pyproject.toml)
     #   pytest-asyncio
     #   pytest-notebook
-pytest-asyncio==0.23.6
+pytest-asyncio==0.24.0
     # via malloy (pyproject.toml)
 pytest-notebook==0.10.0
     # via malloy (pyproject.toml)
@@ -341,25 +351,25 @@ python-dateutil==2.9.0.post0
     #   pandas
 python-json-logger==2.0.7
     # via jupyter-events
-pytz==2024.1
+pytz==2024.2
     # via
     #   pandas
     #   snowflake-connector-python
-pyyaml==6.0.1
+pyyaml==6.0.2
     # via jupyter-events
-pyzmq==25.1.2
+pyzmq==26.2.0
     # via
     #   ipykernel
     #   jupyter-client
     #   jupyter-server
-readme-renderer==43.0
+readme-renderer==44.0
     # via twine
-referencing==0.34.0
+referencing==0.35.1
     # via
     #   jsonschema
     #   jsonschema-specifications
     #   jupyter-events
-requests==2.31.0
+requests==2.32.3
     # via
     #   google-api-core
     #   google-cloud-bigquery
@@ -379,15 +389,15 @@ rfc3986-validator==0.1.1
     # via
     #   jsonschema
     #   jupyter-events
-rich==13.7.1
+rich==13.8.1
     # via twine
-rpds-py==0.18.0
+rpds-py==0.20.0
     # via
     #   jsonschema
     #   referencing
 rsa==4.9
     # via google-auth
-send2trash==1.8.2
+send2trash==1.8.3
     # via jupyter-server
 six==1.16.0
     # via
@@ -399,11 +409,11 @@ smmap==5.0.1
     # via gitdb
 sniffio==1.3.1
     # via anyio
-snowflake-connector-python==3.7.1
+snowflake-connector-python==3.12.2
     # via malloy (pyproject.toml)
 sortedcontainers==2.4.0
     # via snowflake-connector-python
-soupsieve==2.5
+soupsieve==2.6
     # via beautifulsoup4
 stack-data==0.6.3
     # via ipython
@@ -411,7 +421,7 @@ terminado==0.18.1
     # via
     #   jupyter-server
     #   jupyter-server-terminals
-tinycss2==1.2.1
+tinycss2==1.3.0
     # via nbconvert
 toml==0.10.2
     # via
@@ -422,21 +432,20 @@ tomli==2.0.1
     #   build
     #   pip-tools
     #   pylint
-    #   pyproject-hooks
     #   pytest
     #   yapf
-tomlkit==0.12.4
+tomlkit==0.13.2
     # via
     #   pylint
     #   snowflake-connector-python
-tornado==6.4
+tornado==6.4.1
     # via
     #   ipykernel
     #   jupyter-client
     #   jupyter-server
     #   nbdime
     #   terminado
-traitlets==5.14.2
+traitlets==5.14.3
     # via
     #   comm
     #   ipykernel
@@ -449,11 +458,11 @@ traitlets==5.14.2
     #   nbclient
     #   nbconvert
     #   nbformat
-twine==5.0.0
+twine==5.1.1
     # via malloy (pyproject.toml)
-types-python-dateutil==2.9.0.20240316
+types-python-dateutil==2.9.0.20240906
     # via arrow
-typing-extensions==4.10.0
+typing-extensions==4.12.2
     # via
     #   anyio
     #   astroid
@@ -464,26 +473,26 @@ tzdata==2024.1
     # via pandas
 uri-template==1.3.0
     # via jsonschema
-urllib3==1.26.18
+urllib3==1.26.20
     # via
     #   requests
     #   snowflake-connector-python
     #   twine
 wcwidth==0.2.13
     # via prompt-toolkit
-webcolors==1.13
+webcolors==24.8.0
     # via jsonschema
 webencodings==0.5.1
     # via
     #   bleach
     #   tinycss2
-websocket-client==1.7.0
+websocket-client==1.8.0
     # via jupyter-server
-wheel==0.43.0
+wheel==0.44.0
     # via pip-tools
 yapf==0.40.2
     # via malloy (pyproject.toml)
-zipp==3.18.1
+zipp==3.20.2
     # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:

@@ -375,7 +375,10 @@ def validate_data(requirements):
       )
 
   if issue_found:
-    raise AssertionError('ERROR: License data validation failed')
+    # Python dependencies are not packaged/distributed by us
+    # re-add failure if this changes
+    #   raise AssertionError('ERROR: License data validation failed')
+    print('WARNING: issue(s) found with python license information')
 
 
 def gen_requirements_file(path=f'src/malloy/utils/{THIRD_PARTY_FILENAME}'):
