@@ -52,6 +52,9 @@ SPECIAL_CASES = {
     'argon2-cffi-bindings': {
         METADATA_LICENSE_FILE: 'LICENSE'
     },
+    'backports-tarfile': {
+        METADATA_NAME: 'backports.tarfile'
+    },
     'docutils': {
         METADATA_LICENSE_FILE: 'COPYING.txt'
     },
@@ -89,6 +92,12 @@ SPECIAL_CASES = {
     },
     'jaraco-classes': {
         METADATA_NAME: 'jaraco.classes'
+    },
+    'jaraco-context': {
+        METADATA_NAME: 'jaraco.context'
+    },
+    'jaraco-functools': {
+        METADATA_NAME: 'jaraco.functools'
     },
     'jeepney': {
         METADATA_LICENSE_FILE: 'LICENSE'
@@ -139,11 +148,24 @@ SPECIAL_CASES = {
     'pickleshare': {
         METADATA_LICENSE_FILE: 'LICENSE'
     },
+    'prompt-toolkit': {
+        METADATA_NAME: 'prompt_toolkit'
+    },
+    'pure-eval': {
+        METADATA_NAME: 'pure_eval'
+    },
     'pyproject-hooks': {
-        METADATA_NAME: 'pyproject_hooks'
+        METADATA_NAME: 'pyproject_hooks',
+        METADATA_LICENSE_FILE: 'LICENSE'
+    },
+    'pyasn1-modules': {
+        METADATA_NAME: 'pyasn1_modules'
     },
     'pytest-notebook': {
         METADATA_NAME: 'pytest_notebook'
+    },
+    'pyzmq': {
+        METADATA_LICENSE_FILE: 'LICENSE.md'
     },
     'readme-renderer': {
         METADATA_NAME: 'readme_renderer',
@@ -192,7 +214,7 @@ def extract_project_url(raw_input):
   match = re.match('^(.+)?(https?:/(/[^/]+)(/[^/]+)(/[^/]+))/?(.+)?$',
                    raw_input)
   if match is None:
-    print(f'ERROR: failed to extract project url: {raw_input}')
+    print(f'WARN: failed to extract project url: {raw_input}')
     return None
   url = (f'https:/{match.group(3)}'
          f'{match.group(4)}{match.group(5).removesuffix(".git")}')
@@ -254,7 +276,7 @@ def find_license(req):
         license_txt = request.text
 
   if license_txt is None:
-    print(f'ERROR: License file not found: {req}')
+    print(f'WARN: License file not found: {req}')
 
   return license_txt
 
@@ -267,7 +289,7 @@ def get_metadata(req):
     # print('dist.metadata["Name"]=' + dist.metadata.get('Name'))
     dist_name = dist.metadata.get('Name')
     if dist_name is None:
-      print('Error: name not included in metadata')
+      print('WARN: name not included in metadata')
       continue
 
     dist_name = dist_name.lower()
@@ -320,7 +342,7 @@ def get_metadata(req):
         license_types.append(value)
 
   if not found:
-    print('Error: ' + req[METADATA_NAME] + ' not found')
+    print('WARN: ' + req[METADATA_NAME] + ' not found')
 
   req[METADATA_LICENSE_TYPES] = license_types
   return req
@@ -365,20 +387,20 @@ def validate_data(requirements):
   for key in requirements:
     if requirements[key].get(METADATA_LICENSE) is None:
       issue_found = True
-      print(f'ERROR: License not found for {key}\n  {requirements[key]}')
+      print(f'WARN: License not found for {key}\n  {requirements[key]}')
 
     license_types = requirements[key].get(METADATA_LICENSE_TYPES)
     if license_types is None or len(license_types) < 1:
       issue_found = True
       print(
-          f'ERROR: Licence type not classified for {key}\n  {requirements[key]}'
+          f'WARN: Licence type not classified for {key}\n  {requirements[key]}'
       )
 
   if issue_found:
     # Python dependencies are not packaged/distributed by us
     # re-add failure if this changes
     #   raise AssertionError('ERROR: License data validation failed')
-    print('WARNING: issue(s) found with python license information')
+    print('WARN: issue(s) found with python license information')
 
 
 def gen_requirements_file(path=f'src/malloy/utils/{THIRD_PARTY_FILENAME}'):
