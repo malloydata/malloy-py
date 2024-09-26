@@ -135,7 +135,7 @@ if __name__ == "__main__":
   
 ```
 
-### Querying BigQuary tables
+### Querying BigQuery tables
 
 BigQuery auth via OAuth using gcloud.
 ```
