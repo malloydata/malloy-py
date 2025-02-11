@@ -48,7 +48,7 @@ colorama==0.4.6
     # via nbdime
 comm==0.2.2
     # via ipykernel
-cryptography==43.0.1
+cryptography==44.0.1
     # via
     #   pyopenssl
     #   snowflake-connector-python
