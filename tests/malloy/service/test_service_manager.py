@@ -25,6 +25,7 @@
 import pytest
 import asyncio
 from pathlib import Path
+from unittest.mock import patch
 
 from malloy.service import ServiceManager
 
@@ -64,3 +65,21 @@ async def test_returns_external_service_if_provided():
 def test_shutdown_does_not_throw_if_no_proc_started():
   sm = ServiceManager()
   sm.shutdown()
+
+
+@pytest.mark.parametrize("system,machine,expected_suffix", [
+    ("Windows", "x86_64", "-win-x64.exe"),
+    ("Windows", "AMD64", "-win-x64.exe"),
+    ("Linux", "x86_64", "-linux-x64"),
+    ("Linux", "arm64", "-linux-arm64"),
+    ("Linux", "aarch64", "-linux-arm64"),
+    ("Darwin", "x86_64", "-macos-x64"),
+    ("Darwin", "arm64", "-macos-arm64"),  # Apple Silicon
+])
+def test_service_path_for_platform_and_arch(system, machine, expected_suffix):
+  """Test service_path for different platforms and architectures."""
+  with patch("platform.system", return_value=system):
+    with patch("platform.machine", return_value=machine):
+      path = ServiceManager.service_path()
+      assert path.endswith(expected_suffix), \
+          f"Expected path to end with {expected_suffix} but got {path}"
